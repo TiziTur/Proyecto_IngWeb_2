@@ -1,0 +1,133 @@
+:root {
+    --bg: #0a0709;
+    --card: #1a1419;
+    --bordo: #6a0d25;
+    --bordo-light: #8e1636;
+    --text: #f6edf1;
+    --muted: #c9bbc3;
+    --line: #3c2a34;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Manrope", sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 18% 12%, rgba(142, 22, 54, 0.4), transparent 32%),
+        linear-gradient(140deg, #080608 0%, #130e12 48%, #070607 100%);
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+}
+
+.login-shell {
+    width: min(980px, 100%);
+    display: grid;
+    grid-template-columns: 1.08fr 0.92fr;
+    gap: 1rem;
+}
+
+.login-brand,
+.login-card {
+    background: rgba(23, 18, 22, 0.94);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 1.35rem;
+}
+
+.pill {
+    margin: 0;
+    width: fit-content;
+    padding: 0.32rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid #6a3042;
+    background: rgba(142, 22, 54, 0.2);
+    color: #ffd9e3;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+h1,
+h2 {
+    font-family: "Cinzel", serif;
+}
+
+h1 {
+    margin: 0.75rem 0 0.4rem;
+}
+
+.login-brand p {
+    color: var(--muted);
+}
+
+.login-brand ul {
+    color: var(--muted);
+    padding-left: 1.2rem;
+}
+
+.back-link {
+    color: #ffd3de;
+    text-decoration: none;
+    border-bottom: 1px dashed #8e5465;
+}
+
+.back-link:hover {
+    color: #fff2f6;
+}
+
+.hint {
+    margin-top: -0.2rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+form {
+    display: grid;
+    gap: 0.62rem;
+}
+
+label {
+    font-size: 0.9rem;
+    color: #f3dce4;
+}
+
+input {
+    border: 1px solid #4b3540;
+    background: #120e12;
+    color: #f5edf1;
+    border-radius: 12px;
+    padding: 0.66rem 0.75rem;
+}
+
+input:focus {
+    outline: 2px solid #80334c;
+    outline-offset: 1px;
+}
+
+button {
+    margin-top: 0.35rem;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.72rem 1rem;
+    font-weight: 700;
+    color: #fff4f8;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--bordo-light), var(--bordo));
+}
+
+#loginMessage {
+    min-height: 1.2rem;
+    color: #f5bccf;
+}
+
+@media (max-width: 860px) {
+    .login-shell {
+        grid-template-columns: 1fr;
+    }
+}

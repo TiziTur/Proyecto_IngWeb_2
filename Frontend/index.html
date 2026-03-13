@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GastoClaro | Gestion Inteligente de Gastos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="background-glow" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="logo">GastoClaro</div>
+        <nav class="topbar-nav">
+            <a href="#beneficios">Beneficios</a>
+            <a href="#demo">Demostracion</a>
+            <a href="#arquitectura">Arquitectura</a>
+        </nav>
+        <a class="btn btn-outline" href="login.html">Ingresar</a>
+    </header>
+
+    <main class="hero" id="ingreso">
+        <section class="hero-content">
+            <p class="badge">Plataforma de administracion de gastos personales</p>
+            <h1>Controla tus gastos. Entiende tus habitos. Toma mejores decisiones.</h1>
+            <p class="lead">
+                Registra tickets y comprobantes en segundos, organiza tus movimientos y comparte tu avance con un asesor financiero
+                que identifica patrones de consumo para ayudarte a mejorar tu salud economica.
+            </p>
+            <div class="actions">
+                <a class="btn btn-primary" href="login.html">Comenzar ahora</a>
+                <a class="btn btn-ghost" href="#beneficios">Ver beneficios</a>
+            </div>
+        </section>
+
+        <aside class="hero-panel">
+            <h2>Que podras hacer</h2>
+            <ul>
+                <li>Cargar tickets con foto o PDF desde cualquier dispositivo.</li>
+                <li>Categorizar consumos para ver en que se va tu dinero.</li>
+                <li>Recibir analisis de un asesor sobre tus patrones de gasto.</li>
+                <li>Visualizar reportes simples para actuar con rapidez.</li>
+            </ul>
+        </aside>
+    </main>
+
+    <section class="benefits benefits-intro" id="beneficios">
+        <article>
+            <h3>Registro rapido</h3>
+            <p>Carga comprobantes y tickets en menos de 15 segundos desde celular o web.</p>
+        </article>
+        <article>
+            <h3>Analisis inteligente</h3>
+            <p>Detecta tendencias de consumo para planificar mejor tu mes y evitar fugas.</p>
+        </article>
+        <article>
+            <h3>Asesoria profesional</h3>
+            <p>Comparte tus datos con tu asesor para recibir recomendaciones accionables.</p>
+        </article>
+    </section>
+
+    <section class="benefits-expanded" id="beneficios-detalle">
+        <div class="section-heading">
+            <p class="kicker">Beneficios en profundidad</p>
+            <h2>Una entrada completa a una app dinamica de gestion financiera</h2>
+            <p>Esta pagina presenta una experiencia mas extensa con cuadros informativos, demostraciones y un flujo real de acceso.</p>
+        </div>
+
+        <div class="info-grid">
+            <article class="info-card">
+                <h3>Panel de movimientos</h3>
+                <p>Consulta gastos por categoria, metodo de pago y fecha con filtros dinamicos en tiempo real.</p>
+                <ul>
+                    <li>Busqueda por texto y monto.</li>
+                    <li>Etiquetas personalizadas.</li>
+                    <li>Vista mensual y semanal.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h3>Control de presupuesto</h3>
+                <p>Configura limites por rubro y recibe alertas preventivas antes de excederte.</p>
+                <ul>
+                    <li>Reglas por categoria.</li>
+                    <li>Semaforo de avance.</li>
+                    <li>Recordatorios automáticos.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h3>Asesor financiero</h3>
+                <p>El asesor analiza patrones de consumo y propone objetivos concretos de mejora.</p>
+                <ul>
+                    <li>Resumen de habitos.</li>
+                    <li>Recomendaciones priorizadas.</li>
+                    <li>Seguimiento mensual.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h3>Carga de comprobantes</h3>
+                <p>Sube tickets e identifica datos clave para acelerar el registro del gasto.</p>
+                <ul>
+                    <li>Imagen o PDF.</li>
+                    <li>Lectura asistida de texto.</li>
+                    <li>Categorizacion sugerida.</li>
+                </ul>
+            </article>
+        </div>
+    </section>
+
+    <section class="demo" id="demo">
+        <div class="section-heading">
+            <p class="kicker">Demostracion de valor</p>
+            <h2>Ejemplo de comportamiento dinamico del sistema</h2>
+        </div>
+
+        <div class="demo-layout">
+            <article class="demo-card stats">
+                <h3>Indicadores simulados</h3>
+                <div class="stat-list">
+                    <div><span class="stat-number" data-target="126">0</span><small>tickets cargados</small></div>
+                    <div><span class="stat-number" data-target="18">0</span><small>categorias analizadas</small></div>
+                    <div><span class="stat-number" data-target="92">0</span><small>recomendaciones aplicadas</small></div>
+                </div>
+            </article>
+            <article class="demo-card table-card">
+                <h3>Flujo de gastos reciente</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Concepto</th>
+                            <th>Categoria</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>10/03</td><td>Supermercado</td><td>Alimentacion</td><td>$43.200</td></tr>
+                        <tr><td>11/03</td><td>Combustible</td><td>Transporte</td><td>$28.500</td></tr>
+                        <tr><td>12/03</td><td>Streaming</td><td>Suscripciones</td><td>$8.700</td></tr>
+                        <tr><td>12/03</td><td>Farmacia</td><td>Salud</td><td>$12.900</td></tr>
+                    </tbody>
+                </table>
+            </article>
+        </div>
+    </section>
+
+    <section class="architecture" id="arquitectura">
+        <div class="section-heading">
+            <p class="kicker">Cobertura de asignatura</p>
+            <h2>Arquitectura y componentes del proyecto</h2>
+        </div>
+
+        <div class="architecture-grid">
+            <article>
+                <h3>Arquitectura cliente-servidor</h3>
+                <p>Frontend desacoplado del backend mediante consumo de API REST.</p>
+            </article>
+            <article>
+                <h3>HTML, CSS y JavaScript</h3>
+                <p>Interfaz moderna, responsive y dinamica con comportamiento interactivo.</p>
+            </article>
+            <article>
+                <h3>APIs backend</h3>
+                <p>Endpoints para login, gastos, estadisticas e insights financieros.</p>
+            </article>
+            <article>
+                <h3>Servicios externos</h3>
+                <p>Integracion demostrativa con API publica de tasas de cambio.</p>
+            </article>
+            <article>
+                <h3>Persistencia de datos</h3>
+                <p>Repositorios con almacenamiento en archivos JSON para usuarios y gastos.</p>
+            </article>
+            <article>
+                <h3>Aplicacion web dinamica</h3>
+                <p>Indicadores animados, tablas de ejemplo y navegacion fluida por secciones.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="cta-final">
+        <h2>Empieza ahora y convierte tus gastos en decisiones inteligentes</h2>
+        <p>Accede a la plataforma y prueba el flujo de inicio de sesion para continuar con tu panel personal.</p>
+        <a class="btn btn-primary" href="login.html">Ir a inicio de sesion</a>
+    </section>
+
+    <footer>
+        <p>GastoClaro | Tu entrada a una administracion financiera mas clara.</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
