@@ -1,4 +1,9 @@
 {
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix Backend install && npm --prefix Backend run build",
+    "start": "npm --prefix Backend run build && node Backend/dist/main.js"
+  },
   "dependencies": {
     "next-cloudinary": "^6.17.5"
   }
