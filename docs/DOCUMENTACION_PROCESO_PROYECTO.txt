@@ -177,11 +177,14 @@ Recomendaciones adicionales para siguiente etapa:
 - GET /api/advisor/patterns/:userId
 - GET /api/advisor/users/:userId/patterns (compat)
 - POST /api/advisor/ask
+  - body permitido: provider, apiKey, question, userId (opcional)
+  - no enviar propiedad expenses
 - GET /api/advisor/recommendations/:userId
 - GET /api/advisor/clients/health
 
 7.5 Tickets
 - POST /api/tickets/ocr
+- POST /api/tickets/upload (compat legacy)
 
 ====================================================================
 8) DECISIONES TECNICAS Y MOTIVACION
