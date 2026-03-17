@@ -13,8 +13,9 @@ export class ExpensesService {
   ) {}
 
   async create(userId: string, dto: CreateExpenseDto): Promise<Expense> {
+    const commerce = dto.commerce || dto.concept || dto.description || 'Sin concepto';
     const expense = this.expensesRepository.create({
-      commerce: dto.commerce,
+      commerce,
       date: dto.date,
       amount: dto.amount,
       category: dto.category,
@@ -49,7 +50,12 @@ export class ExpensesService {
       throw new NotFoundException('Gasto no encontrado.');
     }
 
-    Object.assign(expense, dto);
+    const patch: Partial<Expense> = { ...dto };
+    if (dto.concept && !dto.commerce) {
+      patch.commerce = dto.concept;
+    }
+
+    Object.assign(expense, patch);
     return this.expensesRepository.save(expense);
   }
 

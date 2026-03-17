@@ -6,6 +6,10 @@ export class UpdateExpenseDto {
 	commerce?: string;
 
 	@IsOptional()
+	@IsString()
+	concept?: string;
+
+	@IsOptional()
 	@IsDateString()
 	date?: string;
 
@@ -23,8 +27,8 @@ export class UpdateExpenseDto {
 	description?: string;
 
 	@IsOptional()
-	@IsEnum(['ARS', 'USD', 'EUR'])
-	currency?: 'ARS' | 'USD' | 'EUR';
+	@IsEnum(['ARS', 'USD', 'EUR', 'GBP', 'MXN'])
+	currency?: 'ARS' | 'USD' | 'EUR' | 'GBP' | 'MXN';
 
 	@IsOptional()
 	@IsNumber()

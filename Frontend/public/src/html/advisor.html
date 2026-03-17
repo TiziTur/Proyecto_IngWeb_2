@@ -73,6 +73,9 @@
           <h1 class="dash-page-title">Mis clientes</h1>
           <p class="dash-page-sub">Lista de usuarios asignados a tu asesoría</p>
         </div>
+        <div style="min-width:240px">
+          <input id="clientSearch" type="text" class="dash-input" placeholder="Buscar cliente por nombre o email" oninput="renderClientsTable()" />
+        </div>
         <button class="btn btn-primary btn-sm" onclick="loadClients()">
           <i class="bi bi-arrow-clockwise me-1"></i> Actualizar
         </button>
@@ -107,6 +110,7 @@
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Rol</th>
+                <th>Estado</th>
                 <th>ID</th>
                 <th>Acciones</th>
               </tr>
@@ -135,7 +139,7 @@
         <p class="dash-panel-title">Seleccionar cliente</p>
         <div class="row g-2">
           <div class="col-sm-8">
-            <input type="number" id="clientIdInput" class="dash-input" placeholder="ID de usuario" min="1" />
+            <input type="text" id="clientIdInput" class="dash-input" placeholder="ID de usuario" />
           </div>
           <div class="col-sm-4">
             <button class="btn btn-primary w-100" onclick="loadClientOverview()">Ver resumen</button>
@@ -164,7 +168,7 @@
         <p class="dash-panel-title">Seleccionar cliente</p>
         <div class="row g-2">
           <div class="col-sm-8">
-            <input type="number" id="patternClientId" class="dash-input" placeholder="ID de usuario" min="1" />
+            <input type="text" id="patternClientId" class="dash-input" placeholder="ID de usuario" />
           </div>
           <div class="col-sm-4">
             <button class="btn btn-primary w-100" onclick="loadPatterns()">Ver patrones</button>
@@ -192,7 +196,7 @@
             <p class="dash-panel-title">Parámetros</p>
             <div class="mb-3">
               <label class="dash-label" for="recClientId">ID de cliente</label>
-              <input id="recClientId" type="number" class="dash-input" placeholder="ID de usuario" min="1" />
+              <input id="recClientId" type="text" class="dash-input" placeholder="ID de usuario" />
             </div>
             <div class="mb-3">
               <label class="dash-label" for="recProvider">Proveedor IA</label>
@@ -215,6 +219,11 @@
             <p class="dash-panel-title">Resultado</p>
             <div id="recOutput" style="font-size:.9rem;color:var(--k-text2);min-height:180px;line-height:1.65">
               Selecciona un cliente y genera recomendaciones.
+            </div>
+            <hr style="border-color:var(--k-border);margin:1rem 0" />
+            <p class="dash-panel-title" style="margin-bottom:.65rem">Historial guardado</p>
+            <div id="recHistory" style="font-size:.85rem;color:var(--k-text2);display:flex;flex-direction:column;gap:.55rem">
+              Aun no hay recomendaciones guardadas.
             </div>
           </div>
         </div>
@@ -303,33 +312,70 @@ function closeSidebar() {
 document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
 
 // Load clients
+let allClients = [];
+let clientHealthMap = {};
 async function loadClients() {
   const tb = document.getElementById('clientsTbody');
-  tb.innerHTML = '<tr><td colspan="5" class="dash-empty"><span class="loading-spinner"></span></td></tr>';
+  tb.innerHTML = '<tr><td colspan="6" class="dash-empty"><span class="loading-spinner"></span></td></tr>';
   try {
-    const res = await fetch(API + '/users', { headers: authHeaders() });
+    const [usersRes, healthRes] = await Promise.all([
+      fetch(API + '/users', { headers: authHeaders() }),
+      fetch(API + '/advisor/clients/health', { headers: authHeaders() }),
+    ]);
+    const res = usersRes;
     if (res.status === 401) { logout(); return; }
     const users = await res.json();
-    const clients = Array.isArray(users) ? users : (users.data || []);
-    document.getElementById('kpiClients').textContent = clients.length;
-    document.getElementById('kpiActive').textContent = clients.filter(u => (u.role||'').toLowerCase() === 'user').length;
+    const clients = (Array.isArray(users) ? users : (users.data || [])).filter(
+      (u) => (u.role || '').toLowerCase() === 'user',
+    );
+
+    const health = healthRes.ok ? await healthRes.json() : [];
+    clientHealthMap = Object.fromEntries((Array.isArray(health) ? health : []).map((item) => [item.userId, item]));
+    allClients = clients;
+
+    document.getElementById('kpiClients').textContent = allClients.length;
+    document.getElementById('kpiActive').textContent = allClients.length;
     document.getElementById('kpiAvg').textContent = '—';
 
-    if (!clients.length) { tb.innerHTML = '<tr><td colspan="5" class="dash-empty">Sin clientes</td></tr>'; return; }
-    tb.innerHTML = clients.map(u => `
+    renderClientsTable();
+    if (!allClients.length) { tb.innerHTML = '<tr><td colspan="6" class="dash-empty">Sin clientes</td></tr>'; return; }
+  } catch(e) {
+    tb.innerHTML = `<tr><td colspan="6" class="dash-empty text-danger">Error: ${escHtml(e.message)}</td></tr>`;
+  }
+}
+
+function renderClientsTable() {
+  const tb = document.getElementById('clientsTbody');
+  if (!tb) return;
+  const term = (document.getElementById('clientSearch')?.value || '').trim().toLowerCase();
+  const clients = allClients.filter((u) => {
+    if (!term) return true;
+    return (u.name || u.username || '').toLowerCase().includes(term) || (u.email || '').toLowerCase().includes(term);
+  });
+
+  if (!clients.length) {
+    tb.innerHTML = '<tr><td colspan="6" class="dash-empty">Sin resultados</td></tr>';
+    return;
+  }
+
+  tb.innerHTML = clients.map(u => {
+    const health = clientHealthMap[u.id] || {};
+    const status = String(health.status || 'green');
+    const statusLabel = status === 'red' ? 'Alto riesgo' : status === 'yellow' ? 'Atencion' : 'Saludable';
+    const statusClass = status === 'red' ? 'sb-inactive' : status === 'yellow' ? 'sb-pending' : 'sb-active';
+    return `
       <tr>
         <td><strong>${escHtml(u.name||u.username||'—')}</strong></td>
         <td>${escHtml(u.email||'—')}</td>
         <td><span class="role-chip rc-${(u.role||'user').toLowerCase()}">${escHtml(u.role||'user')}</span></td>
+        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
         <td><code style="font-size:.8rem">${u.id||'—'}</code></td>
         <td>
-          <button class="dash-btn-icon" title="Ver resumen" onclick="quickView(${u.id})"><i class="bi bi-eye"></i></button>
-          <button class="dash-btn-icon ms-2" title="Patrones" onclick="quickPatterns(${u.id})"><i class="bi bi-graph-up-arrow"></i></button>
+          <button class="dash-btn-icon" title="Ver resumen" onclick="quickView('${u.id}')"><i class="bi bi-eye"></i></button>
+          <button class="dash-btn-icon ms-2" title="Patrones" onclick="quickPatterns('${u.id}')"><i class="bi bi-graph-up-arrow"></i></button>
         </td>
-      </tr>`).join('');
-  } catch(e) {
-    tb.innerHTML = `<tr><td colspan="5" class="dash-empty text-danger">Error: ${escHtml(e.message)}</td></tr>`;
-  }
+      </tr>`;
+  }).join('');
 }
 
 function quickView(id) {
@@ -353,10 +399,57 @@ async function loadClientOverview() {
     const res = await fetch(API + '/advisor/overview/' + id, { headers: authHeaders() });
     if (res.status === 401) { logout(); return; }
     const data = await res.json();
-    out.innerHTML = `<div class="dash-panel"><pre style="font-size:.82rem;white-space:pre-wrap;color:var(--k-text2)">${escHtml(JSON.stringify(data, null, 2))}</pre></div>`;
+    out.innerHTML = renderOverviewVisual(data);
   } catch(e) {
     out.innerHTML = `<p style="color:var(--k-danger,#ef4444)">Error: ${escHtml(e.message)}</p>`;
   }
+}
+
+function renderOverviewVisual(data) {
+  const payload = data && typeof data === 'object' ? data : {};
+  const totalAmount = Number(payload.totalAmount || payload.totalSpent || payload.total || payload.amount || 0);
+  const totalExpenses = Number(payload.totalExpenses || payload.expenseCount || payload.count || 0);
+  const topCategory = payload.topCategory || payload.mainCategory || payload.category || '—';
+  const avgTicket = totalExpenses > 0 ? (totalAmount / totalExpenses) : 0;
+
+  let byCategory = payload.byCategory || payload.categoryTotals || payload.categories || {};
+  if (Array.isArray(byCategory)) {
+    const normalized = {};
+    byCategory.forEach(item => {
+      const k = item.category || item.name || 'Otro';
+      normalized[k] = Number(item.amount || item.total || item.value || 0);
+    });
+    byCategory = normalized;
+  }
+  if (!byCategory || typeof byCategory !== 'object') byCategory = {};
+
+  const rows = Object.entries(byCategory)
+    .map(([name, value]) => ({ name, value: Number(value) || 0 }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6);
+  const maxVal = Math.max(1, ...rows.map(r => r.value));
+
+  const categoryBars = rows.length
+    ? rows.map(r => `<div style="display:grid;grid-template-columns:120px 1fr auto;align-items:center;gap:.6rem">
+        <span style="font-size:.82rem;color:var(--k-text2)">${escHtml(r.name)}</span>
+        <div style="height:8px;background:var(--k-bg);border-radius:999px;overflow:hidden">
+          <div style="height:100%;width:${Math.max(6, (r.value/maxVal)*100)}%;background:var(--k-primary);border-radius:999px"></div>
+        </div>
+        <span style="font-size:.8rem;color:var(--k-muted)">€${r.value.toFixed(2)}</span>
+      </div>`).join('')
+    : '<p style="margin:0;color:var(--k-muted);font-size:.85rem">Sin distribución por categoría disponible.</p>';
+
+  return `<div class="row g-3">
+    <div class="col-12 col-md-4"><div class="kpi-card"><span class="kpi-label">Total gastado</span><span class="kpi-value">€${totalAmount.toFixed(2)}</span></div></div>
+    <div class="col-12 col-md-4"><div class="kpi-card"><span class="kpi-label">Cantidad de gastos</span><span class="kpi-value">${totalExpenses || '—'}</span></div></div>
+    <div class="col-12 col-md-4"><div class="kpi-card"><span class="kpi-label">Ticket promedio</span><span class="kpi-value">€${avgTicket.toFixed(2)}</span></div></div>
+    <div class="col-12">
+      <div class="dash-panel">
+        <p class="dash-panel-title">Categoría principal: <span style="color:var(--k-primary)">${escHtml(topCategory)}</span></p>
+        <div style="display:flex;flex-direction:column;gap:.55rem">${categoryBars}</div>
+      </div>
+    </div>
+  </div>`;
 }
 
 async function loadPatterns() {
@@ -368,10 +461,47 @@ async function loadPatterns() {
     const res = await fetch(API + '/advisor/patterns/' + id, { headers: authHeaders() });
     if (res.status === 401) { logout(); return; }
     const data = await res.json();
-    out.innerHTML = `<div class="dash-panel"><pre style="font-size:.82rem;white-space:pre-wrap;color:var(--k-text2)">${escHtml(JSON.stringify(data, null, 2))}</pre></div>`;
+    out.innerHTML = renderPatternsVisual(data);
   } catch(e) {
     out.innerHTML = `<p style="color:var(--k-danger,#ef4444)">Error: ${escHtml(e.message)}</p>`;
   }
+}
+
+function renderPatternsVisual(data) {
+  const payload = data && typeof data === 'object' ? data : {};
+  const seriesRaw = payload.monthly || payload.timeline || payload.history || payload.trend || [];
+  const points = Array.isArray(seriesRaw)
+    ? seriesRaw.map((item, idx) => {
+      const label = item.month || item.label || item.period || ('P' + (idx + 1));
+      const amount = Number(item.total || item.amount || item.value || 0);
+      return { label: String(label), amount };
+    }).filter(p => Number.isFinite(p.amount))
+    : [];
+
+  const max = Math.max(1, ...points.map(p => p.amount));
+  const avg = points.length ? (points.reduce((s, p) => s + p.amount, 0) / points.length) : 0;
+  const spikes = points.filter(p => p.amount > avg * 1.35);
+
+  const timeline = points.length
+    ? `<div style="display:flex;align-items:flex-end;gap:.55rem;height:170px;padding:.5rem 0 .2rem">${points.map(p => `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.35rem;flex:1;min-width:0">
+        <span style="font-size:.72rem;color:var(--k-muted)">€${p.amount.toFixed(0)}</span>
+        <div class="bar-item" style="width:100%;height:${Math.max(8, (p.amount/max)*100)}%;background:${p.amount > avg * 1.35 ? '#ef4444' : 'var(--k-primary)'}"></div>
+        <span style="font-size:.72rem;color:var(--k-text2)">${escHtml(p.label)}</span>
+      </div>`).join('')}</div>`
+    : '<p style="margin:0;color:var(--k-muted);font-size:.85rem">No hay timeline disponible para este cliente.</p>';
+
+  return `<div class="row g-3">
+    <div class="col-12 col-md-4"><div class="kpi-card"><span class="kpi-label">Puntos de timeline</span><span class="kpi-value">${points.length || '—'}</span></div></div>
+    <div class="col-12 col-md-4"><div class="kpi-card"><span class="kpi-label">Promedio período</span><span class="kpi-value">€${avg.toFixed(0)}</span></div></div>
+    <div class="col-12 col-md-4"><div class="kpi-card"><span class="kpi-label">Alertas de pico</span><span class="kpi-value">${spikes.length}</span></div></div>
+    <div class="col-12">
+      <div class="dash-panel">
+        <p class="dash-panel-title">Evolución del gasto</p>
+        ${timeline}
+      </div>
+    </div>
+  </div>`;
 }
 
 async function loadRecommendations() {
@@ -386,15 +516,39 @@ async function loadRecommendations() {
       body: JSON.stringify({
         provider: document.getElementById('recProvider').value,
         apiKey:   document.getElementById('recKey').value,
-        userId: parseInt(id),
+        userId: String(id),
         question: 'Genera recomendaciones personalizadas de ahorro para este usuario basándote en sus gastos.'
       })
     });
     if (res.status === 401) { logout(); return; }
     const data = await res.json();
     out.textContent = data.answer || data.result || JSON.stringify(data, null, 2);
+    await loadRecommendationHistory(String(id));
   } catch(e) {
     out.innerHTML = `<span style="color:var(--k-danger,#ef4444)">Error: ${escHtml(e.message)}</span>`;
+  }
+}
+
+async function loadRecommendationHistory(userId) {
+  const wrap = document.getElementById('recHistory');
+  if (!wrap) return;
+  wrap.innerHTML = '<span class="loading-spinner"></span>';
+  try {
+    const res = await fetch(API + '/advisor/recommendations/' + userId, { headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    const list = await res.json();
+    if (!Array.isArray(list) || !list.length) {
+      wrap.textContent = 'Aun no hay recomendaciones guardadas.';
+      return;
+    }
+
+    wrap.innerHTML = list.slice(0, 6).map((item) => `
+      <div style="border:1px solid var(--k-border);border-radius:.7rem;padding:.6rem .7rem;background:var(--k-bg)">
+        <div style="font-size:.75rem;color:var(--k-muted);margin-bottom:.25rem">${new Date(item.createdAt).toLocaleString('es-ES')} · ${escHtml(item.provider || 'local')}</div>
+        <div style="color:var(--k-text2);white-space:pre-wrap">${escHtml(item.answer || '')}</div>
+      </div>`).join('');
+  } catch (e) {
+    wrap.innerHTML = `<span style="color:var(--k-danger,#ef4444)">${escHtml(e.message)}</span>`;
   }
 }
 

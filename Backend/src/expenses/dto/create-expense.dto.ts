@@ -2,7 +2,12 @@ import { IsDateString, IsEnum, IsNumber, IsOptional, IsString, Max, Min } from '
 
 export class CreateExpenseDto {
   @IsString()
+  @IsOptional()
   commerce: string;
+
+  @IsString()
+  @IsOptional()
+  concept?: string;
 
   @IsDateString()
   date: string;
@@ -18,8 +23,8 @@ export class CreateExpenseDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(['ARS', 'USD', 'EUR'])
-  currency: 'ARS' | 'USD' | 'EUR';
+  @IsEnum(['ARS', 'USD', 'EUR', 'GBP', 'MXN'])
+  currency: 'ARS' | 'USD' | 'EUR' | 'GBP' | 'MXN';
 
   @IsOptional()
   @IsNumber()

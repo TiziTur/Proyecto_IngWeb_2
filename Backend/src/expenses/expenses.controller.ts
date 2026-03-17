@@ -10,7 +10,12 @@ export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Get()
-  findAll(@Req() req: { user: { id: string } }) {
+  findAll(@Req() req: { user: { id: string; role: string } }) {
+    const role = String(req.user.role || '').toLowerCase();
+    if (role === 'admin' || role === 'advisor') {
+      return this.expensesService.findAllUsersExpenses();
+    }
+
     return this.expensesService.findAllForUser(req.user.id);
   }
 

@@ -136,6 +136,7 @@
           <p class="dash-page-sub">Todos los usuarios de la plataforma</p>
         </div>
         <div class="d-flex gap-2">
+          <input id="usersSearch" type="text" class="dash-input" placeholder="Buscar por nombre o email" oninput="filterUsers()" style="min-width:220px;padding:.45rem .75rem" />
           <select id="filterRole" class="dash-input" onchange="filterUsers()" style="width:auto;padding:.45rem .75rem">
             <option value="">Todos los roles</option>
             <option value="user">User</option>
@@ -165,6 +166,11 @@
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div class="dash-panel mt-3">
+        <p class="dash-panel-title">Nuevos usuarios (últimos 6 meses)</p>
+        <div id="usersMonthlyChart" class="dash-chart-placeholder" style="height:140px"></div>
       </div>
     </div>
 
@@ -372,6 +378,43 @@ function renderKPIs(users) {
       </div>
     </div>`;
   }).join('');
+
+  renderUsersMonthlyChart(users);
+}
+
+function renderUsersMonthlyChart(users) {
+  const wrap = document.getElementById('usersMonthlyChart');
+  if(!wrap) return;
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({
+      key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'),
+      label: d.toLocaleDateString('es-ES', { month: 'short' }).replace('.', ''),
+      count: 0
+    });
+  }
+
+  users.forEach(u => {
+    const raw = u.createdAt || u.created_at || u.registeredAt;
+    if(!raw) return;
+    const d = new Date(raw);
+    if(Number.isNaN(d.getTime())) return;
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    const bucket = months.find(m => m.key === key);
+    if(bucket) bucket.count += 1;
+  });
+
+  const maxVal = Math.max(1, ...months.map(m => m.count));
+  wrap.innerHTML = months.map((m) => {
+    const h = Math.max(10, (m.count / maxVal) * 100);
+    return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.35rem;flex:1;min-width:0">
+      <span style="font-size:.72rem;color:var(--k-muted)">${m.count}</span>
+      <div class="bar-item" style="width:100%;height:${h}%;min-height:12px"></div>
+      <span style="font-size:.72rem;color:var(--k-text2);text-transform:capitalize">${m.label}</span>
+    </div>`;
+  }).join('');
 }
 
 function renderRecentTable(users) {
@@ -398,14 +441,21 @@ function renderFullUsersTable(users) {
       <td>${escHtml(u.email||'—')}</td>
       <td><span class="role-chip rc-${(u.role||'user').toLowerCase()}">${escHtml(u.role||'user')}</span></td>
       <td>
-        <button class="dash-btn-icon" title="Cambiar rol" onclick="openRoleModal(${u.id},'${escHtml(u.role||'user')}')"><i class="bi bi-pencil-square"></i></button>
+        <button class="dash-btn-icon" title="Cambiar rol" onclick="openRoleModal('${u.id}','${escHtml(u.role||'user')}')"><i class="bi bi-pencil-square"></i></button>
       </td>
     </tr>`).join('');
 }
 
 function filterUsers() {
   const role = document.getElementById('filterRole').value;
-  const filtered = role ? allUsers.filter(u=>(u.role||'').toLowerCase()===role) : allUsers;
+  const term = (document.getElementById('usersSearch')?.value || '').trim().toLowerCase();
+  const filtered = allUsers.filter(u => {
+    const roleOk = role ? (u.role||'').toLowerCase()===role : true;
+    const name = (u.name || u.username || '').toLowerCase();
+    const email = (u.email || '').toLowerCase();
+    const textOk = !term || name.includes(term) || email.includes(term);
+    return roleOk && textOk;
+  });
   renderFullUsersTable(filtered);
 }
 
@@ -421,6 +471,12 @@ function closeRoleModal() { document.getElementById('roleModal').style.display =
 async function confirmRoleChange() {
   const role = document.getElementById('roleModalSelect').value;
   if (!_roleModalUserId) return;
+  const target = allUsers.find(u => String(u.id) === String(_roleModalUserId));
+  const currentRole = (target?.role || 'user').toLowerCase();
+  if (role === currentRole) { closeRoleModal(); return; }
+  const displayName = target?.name || target?.username || target?.email || ('ID ' + _roleModalUserId);
+  const ok = confirm('Confirmar cambio de rol para ' + displayName + ': ' + currentRole + ' → ' + role + '?');
+  if (!ok) return;
   try {
     const res = await fetch(API + '/users/' + _roleModalUserId, {
       method: 'PATCH',

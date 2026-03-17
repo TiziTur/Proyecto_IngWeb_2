@@ -22,8 +22,9 @@
 
   <!-- ── Top bar ─────────────────────────────────────────── -->
   <header class="dash-topbar">
-    <button class="dash-menu-btn" id="menuBtn" onclick="toggleSidebar()">
+    <button class="dash-menu-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Abrir menú" title="Abrir menú lateral">
       <i class="bi bi-list"></i>
+      <span class="dash-menu-label">Menú</span>
     </button>
     <a href="/" class="dash-topbar-brand">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--k-primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
@@ -158,6 +159,24 @@
           </div>
         </div>
       </div>
+
+      <div class="dash-panel mt-3">
+        <p class="dash-panel-title">Insights rápidos</p>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div style="background:var(--k-bg);border:1px solid var(--k-border);border-radius:.9rem;padding:.9rem">
+              <div style="font-size:.8rem;color:var(--k-muted);text-transform:uppercase;letter-spacing:.04em">Mes actual vs anterior</div>
+              <div id="insightsMonthDelta" style="font-weight:700;color:var(--k-text);margin-top:.25rem">—</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div style="background:var(--k-bg);border:1px solid var(--k-border);border-radius:.9rem;padding:.9rem">
+              <div style="font-size:.8rem;color:var(--k-muted);text-transform:uppercase;letter-spacing:.04em">Comercio más frecuente</div>
+              <div id="insightsTopMerchant" style="font-weight:700;color:var(--k-text);margin-top:.25rem">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ====== EXPENSES LIST ================================ -->
@@ -192,7 +211,7 @@
                 <th>Concepto</th>
                 <th>Categoría</th>
                 <th>Importe</th>
-                <th>Moneda</th>
+                <th class="col-currency">Moneda</th>
                 <th>Fecha</th>
                 <th></th>
               </tr>
@@ -222,7 +241,9 @@
               <div class="row g-3">
                 <div class="col-12">
                   <label class="dash-label" for="dConcept">Concepto *</label>
-                  <input id="dConcept" type="text" class="dash-input" placeholder="ej. Supermercado" required />
+                  <input id="dConcept" type="text" class="dash-input" placeholder="ej. Supermercado" list="conceptSuggestions" oninput="suggestCategoryFromConcept()" required />
+                  <datalist id="conceptSuggestions"></datalist>
+                  <div id="conceptHint" style="font-size:.78rem;color:var(--k-muted);margin-top:.3rem;min-height:1.1rem"></div>
                 </div>
                 <div class="col-sm-6">
                   <label class="dash-label" for="dCategory">Categoría</label>
@@ -324,6 +345,11 @@
       <div class="row g-3" id="budgetGrid">
         <!-- Injected via JS -->
       </div>
+
+      <div class="dash-panel mt-3">
+        <p class="dash-panel-title">Comprometido del próximo mes</p>
+        <div id="recurringCommitments" style="font-size:.88rem;color:var(--k-text2)">Cargando...</div>
+      </div>
     </div>
 
     <!-- ====== ADVISOR ====================================== -->
@@ -418,6 +444,10 @@
 
   </main>
 </div><!-- /dash-layout -->
+
+<button class="dash-fab" id="quickAddFab" type="button" onclick="showSection('add', null)" aria-label="Añadir gasto" title="Añadir gasto rápido">
+  <i class="bi bi-plus-lg"></i>
+</button>
 
 <!-- ── Overlay for mobile sidebar ──────────────────────── -->
 <button id="sidebarOverlay" type="button" aria-label="Cerrar menú lateral"
@@ -514,6 +544,8 @@ async function loadExpenses() {
     renderRecentTable(allExpenses.slice(0, 6));
     renderChart(allExpenses);
     renderFullTable(allExpenses);
+    updateConceptSuggestions(allExpenses);
+    renderRecurringCommitments(allExpenses);
     const badge = document.getElementById('expensesBadge');
     if(badge) badge.textContent = allExpenses.length;
   } catch(e) {
@@ -529,7 +561,13 @@ function renderKPIs(data) {
     const d = new Date(e.date || e.createdAt);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   });
+  const prevMonth = data.filter(e => {
+    const d = new Date(e.date || e.createdAt);
+    const pm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    return d.getMonth() === pm.getMonth() && d.getFullYear() === pm.getFullYear();
+  });
   const total = thisMonth.reduce((s, e) => s + (+e.amount || 0), 0);
+  const prevTotal = prevMonth.reduce((s, e) => s + (+e.amount || 0), 0);
   document.getElementById('kpiTotal').textContent = '€' + total.toFixed(2);
   document.getElementById('kpiCount').textContent = data.length;
 
@@ -544,6 +582,34 @@ function renderKPIs(data) {
   if (sorted.length) {
     const d = new Date(sorted[0].date || sorted[0].createdAt);
     document.getElementById('kpiLast').textContent = d.toLocaleDateString('es-ES', {day:'2-digit',month:'short'});
+  }
+
+  const deltaEl = document.getElementById('insightsMonthDelta');
+  if (deltaEl) {
+    if (prevTotal <= 0 && total <= 0) {
+      deltaEl.textContent = 'Sin movimiento en los últimos 2 meses';
+      deltaEl.style.color = 'var(--k-muted)';
+    } else if (prevTotal <= 0) {
+      deltaEl.textContent = 'Nuevo gasto este mes: €' + total.toFixed(2);
+      deltaEl.style.color = 'var(--k-primary)';
+    } else {
+      const pct = ((total - prevTotal) / prevTotal) * 100;
+      const arrow = pct >= 0 ? '▲' : '▼';
+      deltaEl.textContent = arrow + ' ' + Math.abs(pct).toFixed(1) + '% (€' + total.toFixed(2) + ' vs €' + prevTotal.toFixed(2) + ')';
+      deltaEl.style.color = pct > 0 ? 'var(--k-danger)' : 'var(--k-success)';
+    }
+  }
+
+  const merchantEl = document.getElementById('insightsTopMerchant');
+  if (merchantEl) {
+    const freq = {};
+    data.forEach(e => {
+      const key = (e.concept || e.description || 'Sin concepto').trim();
+      if (!key) return;
+      freq[key] = (freq[key] || 0) + 1;
+    });
+    const top = Object.entries(freq).sort((a, b) => b[1] - a[1])[0];
+    merchantEl.textContent = top ? (top[0] + ' · ' + top[1] + ' veces') : '—';
   }
 }
 
@@ -568,7 +634,7 @@ function renderRecentTable(data) {
       <td>${catDot(e.category)}</td>
       <td><strong>€${(+e.amount||0).toFixed(2)}</strong></td>
       <td>${fmtDate(e.date||e.createdAt)}</td>
-      <td><button class="dash-btn-icon danger" onclick="deleteExpense(${e.id})" title="Eliminar"><i class="bi bi-trash3"></i></button></td>
+      <td><button class="dash-btn-icon danger" onclick="deleteExpense('${e.id}')" title="Eliminar"><i class="bi bi-trash3"></i></button></td>
     </tr>`).join('');
 }
 
@@ -581,10 +647,56 @@ function renderFullTable(data) {
       <td><strong>${escHtml(e.concept||e.description||'Sin concepto')}</strong></td>
       <td>${catDot(e.category)}</td>
       <td><strong>${(+e.amount||0).toFixed(2)}</strong></td>
-      <td>${escHtml(e.currency||'EUR')}</td>
+      <td class="col-currency">${escHtml(e.currency||'EUR')}</td>
       <td>${fmtDate(e.date||e.createdAt)}</td>
-      <td><button class="dash-btn-icon danger" onclick="deleteExpense(${e.id})" title="Eliminar"><i class="bi bi-trash3"></i></button></td>
+      <td><button class="dash-btn-icon danger" onclick="deleteExpense('${e.id}')" title="Eliminar"><i class="bi bi-trash3"></i></button></td>
     </tr>`).join('');
+}
+
+function updateConceptSuggestions(data) {
+  const dl = document.getElementById('conceptSuggestions');
+  if (!dl) return;
+  const counts = {};
+  data.forEach(e => {
+    const key = (e.concept || e.description || '').trim();
+    if (!key) return;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  dl.innerHTML = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12)
+    .map(([concept]) => `<option value="${escHtml(concept)}"></option>`)
+    .join('');
+}
+
+function suggestCategoryFromConcept() {
+  const conceptInput = document.getElementById('dConcept');
+  const categorySelect = document.getElementById('dCategory');
+  const hint = document.getElementById('conceptHint');
+  if (!conceptInput || !categorySelect || !hint) return;
+
+  const raw = conceptInput.value.trim().toLowerCase();
+  if (!raw) {
+    hint.textContent = '';
+    return;
+  }
+
+  const rules = [
+    { match: ['netflix','spotify','disney','hbo','prime','icloud','youtube premium'], category: 'Suscripciones' },
+    { match: ['uber','cabify','metro','bus','taxi','gasolina','combustible','peaje'], category: 'Transporte' },
+    { match: ['farmacia','medico','hospital','dentista'], category: 'Salud' },
+    { match: ['alquiler','renta','hipoteca','luz','agua','internet','gas'], category: 'Vivienda' },
+    { match: ['super','mercado','carrefour','dia','lidl','almacen'], category: 'Alimentación' },
+    { match: ['cine','bar','restaurante','teatro','juego','steam'], category: 'Ocio' }
+  ];
+
+  const found = rules.find(rule => rule.match.some(word => raw.includes(word)));
+  if (found) {
+    categorySelect.value = found.category;
+    hint.textContent = 'Categoría sugerida aplicada: ' + found.category;
+  } else {
+    hint.textContent = 'No se detectó categoría automática para este concepto.';
+  }
 }
 
 function filterExpenses() {
@@ -726,6 +838,47 @@ function loadBudgets() {
       </div>
     </div>`;
   }).join('');
+
+  renderRecurringCommitments(allExpenses);
+}
+
+function renderRecurringCommitments(data) {
+  const wrap = document.getElementById('recurringCommitments');
+  if (!wrap) return;
+
+  const recurring = data
+    .filter(e => ['Suscripciones', 'Vivienda'].includes(e.category || ''))
+    .reduce((acc, e) => {
+      const concept = (e.concept || e.description || 'Sin concepto').trim();
+      if (!concept) return acc;
+      if (!acc[concept]) acc[concept] = { concept, amount: 0, count: 0 };
+      acc[concept].amount += (+e.amount || 0);
+      acc[concept].count += 1;
+      return acc;
+    }, {});
+
+  const rows = Object.values(recurring)
+    .filter(r => r.count >= 2)
+    .map(r => ({ ...r, estNext: r.amount / r.count }))
+    .sort((a, b) => b.estNext - a.estNext)
+    .slice(0, 8);
+
+  if (!rows.length) {
+    wrap.innerHTML = '<span style="color:var(--k-muted)">Todavía no hay suficientes gastos repetidos para estimar compromisos.</span>';
+    return;
+  }
+
+  const total = rows.reduce((s, r) => s + r.estNext, 0);
+  wrap.innerHTML = `<div style="display:flex;flex-direction:column;gap:.55rem">${rows.map(r => `
+    <div style="display:flex;justify-content:space-between;gap:.75rem;border-bottom:1px dashed var(--k-border);padding-bottom:.4rem">
+      <span>${escHtml(r.concept)} <span style="color:var(--k-muted);font-size:.8rem">(${r.count} registros)</span></span>
+      <strong>€${r.estNext.toFixed(2)}</strong>
+    </div>`).join('')}
+    <div style="display:flex;justify-content:space-between;margin-top:.4rem">
+      <span style="color:var(--k-muted)">Total estimado próximo mes</span>
+      <strong style="color:var(--k-primary)">€${total.toFixed(2)}</strong>
+    </div>
+  </div>`;
 }
 
 // ── AI Advisor ────────────────────────────────────────────

@@ -22,7 +22,7 @@ export class Expense {
   amount: number;
 
   @Column({ type: 'text', default: 'ARS' })
-  currency: 'ARS' | 'USD' | 'EUR';
+  currency: 'ARS' | 'USD' | 'EUR' | 'GBP' | 'MXN';
 
   @Column({ type: 'int', default: 1 })
   participants: number;

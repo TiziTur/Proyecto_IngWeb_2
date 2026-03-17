@@ -8,6 +8,7 @@ import { Expense } from './expenses/expense.entity';
 import { ExpensesModule } from './expenses/expenses.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { AdvisorModule } from './advisor/advisor.module';
+import { AdvisorRecommendation } from './advisor/advisor-recommendation.entity';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { AdvisorModule } from './advisor/advisor.module';
             type: 'postgres' as const,
             url: databaseUrl,
             ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-            entities: [User, Expense],
+            entities: [User, Expense, AdvisorRecommendation],
             synchronize: true,
           };
         }
@@ -29,7 +30,7 @@ import { AdvisorModule } from './advisor/advisor.module';
         return {
           type: 'sqlite' as const,
           database: 'database.sqlite',
-          entities: [User, Expense],
+          entities: [User, Expense, AdvisorRecommendation],
           synchronize: true,
         };
       },

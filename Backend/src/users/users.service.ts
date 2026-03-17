@@ -69,6 +69,16 @@ export class UsersService implements OnModuleInit {
     return this.usersRepository.save(user);
   }
 
+  async updateRole(id: string, role: Role): Promise<User | null> {
+    const user = await this.findById(id);
+    if (!user) {
+      return null;
+    }
+
+    user.role = role;
+    return this.usersRepository.save(user);
+  }
+
   listAll(): Promise<User[]> {
     return this.usersRepository.find({ order: { name: 'ASC' } });
   }
