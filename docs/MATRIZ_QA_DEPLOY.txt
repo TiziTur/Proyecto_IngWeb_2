@@ -184,6 +184,14 @@ Esperado:
 - GET /api/advisor/recommendations/{userId}
 Esperado:
 - Datos coherentes y sin 500.
+- El body de POST /api/advisor/ask NO incluye propiedad expenses.
+
+5.4 Tickets OCR
+- POST /api/tickets/ocr (multipart campo image)
+- POST /api/tickets/upload (multipart campo ticket, compat)
+Esperado:
+- Retorna commerce, date, amount, category, rawText.
+- Sin 404 por ruta inexistente en frontend dashboard.
 
 ====================================================================
 6) SEGURIDAD BASICA

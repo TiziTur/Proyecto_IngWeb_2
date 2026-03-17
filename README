@@ -158,14 +158,15 @@ DELETE /expenses/:id         - Eliminar gasto
 
 ### OCR y Tickets
 ```
-POST   /tickets/ocr          - Procesar imagen de ticket
+POST   /tickets/ocr          - Procesar ticket OCR (campo multipart: image)
+POST   /tickets/upload       - Endpoint compatible legacy (campo multipart: ticket)
 ```
 
 ### Asesor (Análisis)
 ```
 GET    /advisor/overview/:id     - Overview visualizable del cliente
 GET    /advisor/patterns/:id     - Patrones y timeline de consumo
-POST   /advisor/ask              - Obtener recomendación IA
+POST   /advisor/ask              - Obtener recomendación IA (payload: provider, apiKey, question, userId opcional)
 GET    /advisor/recommendations/:id - Historial de recomendaciones guardadas
 GET    /advisor/clients/health   - Semáforo financiero de clientes
 ```

@@ -10,8 +10,19 @@ export class TicketsController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('ticket', { storage: memoryStorage() }))
   async uploadTicket(@UploadedFile() file?: Express.Multer.File) {
+    return this.processTicketFile(file);
+  }
+
+  // Compatibility endpoint used by dashboard OCR form.
+  @Post('ocr')
+  @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
+  async ocrTicket(@UploadedFile() file?: Express.Multer.File) {
+    return this.processTicketFile(file);
+  }
+
+  private async processTicketFile(file?: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('Debes enviar un archivo de imagen en el campo ticket.');
+      throw new BadRequestException('Debes enviar un archivo de imagen en el campo ticket o image.');
     }
 
     const worker = await createWorker('spa+eng');

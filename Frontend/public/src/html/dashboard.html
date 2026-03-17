@@ -994,8 +994,7 @@ async function submitAdvisor(e) {
   const body = {
     provider: document.getElementById('aiProvider').value,
     apiKey:   document.getElementById('aiKey').value,
-    question,
-    expenses: allExpenses.slice(0, 20)
+    question
   };
   try {
     const res = await fetch(API + '/advisor/ask', {
