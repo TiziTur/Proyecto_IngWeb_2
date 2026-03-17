@@ -1,0 +1,12 @@
+[build]
+  publish = "Frontend/public"
+
+[[redirects]]
+  from = "/"
+  to = "/src/html/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/src/html/login.html"
+  status = 200
