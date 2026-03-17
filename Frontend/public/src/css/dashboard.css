@@ -499,7 +499,7 @@
     transform: translateX(-100%);
     transition: transform var(--k-transition);
   }
-  .dash-sidebar.open { transform: translateX(0); display: flex; }
+  .dash-sidebar.open { transform: translateX(0); }
 
   /* Panels */
   .dash-panel { padding: 1.1rem; }
@@ -513,7 +513,7 @@
 }
 
 @media (max-width: 575.98px) {
-  /* Single column KPI on very small screens */
+  /* Keep 2 columns on very small screens — single column would be too tall */
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: .65rem; }
   .kpi-value { font-size: 1.35rem; }
 
