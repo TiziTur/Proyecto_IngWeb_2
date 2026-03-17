@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "echo 'no build needed'",
-  "outputDirectory": "Frontend/public",
+  "buildCommand": "rm -rf public && mkdir -p public && cp -R Frontend/public/. public/",
+  "outputDirectory": "public",
   "rewrites": [
     { "source": "/", "destination": "/src/html/index.html" },
     { "source": "/login", "destination": "/src/html/login.html" },
