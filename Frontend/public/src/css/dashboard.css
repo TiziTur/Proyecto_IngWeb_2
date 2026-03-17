@@ -86,7 +86,7 @@
 .dash-btn-icon {
   width: 34px; height: 34px;
   border-radius: 9px;
-  border: 1px solid var(--k-border);
+  border: 1.5px solid var(--k-border);
   background: var(--k-surface2, var(--k-bg));
   color: var(--k-text2);
   display: grid;
@@ -95,9 +95,22 @@
   font-size: .95rem;
   transition: all var(--k-transition);
   text-decoration: none;
+  flex-shrink: 0;
 }
 
-.dash-btn-icon:hover { background: var(--k-primary-s, var(--k-bg)); color: var(--k-primary); border-color: var(--k-primary); }
+.dash-btn-icon:hover { background: var(--k-primary-s, #dbeafe); color: var(--k-primary); border-color: var(--k-primary); }
+.dash-btn-icon:focus-visible { outline: 2px solid var(--k-primary); outline-offset: 1px; }
+
+/* Group of icon buttons – prevents them from touching each other */
+.btn-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Danger icon button variant */
+.dash-btn-icon.danger { color: var(--k-danger); border-color: rgba(239,68,68,.35); }
+.dash-btn-icon.danger:hover { background: #fef2f2; color: #b91c1c; border-color: var(--k-danger); }
 
 /* ── Sidebar ────────────────────────────────────────────── */
 .dash-sidebar {
@@ -451,16 +464,65 @@
   display: none;
   width: 36px; height: 36px;
   border-radius: 9px;
-  border: 1px solid var(--k-border);
+  border: 1.5px solid var(--k-border);
   background: transparent;
   color: var(--k-text2);
   place-items: center;
   cursor: pointer;
   font-size: 1.1rem;
+  transition: all var(--k-transition);
 }
+.dash-menu-btn:hover { background: var(--k-bg); color: var(--k-text); }
 
 @media (max-width: 991.98px) {
   .dash-menu-btn { display: grid; }
+}
+
+/* ── Mobile improvements ────────────────────────────────── */
+@media (max-width: 767.98px) {
+  /* KPI cards: 2 per row on mobile */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Page header: stack on mobile */
+  .dash-page-header { flex-direction: column; align-items: flex-start; }
+
+  /* Tables: allow horizontal scroll, hide less important columns via class */
+  .dash-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: .75rem; }
+  .dash-table th, .dash-table td { padding: .65rem .85rem; }
+
+  /* Topbar search: hide on mobile to save space */
+  .dash-topbar-search { display: none; }
+
+  /* Sidebar on mobile: fixed full-height drawer */
+  .dash-sidebar {
+    width: 270px;
+    transform: translateX(-100%);
+    transition: transform var(--k-transition);
+  }
+  .dash-sidebar.open { transform: translateX(0); display: flex; }
+
+  /* Panels */
+  .dash-panel { padding: 1.1rem; }
+  .dash-main { padding: .85rem; gap: 1rem; }
+
+  /* Form submit buttons: full width on mobile */
+  .btn-mobile-full { width: 100%; justify-content: center; }
+
+  /* Stack row columns fully on small devices */
+  .dash-form-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 575.98px) {
+  /* Single column KPI on very small screens */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: .65rem; }
+  .kpi-value { font-size: 1.35rem; }
+
+  /* Topbar: minimal */
+  .dash-topbar { padding: 0 .85rem; gap: .5rem; }
+  .dash-topbar-brand { font-size: 1rem; }
+
+  /* Role modal: full screen on mobile */
+  #roleModal > div { border-radius: .75rem; }
 }
 
 /* Dark mode overrides */
