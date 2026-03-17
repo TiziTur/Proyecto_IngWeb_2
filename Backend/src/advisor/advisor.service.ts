@@ -166,7 +166,8 @@ export class AdvisorService {
   }
 
   async getClientsHealth() {
-    const users = await this.usersService.listAll();
+    const usersResult = await this.usersService.listAll();
+    const users = Array.isArray(usersResult) ? usersResult : usersResult.data;
     const clients = users.filter((u) => String(u.role).toLowerCase() === 'user');
 
     const result = await Promise.all(
