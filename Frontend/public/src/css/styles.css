@@ -174,7 +174,9 @@ a:hover { color: var(--k-primary-h); }
   transition: all var(--k-transition);
   text-decoration: none;
   white-space: nowrap;
+  line-height: 1.25;
 }
+.btn-k:focus-visible { outline: 2px solid var(--k-primary); outline-offset: 2px; }
 
 .btn-k-primary {
   background: var(--k-primary);
@@ -206,26 +208,108 @@ a:hover { color: var(--k-primary-h); }
 }
 .btn-k-ghost:hover { background: var(--k-primary-s); }
 
-.btn-k-lg { padding: 0.85rem 2.2rem; font-size: 1rem; }
-.btn-k-sm { padding: 0.4rem 1rem; font-size: 0.82rem; }
+/* Danger button – used for destructive actions (logout, delete) */
+.btn-k-danger {
+  background: transparent;
+  color: var(--k-danger) !important;
+  border: 1.5px solid var(--k-danger);
+}
+.btn-k-danger:hover {
+  background: #fef2f2;
+  color: #b91c1c !important;
+  border-color: #b91c1c;
+}
+[data-theme="dark"] .btn-k-danger:hover { background: #450a0a; }
 
-/* Bootstrap overrides – keep existing btn-primary working */
-.btn-primary, .app-btn {
-  background: var(--k-primary);
-  border-color: var(--k-primary);
-  color: #fff;
+/* Success button */
+.btn-k-success {
+  background: var(--k-success);
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(16,185,129,.25);
+}
+.btn-k-success:hover {
+  background: #059669;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.btn-k-lg { padding: 0.85rem 2.2rem; font-size: 1rem; }
+.btn-k-sm { padding: 0.38rem 0.95rem; font-size: 0.82rem; }
+
+/* Bootstrap overrides – keeps btn-primary, btn-sm, btn-outline-secondary consistent with Klarity */
+.btn {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
   border-radius: 999px;
+  cursor: pointer;
+  transition: all var(--k-transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  line-height: 1.25;
+}
+.btn:focus-visible { box-shadow: 0 0 0 3px rgba(59,130,246,.28); outline: none; }
+
+.btn-primary, .app-btn {
+  --bs-btn-bg: var(--k-primary);
+  --bs-btn-border-color: var(--k-primary);
+  --bs-btn-hover-bg: var(--k-primary-h);
+  --bs-btn-hover-border-color: var(--k-primary-h);
+  --bs-btn-color: #fff;
+  background: var(--k-primary);
+  border-color: var(--k-primary);
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(59,130,246,.28);
 }
 .btn-primary:hover, .app-btn:hover {
   background: var(--k-primary-h);
   border-color: var(--k-primary-h);
-  color: #fff;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59,130,246,.38);
 }
-.btn-light { background: var(--k-primary); border-color: var(--k-primary); color: #fff; font-weight: 700; border-radius: 999px; }
-.btn-light:hover { background: var(--k-primary-h); border-color: var(--k-primary-h); color: #fff; }
-.btn-outline-light { border-color: var(--k-border); color: var(--k-text2); border-radius: 999px; }
-.btn-outline-light:hover { background: var(--k-surface2); border-color: var(--k-primary); color: var(--k-primary); }
+.btn-primary:active, .app-btn:active { transform: translateY(0); }
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--k-text2);
+  --bs-btn-border-color: var(--k-border);
+  --bs-btn-hover-color: var(--k-primary);
+  --bs-btn-hover-bg: var(--k-surface2, var(--k-bg));
+  --bs-btn-hover-border-color: var(--k-primary);
+  color: var(--k-text2) !important;
+  border-color: var(--k-border) !important;
+  background: transparent;
+}
+.btn-outline-secondary:hover {
+  color: var(--k-primary) !important;
+  border-color: var(--k-primary) !important;
+  background: var(--k-surface2, var(--k-bg)) !important;
+}
+
+.btn-sm {
+  padding: 0.38rem 0.95rem;
+  font-size: 0.82rem;
+}
+
+.btn-light { background: var(--k-primary); border-color: var(--k-primary); color: #fff !important; }
+.btn-light:hover { background: var(--k-primary-h); border-color: var(--k-primary-h); color: #fff !important; }
+.btn-outline-light { border-color: var(--k-border) !important; color: var(--k-text2) !important; }
+.btn-outline-light:hover { background: var(--k-surface2) !important; border-color: var(--k-primary) !important; color: var(--k-primary) !important; }
+
+/* Danger variant for plain .btn */
+.btn-danger-outline {
+  background: transparent;
+  color: var(--k-danger) !important;
+  border: 1.5px solid var(--k-danger);
+  border-radius: 999px;
+}
+.btn-danger-outline:hover {
+  background: #fef2f2;
+  color: #b91c1c !important;
+  border-color: #b91c1c;
+}
+[data-theme="dark"] .btn-danger-outline:hover { background: #450a0a; }
 
 /* ── Badges / Pills ────────────────────────────────────────── */
 .k-badge {
