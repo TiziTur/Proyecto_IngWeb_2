@@ -1,0 +1,7 @@
+{
+  "outputDirectory": "Frontend/public",
+  "rewrites": [
+    { "source": "/", "destination": "/src/html/index.html" },
+    { "source": "/login", "destination": "/src/html/login.html" }
+  ]
+}
