@@ -1,12 +1,12 @@
 DOCUMENTACION TECNICA Y DE PROCESO - KLARITY
-Version: 2026-03-17
+Version: 2026-03-28
 Repositorio: Proyecto_IngWeb_2
 
 ====================================================================
 1) RESUMEN DEL PROYECTO
 ====================================================================
 Klarity es una plataforma web full-stack para gestion de gastos personales.
-Incluye paneles por rol (usuario, asesor, admin), OCR de tickets y recomendaciones.
+Incluye paneles por rol (usuario, asesor, admin), OCR de tickets, recomendaciones y autenticacion reforzada.
 Arquitectura basada en frontend estatico + backend NestJS REST con JWT.
 
 ====================================================================
@@ -22,12 +22,11 @@ Arquitectura basada en frontend estatico + backend NestJS REST con JWT.
   - dashboard.html (usuario)
   - advisor.html (asesor)
   - admin.html (admin)
-- Estilos:
-  - styles.css (design system global)
-  - dashboard.css (estilos de paneles)
-- Librerias visuales:
-  - Bootstrap CSS (CDN)
-  - Bootstrap Icons
+  - login.html (auth)
+- Scripts relevantes:
+  - login.js
+  - i18n.js
+  - universal-i18n.js (traduccion runtime de textos hardcodeados)
 
 2.2 Backend
 - Framework: NestJS.
@@ -53,6 +52,12 @@ Arquitectura basada en frontend estatico + backend NestJS REST con JWT.
 - email (unique)
 - name
 - passwordHash
+- emailVerified
+- emailVerificationTokenHash
+- emailVerificationExpiresAt
+- passwordResetTokenHash
+- passwordResetExpiresAt
+- authProvider (password/google)
 - role (user/advisor/admin)
 - createdAt
 - updatedAt
@@ -85,75 +90,59 @@ Arquitectura basada en frontend estatico + backend NestJS REST con JWT.
 ====================================================================
 4.1 Metodo de autenticacion
 - JWT Bearer Token.
-- Login y registro via /auth.
-- Estrategia: passport-jwt.
+- Login y registro tradicional via /auth.
+- Login social con Google ID Token.
+- Verificacion de email para cuentas password.
+- Recuperacion de cuenta por token temporal.
 
 4.2 RBAC
 - Roles definidos en enum.
 - Decorador @Roles.
 - RolesGuard en rutas protegidas.
 
-4.3 Flujo general
-1. Usuario loguea.
-2. Backend valida credenciales (bcrypt compare).
-3. Backend firma JWT.
-4. Frontend guarda token.
-5. Requests posteriores incluyen Authorization: Bearer <token>.
+4.3 Flujo general actual
+1. Registro crea usuario con emailVerified=false.
+2. Backend genera token de verificacion, guarda hash y envia enlace por email.
+3. Usuario verifica correo (endpoint verify-email).
+4. Login valida credenciales y estado de verificacion.
+5. Backend firma JWT y frontend guarda token.
+6. Requests posteriores usan Authorization: Bearer <token>.
 
 ====================================================================
 5) SEGURIDAD IMPLEMENTADA
 ====================================================================
 - Passwords hasheadas con bcryptjs.
-- Validacion de payloads con ValidationPipe global:
-  - whitelist
-  - transform
-  - forbidNonWhitelisted
-- CORS configurable por variable CORS_ORIGIN.
+- ValidationPipe global con whitelist, transform y forbidNonWhitelisted.
+- DTOs de auth endurecidos (tamano y formato, password fuerte).
+- CORS configurable por CORS_ORIGIN.
 - Helmet activo para headers de seguridad.
 - JWT_SECRET configurable por entorno.
-- Guardias de autenticacion y de roles.
-- DTOs con class-validator.
-
-Recomendaciones adicionales para siguiente etapa:
-- Rate limiting en auth y advisor.
-- Auditoria persistente de cambios criticos.
-- Rotacion de secretos y politicas de expiracion token.
-- Separar seeds de produccion.
+- Guardias de autenticacion y roles.
+- Rate limiting global con @nestjs/throttler.
+- Throttling adicional por endpoint en auth.
+- Tokens de verify/reset almacenados hasheados (SHA-256).
+- Normalizacion de email en backend.
 
 ====================================================================
 6) FUNCIONALIDADES POR ROL
 ====================================================================
 6.1 Usuario
 - CRUD de gastos.
-- Marcado de gastos mensuales + autodeteccion por concepto.
-- KPIs de resumen.
-- Selector global de moneda de visualizacion (impacta KPIs, tablas y graficos).
-- Filtros por categoria.
-- OCR ticket.
-- OCR ticket con alta automatica de gasto en dashboard.
-- Confirmacion visual de eliminacion de gasto con modal propio.
-- Presupuestos visuales.
-- Insights rapidos:
-  - mes actual vs anterior
-  - comercio mas frecuente
-- Sugerencia de categoria por concepto.
-- Comprometido proximo mes para gastos recurrentes.
-- UX mobile: menu drawer + FAB.
+- OCR ticket con alta automatica.
+- Presupuestos visuales y selector de moneda global.
+- Insights rapidos y recurrentes.
+- Chat asesor.
 
 6.2 Asesor
 - Lista de clientes con busqueda.
-- Semaforo financiero por cliente.
-- Resumen visual por cliente.
-- Patrones visuales con timeline y picos.
-- Generacion de recomendaciones.
-- Presentacion de respuesta IA por secciones (Problema, Diagnostico, Solucion, Proximo paso).
-- Persistencia e historial de recomendaciones.
+- Semaforo financiero.
+- Resumen visual + patrones timeline.
+- Recomendaciones con historial.
 
 6.3 Admin
 - Vista global de usuarios y gastos.
-- Filtro y busqueda de usuarios.
-- Cambio de rol con confirmacion.
-- Grafico de nuevos usuarios (6 meses).
+- Filtro/busqueda y cambio de rol.
+- Grafico de nuevos usuarios.
 
 ====================================================================
 7) ENDPOINTS PRINCIPALES
@@ -161,18 +150,21 @@ Recomendaciones adicionales para siguiente etapa:
 7.1 Auth
 - POST /api/auth/register
 - POST /api/auth/login
+- POST /api/auth/google
+- POST /api/auth/verify-email
+- POST /api/auth/resend-verification
+- POST /api/auth/request-password-reset
+- POST /api/auth/reset-password
 - GET /api/auth/me
 - PUT /api/auth/profile
 - PATCH /api/auth/profile
 
 7.2 Users
 - GET /api/users
-  - filtros opcionales: q, role, page, limit
 - PATCH /api/users/:id
 
 7.3 Expenses
 - GET /api/expenses
-  - filtros opcionales: q, category, dateFrom, dateTo, userId, page, limit
 - POST /api/expenses
 - PUT /api/expenses/:id
 - DELETE /api/expenses/:id
@@ -183,39 +175,31 @@ Recomendaciones adicionales para siguiente etapa:
 - GET /api/advisor/patterns/:userId
 - GET /api/advisor/users/:userId/patterns (compat)
 - POST /api/advisor/ask
-  - body permitido: provider, apiKey, question, userId (opcional)
-  - no enviar propiedad expenses
 - GET /api/advisor/recommendations/:userId
 - GET /api/advisor/clients/health
 
 7.5 Tickets
 - POST /api/tickets/ocr
-- POST /api/tickets/upload (compat legacy)
-- Regla de importe OCR: prioridad a lineas con TOTAL/A PAGAR, descartando ruido de direccion.
-- OCR configurable por entorno: OCR_PROVIDER=ocrspace + OCR_SPACE_API_KEY.
-- Fallback automatico a Tesseract local si OCR externo no responde.
+- POST /api/tickets/upload (compat)
 
 ====================================================================
-8) DECISIONES TECNICAS Y MOTIVACION
-====================================================================
-- Bootstrap CSS agregado en dashboards para corregir render de botones/clases utility.
-- Se mantuvo compatibilidad hacia atras en endpoints:
-  - si no hay paginacion, respuesta simple tipo array
-  - con paginacion, respuesta data + meta
-- Se adapto frontend para ids uuid en onclick y requests.
-- Se incorporo persistencia de recomendaciones para trazabilidad real.
-- Se reforzo UX mobile y consistencia visual con variantes de botones.
-
-====================================================================
-9) CONFIGURACION DE ENTORNO
+8) CONFIGURACION DE ENTORNO
 ====================================================================
 Backend (minimo):
 - DATABASE_URL
 - JWT_SECRET
-- NODE_ENV
 - PORT
 - DB_SSL
 - CORS_ORIGIN
+- APP_URL
+
+Backend (auth extendido):
+- GOOGLE_CLIENT_ID
+- SMTP_HOST
+- SMTP_PORT
+- SMTP_USER
+- SMTP_PASS
+- MAIL_FROM
 
 Seeds (opcional):
 - SEED_DEFAULT_PASSWORD
@@ -225,45 +209,17 @@ Seeds (opcional):
 
 Frontend:
 - Config API base en src/js/config.js
-- Netlify rewrites configuradas para rutas limpias.
+- Config Google client id en src/js/config.js (window.KLARITY_GOOGLE_CLIENT_ID)
+- Netlify rewrites para rutas limpias.
 
 ====================================================================
-10) PROCESO DE TRABAJO APLICADO
+9) CAMBIOS RECIENTES (2026-03-28)
 ====================================================================
-- Paso 1: diagnostico de UI (causa raiz de botones sin bootstrap).
-- Paso 2: correccion visual global (CSS + clases).
-- Paso 3: mejora de UX por rol (admin/advisor/user).
-- Paso 4: alineacion backend-frontend (endpoints, DTOs, roles).
-- Paso 5: persistencia de recomendaciones y semaforo advisor.
-- Paso 6: filtros y paginacion opcionales para escalabilidad.
-- Paso 7: hardening basico y documentacion de QA.
-
-====================================================================
-11) RIESGOS Y LIMITES ACTUALES
-====================================================================
-- Recomendaciones advisor usan motor local de reglas, no LLM remoto real.
-- Sin suite automatizada de tests e2e aun.
-- Sin observabilidad completa (metricas/alerts centralizadas).
-- Seeds dependen de variables para passwords controladas.
-
-====================================================================
-12) ROADMAP SUGERIDO
-====================================================================
-- Persistir presupuestos en backend.
-- Exportacion CSV/PDF.
-- Rate limiting y auditoria completa.
-- Tests unitarios y e2e con CI.
-- Dashboard de salud backend con latencia/error rate.
-
-====================================================================
-13) OPERACION DE DEPLOY
-====================================================================
-Secuencia recomendada al validar:
-1. Desplegar backend en Railway.
-2. Verificar variables.
-3. Validar endpoints base /api.
-4. Desplegar frontend en Netlify.
-5. Ejecutar matriz QA completa.
-6. Corregir hallazgos y revalidar.
+- Se elimino exposicion de credenciales demo en login.
+- Se agrego recuperacion de cuenta y reenvio de verificacion en UI.
+- Se incorporo Google Sign-In.
+- Se agrego servicio de correo para verify/reset con fallback a logs.
+- Se aplico rate limiting global + por endpoints auth.
+- Se completo la traduccion EN en todas las pages con universal-i18n runtime.
 
 Fin del documento.

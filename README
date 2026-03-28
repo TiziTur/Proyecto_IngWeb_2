@@ -1,57 +1,57 @@
-# Klarity - Plataforma Inteligente de Gestión de Gastos Personales
+# Klarity - Plataforma Inteligente de Gestion de Gastos Personales
 
-Aplicación web full-stack para la gestión financiera personal con dashboards rol-basados, análisis de gastos en tiempo real y recomendaciones impulsadas por IA.
+Aplicacion web full-stack para la gestion financiera personal con dashboards por rol, analisis de gastos en tiempo real y recomendaciones impulsadas por IA.
 
-**Proyecto:** Ingeniería Web II (2026)  
-**Estado:** En proceso   
-**Última actualización:**  16 de Marzo de 2026
-
----
-
-## 🎯 Descripción General
-
-Klarity es una plataforma moderna de gestión financiera que empodera a usuarios para rastrear, analizar y optimizar sus gastos personales. Con arquitectura cliente-servidor escalable, soporte multi-moneda y paneles especializados por rol (usuario, asesor, administrador), ofrece una experiencia integral de control financiero.
+**Proyecto:** Ingenieria Web II (2026)  
+**Estado:** En proceso  
+**Ultima actualizacion:** 28 de Marzo de 2026
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🎯 Descripcion General
 
-| Capa | Tecnologías |
+Klarity es una plataforma moderna de gestion financiera que permite registrar, analizar y optimizar gastos personales. Incluye arquitectura cliente-servidor, soporte multi-moneda y paneles especializados por rol (usuario, asesor y administrador).
+
+---
+
+## 🛠️ Stack Tecnologico
+
+| Capa | Tecnologias |
 |------|-------------|
-| **Frontend** | HTML5, CSS3, JavaScript ES6+, Bootstrap Icons |
-| **Diseño** | Sistema de diseño Klarity personalizado, responsive (mobile-first) |
-| **Backend** | NestJS, TypeORM, PostgreSQL, JWT Authentication |
-| **Autenticación** | JWT Bearer tokens, Role-Based Access Control (RBAC) |
-| **OCR & IA** | Tesseract.js (local), OpenAI/Anthropic (opcional) |
-| **Hosting** | Netlify (Frontend), Railway (Backend + DB) |
-| **Internacionalización** | ES/EN (sistema i18n completo) |
+| Frontend | HTML5, CSS3, JavaScript ES6+, Bootstrap Icons |
+| Diseno | Sistema Klarity personalizado, responsive |
+| Backend | NestJS, TypeORM, PostgreSQL/SQLite |
+| Autenticacion | JWT + RBAC, verificacion por correo, recuperacion de cuenta, Google Sign-In |
+| OCR e IA | OCR.space + fallback Tesseract, OpenAI/Anthropic opcional |
+| Hosting | Netlify (Frontend), Railway (Backend + DB) |
+| Internacionalizacion | ES/EN (con cobertura global en todas las paginas) |
 
 ---
 
 ## 🏗️ Arquitectura del Sistema
 
-```
+```txt
 ┌─────────────────────────────────────────────────────────┐
-│                    NAVEGADOR (Frontend)                  │
-│  ┌──────────────┬──────────────┬──────────────────────┐  │
-│  │   Dashboard  │   Advisor    │      Admin Panel     │  │
-│  │   (Usuario)  │   (Asesor)   │  (Administrador)     │  │
-│  └──────────────┴──────────────┴──────────────────────┘  │
-│              (Hosted en Netlify)                         │
+│                  NAVEGADOR (Frontend)                  │
+│  ┌──────────────┬──────────────┬──────────────────────┐ │
+│  │  Dashboard   │   Advisor    │      Admin Panel     │ │
+│  │  (Usuario)   │   (Asesor)   │   (Administrador)    │ │
+│  └──────────────┴──────────────┴──────────────────────┘ │
+│                 (Hosted en Netlify)                    │
 └──────────────────────┬──────────────────────────────────┘
-                       │ REST API / JWT Auth
+                       │ REST API / JWT
                        ↓
 ┌─────────────────────────────────────────────────────────┐
-│    BACKEND NestJS (Hosted en Railway)                   │
+│               BACKEND NestJS (Railway)                 │
 │  ┌─────────────────────────────────────────────────────┐│
-│  │ Auth | Users | Expenses | Advisor | Tickets/OCR     ││
+│  │   Auth | Users | Expenses | Advisor | Tickets/OCR  ││
 │  └─────────────────────────────────────────────────────┘│
 └──────────────────────┬──────────────────────────────────┘
                        │ SQL
                        ↓
-            ┌──────────────────────┐
-            │  PostgreSQL (Railway) │
-            └──────────────────────┘
+            ┌──────────────────────────┐
+            │ PostgreSQL (Railway DB)  │
+            └──────────────────────────┘
 ```
 
 ---
@@ -60,321 +60,170 @@ Klarity es una plataforma moderna de gestión financiera que empodera a usuarios
 
 | Rol | Acceso | Funcionalidades |
 |-----|--------|-----------------|
-| **Usuario** | `/dashboard` | Registrar gastos, visualizar análisis personal, suscripciones, chatbot asesor |
-| **Asesor** | `/advisor` | Dashboard de clientes, análisis de patrones, recomendaciones personalizadas |
-| **Administrador** | `/admin` | Gestión de usuarios, roles, vista global de gastos, salud del sistema |
+| Usuario | `/dashboard` | Registrar gastos, OCR, presupuestos, analisis personal, chatbot asesor |
+| Asesor | `/advisor` | Ver clientes, analizar patrones, generar recomendaciones, consultar historial |
+| Administrador | `/admin` | Gestion global de usuarios/roles, vista global de gastos y estado de sistema |
 
 ---
 
 ## ✨ Funcionalidades Principales
 
 ### Cumplidas (Requisitos)
-- ✅ Autenticación JWT con registro y login seguro
-- ✅ Gestión de perfiles con edición
-- ✅ CRUD completo de gastos
-- ✅ Carga de tickets (imagen) con OCR para extracción automática
-- ✅ Visualización de gastos y dashboards análiticos
-- ✅ Análisis de patrones de consumo
-- ✅ Recomendaciones financieras automáticas
-- ✅ Sistema de roles (usuario, asesor, administrador)
+- ✅ Autenticacion JWT con registro y login seguro.
+- ✅ Gestion de perfiles con edicion.
+- ✅ CRUD completo de gastos.
+- ✅ Carga de tickets con OCR para extraccion automatica.
+- ✅ Visualizacion de gastos y dashboards analiticos.
+- ✅ Analisis de patrones de consumo.
+- ✅ Recomendaciones financieras.
+- ✅ Sistema de roles (usuario, asesor, administrador).
 
 ### Extras Implementados
-- 🌍 Soporte multi-moneda (ARS, USD, EUR, GBP, MXN)
-- 🔄 Selector de moneda de visualización global en resumen/presupuestos
-- 💰 Presupuestos y límites de gasto con visualización de progreso
-- 🔁 Marcado de gastos mensuales con autodetección por concepto
-- 🎨 Sistema de temas (modo oscuro/claro) persistente
-- 🌐 Internacionalización completo (ES/EN)
-- 🤖 Chatbot asesor financiero integrado
-- 🧠 Respuesta del asesor en formato seccionado (Problema, Diagnóstico, Solución, Próximo paso)
-- 📊 Gráficos interactivos de gasto por categoría
-- 🔐 RBAC (Control de Acceso Basado en Roles) avanzado
-- ♿ Accesibilidad WCAG completa (aria-labels, navegación por teclado)
-- 🗑️ Confirmación visual personalizada para eliminar gastos (sin popup nativo)
+- 🌍 Soporte multi-moneda (ARS, USD, EUR, GBP, MXN).
+- 🔄 Selector global de moneda de visualizacion.
+- 💰 Presupuestos y limites de gasto con barra de progreso.
+- 🔁 Marcado de gastos mensuales con autodeteccion por concepto.
+- 🎨 Sistema de temas (claro/oscuro) persistente.
+- 🌐 Internacionalizacion ES/EN con cobertura completa en todas las pages.
+- 🤖 Chatbot asesor financiero integrado.
+- 🧠 Respuesta de asesor en formato seccionado (Problema, Diagnostico, Solucion, Proximo paso).
+- 📊 Graficos interactivos de gasto por categoria.
+- 🔐 Verificacion de correo al registrarse.
+- 🔑 Recuperacion de cuenta por email con token temporal.
+- 🧩 Login/registro con Google (ID Token).
+- 🚦 Rate limiting global y por endpoints de autenticacion.
+- 🛡️ Endurecimiento de seguridad en auth (DTOs, validaciones fuertes, tokens hasheados).
+- 🗑️ Confirmacion visual personalizada para eliminar gastos.
+- 🙈 Remocion de credenciales demo visibles en pantalla de login.
 
 ---
 
-## 🚀 Ejecución Local
-
-### Requisitos Previos
-- Node.js 18+ y npm 8+
-- PostgreSQL 12+ (o SQLite para desarrollo local)
-- Git
+## 🚀 Ejecucion Local
 
 ### Backend
 
 ```bash
 cd Backend
 npm install
-cp .env.example .env  # Configurar variables
+cp .env.example .env
 npm run start:dev
 ```
 
-**Variables de entorno necesarias:**
-```
-DATABASE_URL=postgresql://...
-JWT_SECRET=tu_secret_fuerte
-NODE_ENV=development
-PORT=3000
-OCR_PROVIDER=ocrspace
-OCR_SPACE_API_KEY=tu_api_key_ocr_space
-```
+Variables clave (`Backend/.env`):
 
-El API estará disponible en `http://localhost:3000/api`
+```env
+PORT=3000
+DATABASE_URL=
+DB_SSL=false
+CORS_ORIGIN=http://localhost:5173
+
+JWT_SECRET=replace_with_a_long_random_secret
+APP_URL=http://localhost:5173
+
+GOOGLE_CLIENT_ID=
+
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+MAIL_FROM=no-reply@klarity.local
+
+SEED_DEFAULT_PASSWORD=
+SEED_ADVISOR_PASSWORD=
+SEED_ADMIN_PASSWORD=
+SEED_DEMO_PASSWORD=
+```
 
 ### Frontend
 
 ```bash
 cd Frontend/public
-# Servir con servidor estático (ej: Live Server, http-server, etc)
-open src/html/index.html
+# servir archivos estaticos (Live Server, http-server, etc)
 ```
 
-O usando `http-server`:
-```bash
-npm install -g http-server
-http-server Frontend/public -p 8080
+`config.js` contempla:
+- `window.WISEPOCKET_API_BASE_URL`
+- `window.KLARITY_GOOGLE_CLIENT_ID`
+
+---
+
+## 📡 API Auth
+
+Endpoints principales:
+
+```txt
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/google
+POST /api/auth/verify-email
+POST /api/auth/resend-verification
+POST /api/auth/request-password-reset
+POST /api/auth/reset-password
+GET  /api/auth/me
+PATCH /api/auth/profile
+PUT   /api/auth/profile
 ```
 
 ---
 
-## 📡 API REST Endpoints
+## 🔐 Seguridad Implementada
 
-### Autenticación
-```
-POST   /auth/register        - Crear cuenta
-POST   /auth/login           - Iniciar sesión
-GET    /auth/profile         - Obtener perfil
-PATCH  /auth/profile         - Actualizar perfil
-```
-
-### Usuarios (Asesor/Admin)
-```
-GET    /users                - Listar usuarios (filtros opcionales: q, role, page, limit)
-PATCH  /users/:id            - Actualizar rol de usuario
-```
-
-### Gastos
-```
-GET    /expenses             - Obtener gastos (filtros opcionales: q, category, dateFrom, dateTo, userId, page, limit)
-POST   /expenses             - Crear nuevo gasto (incluye isMonthly opcional)
-PUT    /expenses/:id         - Actualizar gasto
-DELETE /expenses/:id         - Eliminar gasto
-```
-
-### OCR y Tickets
-```
-POST   /tickets/ocr          - Procesar ticket OCR (campo multipart: image) y guardar gasto en dashboard
-POST   /tickets/upload       - Endpoint compatible legacy (campo multipart: ticket)
-```
-
-Notas de OCR:
-- Se puede usar OCR externo con `OCR_PROVIDER=ocrspace` y `OCR_SPACE_API_KEY`.
-- Si OCR.space falla o no esta configurado, backend usa Tesseract local como fallback.
-- La extracción de importe prioriza líneas con "TOTAL"/"A PAGAR".
-- Se ignoran líneas típicas de dirección para evitar tomar números de calle como monto.
-
-### Asesor (Análisis)
-```
-GET    /advisor/overview/:id     - Overview visualizable del cliente
-GET    /advisor/patterns/:id     - Patrones y timeline de consumo
-POST   /advisor/ask              - Obtener recomendación IA (payload: provider, apiKey, question, userId opcional)
-GET    /advisor/recommendations/:id - Historial de recomendaciones guardadas
-GET    /advisor/clients/health   - Semáforo financiero de clientes
-```
+- JWT con expiracion y rutas protegidas.
+- Passwords hasheadas con bcrypt.
+- ValidationPipe global con whitelist y forbidNonWhitelisted.
+- Reglas de password fuerte en registro/reset.
+- Rate limiting global y por endpoints sensibles de auth.
+- Tokens de verificacion y recuperacion guardados hasheados (SHA-256).
+- CORS configurable por entorno.
+- Helmet habilitado.
 
 ---
 
-## ✅ Checklist de Validación (Railway + Netlify)
+## 🌐 Deploy (Railway + Netlify)
 
-Cuando levantes ambos servicios, valida esto en orden:
+### Railway (Backend)
+- Configurar `DATABASE_URL`, `JWT_SECRET`, `DB_SSL`, `CORS_ORIGIN`, `APP_URL`.
+- Para auth extendido: `GOOGLE_CLIENT_ID`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`.
 
-1. Login por rol
-- `demo@klarity.app` entra a `/dashboard`
-- `advisor@klarity.app` entra a `/advisor`
-- `admin@klarity.app` entra a `/admin`
-
-2. Dashboard usuario
-- Crear gasto manual con `Concepto` y moneda `GBP` o `MXN`
-- Marcar gasto como mensual y validar que persiste
-- Ver que aparece en tabla y KPIs
-- Probar botón flotante mobile (FAB)
-
-3. Advisor
-- Ver clientes con estado financiero (semáforo)
-- Abrir `Resumen` y `Patrones` de un cliente
-- Generar recomendación y confirmar que aparece en `Historial guardado`
-
-4. Admin
-- Buscar usuarios por nombre/email
-- Cambiar rol con confirmación modal
-- Confirmar gráfico de `Nuevos usuarios (últimos 6 meses)`
-
-5. Mobile
-- Sidebar drawer con botón `Menú`
-- Tabla de gastos sin columna `Moneda` en pantallas chicas
-
-6. Backend API
-- `GET /api/users?q=demo&limit=10&page=1`
-- `GET /api/expenses?category=Ocio&dateFrom=2026-01-01&dateTo=2026-12-31`
-- `GET /api/advisor/recommendations/{userId}`
+### Netlify (Frontend)
+- Public directory: `Frontend/public`.
+- Rutas limpias en `netlify.toml`.
+- Configurar `window.KLARITY_GOOGLE_CLIENT_ID` para Google Sign-In.
 
 ---
 
-## 🌐 Despliegue en Producción
+## 📁 Estructura
 
-### Backend en Railway
-
-1. Conectar repositorio GitHub a Railway
-2. Crear aplicación Node.js
-3. Crear complemento PostgreSQL
-4. Variables de entorno:
-   - `DATABASE_URL` (auto-generada)
-   - `JWT_SECRET` (generar secret fuerte)
-   - `NODE_ENV=production`
-   - `DB_SSL=true`
-
-API Base: `https://wisepocket-production.up.railway.app/api`
-
-### Frontend en Netlify
-
-1. Conectar repositorio GitHub a Netlify
-2. Build command: (no aplica - frontend estático)
-3. Publish directory: `Frontend/public`
-4. Redirecciones configuradas en `netlify.toml`:
-   - `/` → `index.html`
-   - `/login` → `login.html`
-   - `/dashboard` → `dashboard.html`
-   - `/advisor` → `advisor.html`
-   - `/admin` → `admin.html`
-
----
-
-## 📁 Estructura del Proyecto
-
-```
+```txt
 Proyecto_IngWeb_2/
 ├── Backend/
 │   ├── src/
-│   │   ├── auth/        # Autenticación JWT
-│   │   ├── users/       # Gestión de usuarios
-│   │   ├── expenses/    # CRUD de gastos
-│   │   ├── tickets/     # OCR y procesamiento
-│   │   ├── advisor/     # Análisis y recomendaciones
-│   │   └── main.ts      # Entry point
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── Frontend/
-│   └── public/
-│       └── src/
-│           ├── html/
-│           │   ├── index.html      # Landing page
-│           │   ├── login.html      # Autenticación
-│           │   ├── dashboard.html  # Panel usuario
-│           │   ├── advisor.html    # Panel asesor
-│           │   └── admin.html      # Panel admin
-│           ├── css/
-│           │   ├── styles.css      # Estilos globales
-│           │   ├── dashboard.css   # Estilos dashboards
-│           │   └── login.css       # Estilos login
-│           └── js/
-│               ├── config.js       # Configuración
-│               ├── login.js        # Lógica autenticación
-│               ├── theme.js        # Toggle tema
-│               ├── i18n.js         # Internacionalización
-│               └── main.js         # Script general
-│
-├── netlify.toml         # Configuración Netlify
-└── README.md            # Este archivo
+│   │   ├── auth/
+│   │   ├── users/
+│   │   ├── expenses/
+│   │   ├── tickets/
+│   │   ├── advisor/
+│   │   └── main.ts
+│   └── .env.example
+├── Frontend/public/src/
+│   ├── html/
+│   ├── css/
+│   └── js/
+├── docs/
+│   ├── DOCUMENTACION_PROCESO_PROYECTO.txt
+│   └── MATRIZ_QA_DEPLOY.txt
+└── README
 ```
 
 ---
 
-## 🔐 Seguridad
+## 📊 Commits relevantes recientes
 
-- ✅ JWT con firma y expiración
-- ✅ Contraseñas hasheadas con bcrypt
-- ✅ CORS configurado en backend
-- ✅ Validación de entrada en DTOs
-- ✅ Rate limiting recomendado para producción
-- ✅ HTTPS obligatorio en Netlify/Railway
+- `83c9c85` Harden auth flows and complete English localization coverage
+- `d48bab3` Improve advisor UX, global currency selector and custom delete modal
 
 ---
 
-## 🛑 Pausar Servicios
+## 🔗 Repositorio
 
-Para evitar consumo de créditos durante períodos inactivos:
-
-**Railway:**
-1. Dashboard → Proyecto → Settings → Danger Zone → "Pause Project"
-2. Para reactivar: "Resume"
-
-**Netlify:**
-1. Site settings → Build & deploy → Stop builds
-2. Para reactivar: Reconectar repositorio o trigger manual
-
----
-
-## 📝 Credenciales Demo
-
-```
-Asesor:
-  Email: advisor@wisepocket.com
-  Contraseña: 123456
-```
-
----
-
-## 👨‍💻 Desarrollo Local
-
-### Hot Reload Backend
-```bash
-npm run start:dev
-```
-
-### Debug Mode
-- Backend: Implementado en `debug` directamente con TypeORM logging
-- Frontend: Console logs en funciones críticas
-
----
-
-## 📊 Commits Principales
-
-- **903843f** - Feat: Complete Klarity redesign with role dashboards
-- Features: Dashboard HTML5, Advisor panel, Admin panel, CSS completo, i18n, themes
-
----
-
-## 🤝 Contribuciones
-
-Este es un proyecto de educativo de Ingeniería Web II. Cambios y mejoras son bienvenidas.
-
----
-
-## 📄 Licencia
-
-Proyecto educativo - Ingeniería Web II, 2026
-
----
-
-**Última actualización:** Marzo 2026  
-**Versión:** 1.0.0
-2. Netlify usa netlify.toml automaticamente.
-3. Publica desde Frontend/public.
-
-Rutas de uso en produccion
-
-- Home: usa la URL de Netlify (dominio principal).
-- Login: URL-de-Netlify/login
-- Backend API: https://wisepocket-production.up.railway.app/api
-
-Nota importante para ver la web completa
-
-- Debes navegar siempre desde la URL principal de Netlify y su ruta /login.
-- El frontend ya esta configurado para consumir Railway con:
-  - Frontend/public/src/js/config.js
-
-Repositorio
-
-- GitHub: https://github.com/TiziTur/WisePocket
+- https://github.com/TiziTur/Proyecto_IngWeb_2

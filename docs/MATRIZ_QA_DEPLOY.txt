@@ -1,27 +1,29 @@
 MATRIZ QA - KLARITY
-Version: 2026-03-17
+Version: 2026-03-28
 Objetivo: validar end-to-end frontend + backend luego de encender Railway y Netlify.
 
 ====================================================================
 0) PRE-CHECK
 ====================================================================
 Estado requerido:
-- Backend deployado y en estado healthy.
+- Backend deployado y healthy.
 - Frontend deployado en Netlify.
 - Variables de entorno cargadas en Railway.
 
 Variables minimas backend:
 - DATABASE_URL
 - JWT_SECRET
-- NODE_ENV=production
-- DB_SSL=true (si Railway lo requiere)
-- CORS_ORIGIN=https://TU-SITIO-NETLIFY
+- DB_SSL=true (si aplica)
+- CORS_ORIGIN=https://TU-SITIO
+- APP_URL=https://TU-SITIO
 
-Variables opcionales (seed users):
-- SEED_ADMIN_PASSWORD
-- SEED_ADVISOR_PASSWORD
-- SEED_DEMO_PASSWORD
-- SEED_DEFAULT_PASSWORD
+Variables auth extendido:
+- GOOGLE_CLIENT_ID
+- SMTP_HOST
+- SMTP_PORT
+- SMTP_USER
+- SMTP_PASS
+- MAIL_FROM
 
 Resultado esperado:
 - /api responde.
@@ -30,29 +32,40 @@ Resultado esperado:
 ====================================================================
 1) AUTENTICACION Y RBAC
 ====================================================================
-Caso A: login usuario
+Caso A: registro + verificacion email
 Pasos:
 1. Ir a /login.
-2. Iniciar con demo@klarity.app.
-3. Confirmar redireccion a /dashboard.
+2. Crear cuenta nueva (idealmente Yopmail).
+3. Abrir mail y entrar al link con verifyToken.
+4. Intentar login.
 Esperado:
-- Token guardado en storage.
-- No acceso a /advisor ni /admin.
+- Sin verificacion previa, login bloqueado.
+- Tras verificacion, login exitoso.
 
-Caso B: login advisor
+Caso B: login usuario/advisor/admin
 Pasos:
-1. Login advisor@klarity.app.
-2. Confirmar redireccion a /advisor.
+1. Login con cada rol.
 Esperado:
-- Puede ver /advisor.
-- No puede entrar a /admin.
+- user -> /dashboard
+- advisor -> /advisor
+- admin -> /admin
 
-Caso C: login admin
+Caso C: login Google
 Pasos:
-1. Login admin@klarity.app.
-2. Confirmar redireccion a /admin.
+1. Click en "Continuar con Google".
+2. Seleccionar cuenta.
 Esperado:
-- Puede gestionar usuarios y ver gastos globales.
+- Login exitoso.
+- Usuario creado si no existia.
+
+Caso D: recuperacion de cuenta
+Pasos:
+1. Click "Recuperar cuenta".
+2. Solicitar reset por email.
+3. Abrir link con resetToken y cambiar password.
+4. Login con nueva password.
+Esperado:
+- Flujo completo sin errores.
 
 ====================================================================
 2) DASHBOARD USUARIO
@@ -60,160 +73,99 @@ Esperado:
 Caso A: alta de gasto manual
 Pasos:
 1. Ir a "Anadir gasto".
-2. Cargar concepto, categoria, monto, moneda GBP o MXN.
-3. Marcar opcion de gasto mensual para un concepto recurrente (ej: alquiler).
-4. Guardar.
+2. Cargar concepto, categoria, monto y moneda.
+3. Guardar.
 Esperado:
-- Registro exitoso.
-- Aparece en tabla y KPI.
-- Se mantiene flag mensual para ese gasto.
+- Registro exitoso en tabla/KPI.
 
-Caso B: sugerencia de categoria
+Caso B: OCR
 Pasos:
-1. Escribir concepto: Netflix.
+1. Subir ticket.
 Esperado:
-- Sugiere/aplica categoria Suscripciones.
+- Extrae y guarda gasto automaticamente.
 
-Caso C: insights y recurrentes
-Pasos:
-1. Ver panel "Insights rapidos".
-2. Ver bloque "Comprometido del proximo mes".
-Esperado:
-- Muestra delta mes actual vs anterior.
-- Muestra comercio frecuente.
-- Si hay recurrencia, estima total proximo mes.
-
-Caso D: mobile UX
+Caso C: mobile UX
 Pasos:
 1. Abrir en viewport movil.
-2. Probar boton Menu y FAB.
+2. Probar menu/FAB.
 Esperado:
-- Sidebar funciona como drawer.
-- FAB abre "Anadir gasto".
-- Columna Moneda oculta en tabla mobile.
+- Drawer y FAB funcionales.
 
 ====================================================================
 3) PANEL ASESOR
 ====================================================================
-Caso A: lista clientes + semaforo
-Pasos:
-1. Entrar a /advisor.
-2. Revisar tabla de clientes.
+Caso A: clientes + semaforo
 Esperado:
-- Columna Estado con Saludable/Atencion/Alto riesgo.
-- Busqueda por nombre/email funcional.
+- Estado Saludable/Atencion/Alto riesgo.
 
-Caso B: resumen cliente
-Pasos:
-1. Seleccionar cliente.
-2. Abrir Resumen.
+Caso B: resumen y patrones
 Esperado:
-- KPIs visibles (total, cantidad, ticket promedio).
-- Distribucion por categoria en formato visual.
+- KPIs, barras y timeline correctos.
 
-Caso C: patrones cliente
-Pasos:
-1. Abrir Patrones para mismo cliente.
+Caso C: recomendaciones
 Esperado:
-- Timeline mensual.
-- Deteccion de picos.
-
-Caso D: recomendaciones + historial
-Pasos:
-1. Ir a Recomendaciones IA.
-2. Cargar userId cliente.
-3. Ejecutar "Generar recomendaciones".
-Esperado:
-- Devuelve respuesta.
-- Queda guardada en historial inferior.
+- Respuesta visible + persistida en historial.
 
 ====================================================================
 4) PANEL ADMIN
 ====================================================================
-Caso A: gestion usuarios
-Pasos:
-1. Ir a /admin seccion Usuarios.
-2. Buscar por nombre/email.
-3. Filtrar por rol.
+Caso A: usuarios
 Esperado:
-- Tabla filtra correctamente.
+- Busqueda/filtro correctos.
 
 Caso B: cambio de rol
-Pasos:
-1. Elegir usuario.
-2. Cambiar rol.
-3. Confirmar modal.
 Esperado:
-- PATCH exitoso.
-- Rol actualizado en tabla.
+- PATCH exitoso y rol reflejado en UI.
 
 Caso C: metricas
-Pasos:
-1. Ir a Vision general.
 Esperado:
-- KPIs con datos.
-- Grafico de nuevos usuarios 6 meses.
+- KPIs y grafico de nuevos usuarios funcionales.
 
 ====================================================================
-5) API BACKEND - PRUEBAS MANUALES RAPIDAS
+5) API BACKEND - PRUEBAS RAPIDAS
 ====================================================================
-Usar token Bearer en Authorization.
+Usar Bearer token.
 
-5.1 Usuarios
-- GET /api/users
-- GET /api/users?q=demo
-- GET /api/users?role=user
-- GET /api/users?limit=10&page=1
-Esperado:
-- Sin limit/page => array simple.
-- Con limit/page => objeto con data + meta.
+Auth:
+- POST /api/auth/register
+- POST /api/auth/verify-email
+- POST /api/auth/login
+- POST /api/auth/google
+- POST /api/auth/request-password-reset
+- POST /api/auth/reset-password
 
-5.2 Gastos
-- GET /api/expenses
-- GET /api/expenses?category=Ocio
-- GET /api/expenses?q=netflix
-- GET /api/expenses?dateFrom=2026-01-01&dateTo=2026-12-31
-- GET /api/expenses?limit=10&page=1
-Esperado:
-- Compatible con comportamiento anterior.
-- Si hay paginacion => data + meta.
+Users:
+- GET /api/users?q=demo&limit=10&page=1
 
-5.3 Advisor
-- GET /api/advisor/clients/health
-- GET /api/advisor/overview/{userId}
-- GET /api/advisor/patterns/{userId}
-- POST /api/advisor/ask
+Expenses:
+- GET /api/expenses?category=Ocio&dateFrom=2026-01-01&dateTo=2026-12-31
+
+Advisor:
 - GET /api/advisor/recommendations/{userId}
-Esperado:
-- Datos coherentes y sin 500.
-- El body de POST /api/advisor/ask NO incluye propiedad expenses.
 
-5.4 Tickets OCR
-- POST /api/tickets/ocr (multipart campo image)
-- POST /api/tickets/upload (multipart campo ticket, compat)
 Esperado:
-- Retorna commerce, date, amount, category, rawText.
-- Sin 404 por ruta inexistente en frontend dashboard.
-- En dashboard OCR, ademas se crea gasto automaticamente con los datos extraidos.
+- Sin errores 500.
+- Mensajes de validacion consistentes.
 
 ====================================================================
-6) SEGURIDAD BASICA
+6) I18N EN TODAS LAS PAGINAS
 ====================================================================
-Checklist:
-- Endpoints protegidos requieren JWT.
-- Roles respetados (RBAC).
-- Passwords en DB hasheadas.
-- CORS restringido por CORS_ORIGIN en prod.
-- No exponer API keys en frontend.
+Caso A: cambio de idioma a EN
+Pasos:
+1. En landing, cambiar ES -> EN.
+2. Navegar a login, dashboard, advisor y admin.
+Esperado:
+- No quedan textos de interfaz en espanol.
+- Placeholders/titles dinamicos tambien aparecen en ingles.
 
 ====================================================================
 7) CRITERIO DE APROBACION
 ====================================================================
 Aprobado si:
 - Todos los casos A de cada seccion pasan.
+- Flujos auth (verify/reset/google) pasan.
 - No hay errores 500 en flujos principales.
-- No hay bloqueos UX criticos.
-- Login y navegacion por rol funcionan en web y mobile.
+- Cambio de idioma EN cubre todas las pages.
 
 Registro QA sugerido:
 - Caso
