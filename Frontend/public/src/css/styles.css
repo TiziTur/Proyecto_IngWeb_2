@@ -531,6 +531,23 @@ footer, .k-footer { background: var(--k-surface); border-top: 1px solid var(--k-
 .k-lang-btn { font-size: .79rem; font-weight: 700; padding: .3rem .7rem; border-radius: 8px; border: 1px solid var(--k-border); background: var(--k-surface2); color: var(--k-text2); cursor: pointer; transition: all var(--k-transition); letter-spacing: .04em; }
 .k-lang-btn.active, .k-lang-btn:hover { background: var(--k-primary-s); color: var(--k-primary); border-color: var(--k-primary); }
 
+/* ── Navbar controls wrapper (lang + theme + auth) ─────────── */
+.k-nav-controls { display: flex; align-items: center; gap: .5rem; }
+
+/* ── Navbar auth: go-to-panel button ───────────────────────── */
+.k-nav-go-btn { display: inline-flex; align-items: center; gap: .4rem; font-size: .82rem; font-weight: 700; padding: .35rem .85rem; border-radius: 8px; border: 1px solid var(--k-primary); background: var(--k-primary-s); color: var(--k-primary); cursor: pointer; transition: all var(--k-transition); white-space: nowrap; text-decoration: none; }
+.k-nav-go-btn:hover { background: var(--k-primary); color: #fff; }
+
+/* ── Navbar auth: avatar button + dropdown ─────────────────── */
+.k-nav-avatar-wrap { position: relative; }
+.k-nav-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--k-primary); background: var(--k-primary-s); color: var(--k-primary); font-size: .85rem; font-weight: 700; cursor: pointer; display: grid; place-items: center; transition: all var(--k-transition); user-select: none; }
+.k-nav-avatar:hover { background: var(--k-primary); color: #fff; }
+.k-nav-dropdown { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 170px; background: var(--k-surface); border: 1px solid var(--k-border); border-radius: var(--k-radius-sm); box-shadow: var(--k-shadow); z-index: 1050; overflow: hidden; }
+.k-nav-dropdown.open { display: block; }
+.k-nav-dropdown-header { padding: .6rem 1rem; font-size: .78rem; font-weight: 700; color: var(--k-muted); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--k-border); }
+.k-nav-dropdown-item { display: flex; align-items: center; gap: .55rem; padding: .6rem 1rem; font-size: .88rem; color: var(--k-text2); cursor: pointer; transition: background var(--k-transition); background: none; border: none; width: 100%; text-align: left; }
+.k-nav-dropdown-item:hover { background: var(--k-bg2); color: var(--k-text); }
+
 /* ── Stats strip ───────────────────────────────────────────── */
 .k-stats-strip { background: var(--k-surface); border-top: 1px solid var(--k-border); border-bottom: 1px solid var(--k-border); padding: 2.5rem 0; }
 .k-stat-item { text-align: center; }
@@ -604,6 +621,8 @@ footer, .k-footer { background: var(--k-surface); border-top: 1px solid var(--k-
   .k-mockup-inner { transform: none; }
   .k-section { padding: 3.5rem 0; }
   .navbar-nav { padding-top: .7rem; gap: .2rem; }
+  .k-nav-controls { margin-top: .75rem; flex-wrap: wrap; }
+  .k-nav-dropdown { right: auto; left: 0; }
 }
 
 @media (max-width: 575.98px) {

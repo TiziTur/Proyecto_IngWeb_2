@@ -14,6 +14,9 @@
       'nav.pricing':   'Precios',
       'nav.demo':      'Demo Lab',
       'nav.login':     'Iniciar sesión',
+      'nav.goToPanel': 'Ir al panel',
+      'nav.logout':    'Cerrar sesión',
+      'nav.myAccount': 'Mi cuenta',
 
       // Hero
       'hero.eyebrow':   '✦ Gestión financiera inteligente',
@@ -621,6 +624,9 @@
       'nav.pricing':   'Pricing',
       'nav.demo':      'Demo Lab',
       'nav.login':     'Log in',
+      'nav.goToPanel': 'Go to panel',
+      'nav.logout':    'Log out',
+      'nav.myAccount': 'My account',
 
       // Hero
       'hero.eyebrow':   '✦ Smart financial management',

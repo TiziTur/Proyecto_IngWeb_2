@@ -34,13 +34,29 @@
         <li class="nav-item"><a class="nav-link" href="#funciones" data-i18n="nav.features">Funciones</a></li>
         <li class="nav-item"><a class="nav-link" href="#precios" data-i18n="nav.pricing">Precios</a></li>
       </ul>
-      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+      <div class="k-nav-controls mt-3 mt-lg-0">
         <button class="k-lang-btn active" id="btnES" onclick="setLang('es')" title="Español">ES</button>
         <button class="k-lang-btn" id="btnEN" onclick="setLang('en')" title="English">EN</button>
         <button class="k-theme-btn" id="themeToggle" title="Cambiar tema" aria-label="Toggle theme">
           <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
         </button>
-        <a class="btn-k btn-k-primary btn-k-sm" href="/login" data-i18n="nav.login">Ingresar</a>
+        <!-- Auth state: replaced by JS on DOMContentLoaded -->
+        <a class="btn-k btn-k-primary btn-k-sm" id="navLoginBtn" href="/login" data-i18n="nav.login">Iniciar sesión</a>
+        <!-- Logged-in controls (hidden until auth check) -->
+        <a class="k-nav-go-btn d-none" id="navGoBtn" href="/dashboard">
+          <i class="bi bi-layout-sidebar-inset"></i>
+          <span data-i18n="nav.goToPanel">Ir al panel</span>
+        </a>
+        <div class="k-nav-avatar-wrap d-none" id="navAvatarWrap">
+          <button class="k-nav-avatar" id="navAvatar" aria-label="Cuenta">?</button>
+          <div class="k-nav-dropdown" id="navDropdown">
+            <div class="k-nav-dropdown-header" data-i18n="nav.myAccount">Mi cuenta</div>
+            <button class="k-nav-dropdown-item" id="navLogoutBtn">
+              <i class="bi bi-box-arrow-right"></i>
+              <span data-i18n="nav.logout">Cerrar sesión</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -501,6 +517,70 @@
 <script src="/src/js/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
+// Navbar auth state
+(function () {
+  function T(key) {
+    var lang = window.getLang ? window.getLang() : (localStorage.getItem('klarity-lang') || 'es');
+    var dict = window.__klarityI18n && window.__klarityI18n[lang];
+    return (dict && dict[key] !== undefined) ? dict[key] : key;
+  }
+  var ROLE_ROUTES = { user: '/dashboard', advisor: '/advisor', admin: '/admin' };
+  function getUser() {
+    try { return JSON.parse(localStorage.getItem('klarity_user') || sessionStorage.getItem('klarity_user') || 'null'); } catch(e) { return null; }
+  }
+  function getToken() {
+    return localStorage.getItem('klarity_token') || sessionStorage.getItem('klarity_token') || '';
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var user  = getUser();
+    var token = getToken();
+    if (!user || !token) return; // not logged in – show default login button
+
+    // Hide login button, show authenticated controls
+    var loginBtn   = document.getElementById('navLoginBtn');
+    var goBtn      = document.getElementById('navGoBtn');
+    var avatarWrap = document.getElementById('navAvatarWrap');
+    var avatar     = document.getElementById('navAvatar');
+    var dropdown   = document.getElementById('navDropdown');
+    var logoutBtn  = document.getElementById('navLogoutBtn');
+
+    if (loginBtn)   loginBtn.classList.add('d-none');
+    if (goBtn) {
+      var route = ROLE_ROUTES[user.role] || '/dashboard';
+      goBtn.href = route;
+      goBtn.classList.remove('d-none');
+      var span = goBtn.querySelector('[data-i18n="nav.goToPanel"]');
+      if (span) span.textContent = T('nav.goToPanel');
+    }
+    if (avatarWrap) avatarWrap.classList.remove('d-none');
+    if (avatar) {
+      var initial = (user.name || user.email || '?').slice(0, 1).toUpperCase();
+      avatar.textContent = initial;
+      avatar.setAttribute('aria-label', user.name || user.email || T('nav.myAccount'));
+    }
+
+    // Dropdown toggle
+    if (avatar && dropdown) {
+      avatar.addEventListener('click', function (e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+      });
+      document.addEventListener('click', function () { dropdown.classList.remove('open'); });
+    }
+
+    // Logout
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function () {
+        localStorage.removeItem('klarity_token');
+        localStorage.removeItem('klarity_user');
+        sessionStorage.removeItem('klarity_token');
+        sessionStorage.removeItem('klarity_user');
+        window.location.href = '/';
+      });
+    }
+  });
+})();
+
 // Scroll reveal
 const revealEls = document.querySelectorAll('.reveal');
 const revealObs = new IntersectionObserver((entries) => {
