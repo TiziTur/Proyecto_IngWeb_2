@@ -92,7 +92,7 @@ Arquitectura basada en frontend estatico + backend NestJS REST con JWT.
 - JWT Bearer Token.
 - Login y registro tradicional via /auth.
 - Login social con Google ID Token.
-- Verificacion de email para cuentas password.
+- Verificacion de email para cuentas password (temporalmente desactivada en runtime actual).
 - Recuperacion de cuenta por token temporal.
 
 4.2 RBAC
@@ -224,5 +224,7 @@ Frontend:
 - Se agrego servicio de correo para verify/reset con fallback a logs.
 - Se aplico rate limiting global + por endpoints auth.
 - Se completo la traduccion EN en todas las pages con universal-i18n runtime.
+- Se agrego estrategia profesional de idioma con landing separada: ES (`/`) y EN (`/en`).
+- Se agrego selector de idioma persistente en login, dashboard, advisor y admin.
 
 Fin del documento.

@@ -278,10 +278,18 @@
 
     document.documentElement.setAttribute('lang', lang === 'es' ? 'es' : 'en');
     localStorage.setItem(STORAGE_KEY, lang);
+
+    if (window.klarityLang && typeof window.klarityLang.syncButtons === 'function') {
+      window.klarityLang.syncButtons(document);
+    }
   }
 
   // ── Public API ────────────────────────────────────────────
   window.setLang = function (lang) {
+    if (window.klarityLang && typeof window.klarityLang.setLangAndNavigate === 'function') {
+      window.klarityLang.setLangAndNavigate(lang);
+      return;
+    }
     applyLang(lang);
   };
 
@@ -291,6 +299,10 @@
 
   // ── Init ─────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function () {
+    if (window.klarityLang && typeof window.klarityLang.getLang === 'function') {
+      var stored = window.klarityLang.getLang();
+      localStorage.setItem(STORAGE_KEY, stored);
+    }
     var saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_LANG;
     applyLang(saved);
   });

@@ -7,6 +7,11 @@
   status = 200
 
 [[redirects]]
+  from = "/en"
+  to = "/src/html/en.html"
+  status = 200
+
+[[redirects]]
   from = "/login"
   to = "/src/html/login.html"
   status = 200

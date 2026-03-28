@@ -39,28 +39,19 @@ export class AuthService implements OnModuleInit {
       throw new BadRequestException('El email ya esta registrado.');
     }
 
-    const verificationToken = this.authSecurityService.generateToken();
-    const verificationTokenHash = this.authSecurityService.hashToken(verificationToken);
-    const verificationExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
-
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = await this.usersService.create({
       email,
       name: String(dto.name || '').trim(),
       passwordHash,
       role: dto.role ?? Role.USER,
-      emailVerified: false,
-      emailVerificationTokenHash: verificationTokenHash,
-      emailVerificationExpiresAt: verificationExpiresAt,
+      emailVerified: true,
+      emailVerificationTokenHash: null,
+      emailVerificationExpiresAt: null,
       authProvider: 'password',
     });
 
-    await this.sendVerificationEmail(user.email, user.name, verificationToken);
-
-    return {
-      message: 'Cuenta creada. Verifica tu correo para iniciar sesion.',
-      requiresEmailVerification: true,
-    };
+    return this.signAuthResponse(user.id, user.email, user.role, user.name);
   }
 
   async login(dto: LoginDto) {
@@ -79,10 +70,6 @@ export class AuthService implements OnModuleInit {
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) {
       throw new UnauthorizedException('Credenciales invalidas.');
-    }
-
-    if (!user.emailVerified) {
-      throw new UnauthorizedException('Debes verificar tu correo antes de ingresar.');
     }
 
     this.authSecurityService.clearLoginRateLimit(email);

@@ -209,6 +209,30 @@ body {
   max-width: 420px;
 }
 
+.login-lang-switch {
+  display: inline-flex;
+  gap: .35rem;
+  margin: -.8rem 0 1.2rem;
+}
+
+.login-lang-switch .k-lang-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: .6rem;
+  border: 1px solid var(--k-border);
+  background: var(--k-surface);
+  color: var(--k-muted);
+  font-size: .76rem;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.login-lang-switch .k-lang-btn.active {
+  background: var(--k-primary);
+  color: #fff;
+  border-color: var(--k-primary);
+}
+
 /* ── Tabs ─────────────────────────────────────────────────── */
 .login-tabs {
   display: flex;

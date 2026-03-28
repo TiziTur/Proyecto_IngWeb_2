@@ -122,8 +122,10 @@ if (registerForm) {
         }
 
         try {
-            await postJson('/auth/register', payload);
-            setMsg(registerMessage, '<span style="color:var(--k-success,#10b981)"><i class="bi bi-check-circle me-1"></i>Cuenta creada. Revisa tu correo para verificarla antes de iniciar sesion.</span>');
+            const data = await postJson('/auth/register', payload);
+            setMsg(registerMessage, '<span style="color:var(--k-success,#10b981)"><i class="bi bi-check-circle me-1"></i>Cuenta creada. Redirigiendo...</span>');
+            saveSession(data, true);
+            setTimeout(() => redirectByRole(data.user && data.user.role), 600);
         } catch (error) {
             setMsg(registerMessage, '<span style="color:var(--k-danger,#ef4444)"><i class="bi bi-exclamation-circle me-1"></i>' + escHtml(error.message || 'No se pudo crear la cuenta.') + '</span>', true);
         } finally {

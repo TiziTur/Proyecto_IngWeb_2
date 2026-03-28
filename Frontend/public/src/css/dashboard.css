@@ -69,6 +69,29 @@
   gap: .75rem;
 }
 
+.topbar-lang-switch {
+  display: inline-flex;
+  gap: .35rem;
+}
+
+.topbar-lang-switch .k-lang-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: .6rem;
+  border: 1px solid var(--k-border);
+  background: var(--k-surface);
+  color: var(--k-muted);
+  font-size: .73rem;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.topbar-lang-switch .k-lang-btn.active {
+  background: var(--k-primary);
+  color: #fff;
+  border-color: var(--k-primary);
+}
+
 .dash-avatar {
   width: 34px; height: 34px;
   border-radius: 50%;
@@ -556,6 +579,7 @@
 
   /* Topbar search: hide on mobile to save space */
   .dash-topbar-search { display: none; }
+  .topbar-lang-switch { order: -1; }
 
   .dash-menu-label { display: inline; }
   .dash-menu-btn { width: auto; padding: 0 .55rem; gap: .15rem; }

@@ -4,6 +4,7 @@
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/", "destination": "/src/html/index.html" },
+    { "source": "/en", "destination": "/src/html/en.html" },
     { "source": "/login", "destination": "/src/html/login.html" },
     { "source": "/(.*)", "destination": "/src/$1" }
   ]

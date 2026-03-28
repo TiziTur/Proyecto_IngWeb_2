@@ -50,6 +50,11 @@
         <button class="login-tab" id="tab-register" onclick="switchTab('register')" role="tab" aria-selected="false" aria-controls="panel-register">Crear cuenta</button>
       </div>
 
+      <div class="login-lang-switch" aria-label="Selector de idioma">
+        <button class="k-lang-btn active" id="btnES" type="button" onclick="setLang('es')" title="Español">ES</button>
+        <button class="k-lang-btn" id="btnEN" type="button" onclick="setLang('en')" title="English">EN</button>
+      </div>
+
       <!-- Login form -->
       <section id="panel-login" class="login-panel" role="tabpanel">
         <h2 class="login-form-title">Bienvenido de vuelta</h2>
@@ -134,6 +139,7 @@
 
 <script src="/src/js/config.js"></script>
 <script src="/src/js/theme.js"></script>
+<script src="/src/js/lang.js"></script>
 <script src="/src/js/universal-i18n.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="/src/js/login.js"></script>

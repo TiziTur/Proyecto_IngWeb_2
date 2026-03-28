@@ -37,6 +37,10 @@
     </div>
 
     <div class="dash-topbar-right">
+      <div class="topbar-lang-switch" aria-label="Language selector">
+        <button class="k-lang-btn active" id="btnES" type="button" onclick="setLang('es')" title="Español">ES</button>
+        <button class="k-lang-btn" id="btnEN" type="button" onclick="setLang('en')" title="English">EN</button>
+      </div>
       <button class="dash-btn-icon" title="Notificaciones" aria-label="Notificaciones">
         <i class="bi bi-bell"></i>
       </button>
@@ -489,6 +493,7 @@
 <!-- ── Scripts ────────────────────────────────────────── -->
 <script src="/src/js/config.js"></script>
 <script src="/src/js/theme.js"></script>
+<script src="/src/js/lang.js"></script>
 <script src="/src/js/universal-i18n.js"></script>
 <script>
 // ============================================================
