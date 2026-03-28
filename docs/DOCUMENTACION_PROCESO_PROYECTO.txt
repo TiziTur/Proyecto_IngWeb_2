@@ -226,5 +226,6 @@ Frontend:
 - Se completo la traduccion EN en todas las pages con universal-i18n runtime.
 - Se agrego estrategia profesional de idioma con landing separada: ES (`/`) y EN (`/en`).
 - Se agrego selector de idioma persistente en login, dashboard, advisor y admin.
+- Se amplio diccionario runtime universal para cubrir textos hardcodeados restantes en landing y paneles.
 
 Fin del documento.
