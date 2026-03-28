@@ -1,5 +1,5 @@
 DOCUMENTACION TECNICA Y DE PROCESO - KLARITY
-Version: 2026-03-28
+Version: 2026-03-29
 Repositorio: Proyecto_IngWeb_2
 
 ====================================================================
@@ -41,7 +41,7 @@ Arquitectura basada en frontend estatico + backend NestJS REST con JWT.
 - Prefijo API: /api
 
 2.3 Despliegue
-- Frontend: Netlify.
+- Frontend: Railway.
 - Backend + DB: Railway.
 
 ====================================================================
@@ -213,7 +213,12 @@ Seeds (opcional):
 Frontend:
 - Config API base en src/js/config.js
 - Config Google client id en src/js/config.js (window.KLARITY_GOOGLE_CLIENT_ID)
-- Netlify rewrites para rutas limpias.
+- Rutas limpias servidas por `Frontend/server.js`.
+
+Despliegue full Railway:
+- Frontend usa un servidor Node estatico propio (`Frontend/server.js`) sin frameworks.
+- Frontend inyecta configuracion runtime via `/runtime-config.js`.
+- Backend y Frontend se despliegan como servicios separados con root directories `Backend` y `Frontend`.
 
 ====================================================================
 9) CAMBIOS RECIENTES (2026-03-28)
@@ -226,6 +231,13 @@ Frontend:
 - Se completo la traduccion EN en todas las pages con universal-i18n runtime.
 - Se agrego estrategia profesional de idioma con landing separada: ES (`/`) y EN (`/en`).
 - Se agrego selector de idioma persistente en login, dashboard, advisor y admin.
+
+10) CAMBIOS RECIENTES (2026-03-29)
+====================================================================
+- Se preparo el proyecto para despliegue 100% en Railway (frontend + backend + DB).
+- Se agrego frontend server sin frameworks (`Frontend/server.js`) con rutas limpias y runtime-config.
+- Se agrego `Frontend/railway.json` y `Frontend/package.json` para build/deploy dedicados.
+- Se actualizaron todas las pages para cargar `/runtime-config.js` en lugar de un config fijo.
 - Se amplio diccionario runtime universal para cubrir textos hardcodeados restantes en landing y paneles.
 - Se retiro la seccion Demo Lab de la landing para mejorar foco y conversion.
 - Se reemplazo grafico de barras por grafico de torta con porcentajes en resumen de gastos por categoria.

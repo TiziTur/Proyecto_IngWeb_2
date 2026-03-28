@@ -25,7 +25,7 @@ Klarity es una plataforma moderna de gestion financiera que permite registrar, a
 | Backend | NestJS, TypeORM, PostgreSQL/SQLite |
 | Autenticacion | JWT + RBAC, verificacion por correo, recuperacion de cuenta, Google Sign-In |
 | OCR e IA | OCR.space + fallback Tesseract, OpenAI/Anthropic opcional |
-| Hosting | Netlify (Frontend), Railway (Backend + DB) |
+| Hosting | Railway (Frontend + Backend + DB) |
 | Internacionalizacion | ES/EN (con cobertura global en todas las paginas) |
 
 ---
@@ -190,22 +190,29 @@ PUT   /api/auth/profile
 
 ---
 
-## 🌐 Deploy (Railway + Netlify)
+## 🌐 Deploy (Railway Full Stack)
 
 ### Railway (Backend)
+- Root Directory: `Backend`
 - Configurar `DATABASE_URL`, `JWT_SECRET`, `DB_SSL`, `CORS_ORIGIN`, `APP_URL`.
 - Para auth extendido: `GOOGLE_CLIENT_ID`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`.
 - Si SMTP falla por timeout, el backend no bloquea registro/recuperacion: guarda usuario/solicitud y deja fallback por logs.
-- `CORS_ORIGIN` puede incluir multiples dominios separados por coma (sin espacios), por ejemplo: `https://tu-netlify.app,https://tu-frontend.com`.
-- El backend normaliza origenes CORS (mayusculas/minusculas y slash final) para evitar bloqueos por diferencias de formato.
-- Verificacion por correo temporalmente desactivada para no bloquear registro/login en entorno actual.
 
-### Netlify (Frontend)
-- Public directory: `Frontend/public`.
-- Rutas limpias en `netlify.toml`.
-- Configurar `window.KLARITY_GOOGLE_CLIENT_ID` para Google Sign-In.
+### Railway (Frontend)
+- Root Directory: `Frontend`
+- El frontend se sirve con `Frontend/server.js` (Node HTTP server, sin frameworks).
+- El servidor expone `runtime-config.js` para inyectar variables en runtime.
+- Variables requeridas:
+  - `WISEPOCKET_API_BASE_URL=https://<tu-backend-railway>/api`
+  - `KLARITY_GOOGLE_CLIENT_ID=<opcional>`
 
-Nota: configuracion de Vercel removida porque el entorno activo del proyecto es Netlify.
+### Flujo recomendado de despliegue
+1) Crear proyecto Railway.
+2) Agregar PostgreSQL.
+3) Crear servicio Backend (root `Backend`).
+4) Crear servicio Frontend (root `Frontend`).
+5) Configurar variables y dominios.
+6) Actualizar `APP_URL` y `CORS_ORIGIN` en backend con dominio real del frontend.
 
 ---
 
@@ -226,6 +233,9 @@ Proyecto_IngWeb_2/
 │   ├── html/
 │   ├── css/
 │   └── js/
+├── Frontend/server.js
+├── Frontend/railway.json
+├── Frontend/package.json
 ├── docs/
 │   ├── DOCUMENTACION_PROCESO_PROYECTO.txt
 │   └── MATRIZ_QA_DEPLOY.txt

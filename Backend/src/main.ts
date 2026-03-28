@@ -6,11 +6,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, '').toLowerCase();
+  const frontendUrl = normalizeOrigin(process.env.APP_URL || '');
 
   const allowedOrigins = (process.env.CORS_ORIGIN || '')
     .split(',')
     .map((origin) => normalizeOrigin(origin))
     .filter(Boolean);
+
+  if (frontendUrl && !allowedOrigins.includes(frontendUrl)) {
+    allowedOrigins.push(frontendUrl);
+  }
 
   // Security headers
   // eslint-disable-next-line @typescript-eslint/no-var-requires
