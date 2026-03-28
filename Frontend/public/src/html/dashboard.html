@@ -899,7 +899,7 @@ function suggestCategoryFromConcept() {
     if (monthlyCheck && isMonthlyConcept(raw)) {
       monthlyCheck.checked = true;
     }
-    hint.textContent = T('dash.js.catSuggested') + found.category;
+    hint.textContent = T('dash.js.catSuggested') + displayCategory(found.category);
   } else {
     const monthlyCheck = document.getElementById('dIsMonthly');
     if (monthlyCheck && isMonthlyConcept(raw)) {
@@ -1129,7 +1129,7 @@ function loadBudgets() {
     return `<div class="col-12 col-sm-6 col-xl-4">
       <div class="dash-panel">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
-          <strong style="font-size:.92rem">${escHtml(cat)}</strong>
+          <strong style="font-size:.92rem">${escHtml(displayCategory(cat))}</strong>
           <span style="font-size:.8rem;color:var(--k-muted)">${formatMoney(spent, displayCurrency, 0)} / ${formatMoney(limit, displayCurrency, 0)}</span>
         </div>
         <div style="background:var(--k-bg);border-radius:999px;height:8px;overflow:hidden">
