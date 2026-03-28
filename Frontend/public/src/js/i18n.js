@@ -152,6 +152,7 @@
       'login.verifyTitle': 'Verificar correo',
       'login.resendLink':  'Reenviar enlace de verificacion',
       'login.emailPlaceholder':'correo@dominio.com',
+      'login.secureHint': 'Tus credenciales no se muestran en pantalla. Usa cuentas temporales para pruebas y verifica el flujo completo por correo.',
 
       // Dashboard
       'dash.overview':    'Resumen',
@@ -312,6 +313,7 @@
       'login.verifyTitle': 'Verify email',
       'login.resendLink':  'Resend verification link',
       'login.emailPlaceholder':'email@domain.com',
+      'login.secureHint': 'Your credentials are never shown on screen. Use temporary accounts for testing and verify the full flow by email.',
 
       // Dashboard
       'dash.overview':    'Overview',

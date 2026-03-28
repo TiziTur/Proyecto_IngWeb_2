@@ -750,10 +750,55 @@ function renderKPIs(data) {
 // ── Table helpers ─────────────────────────────────────────
 const CAT_COLORS = {
   'Alimentación':'cat-food','Transporte':'cat-transport','Ocio':'cat-leisure',
-  'Suscripciones':'cat-subs','Salud':'cat-health','Vivienda':'cat-housing','Otro':'cat-other'
+  'Alimentacion':'cat-food','Suscripciones':'cat-subs','Salud':'cat-health','Vivienda':'cat-housing','Otro':'cat-other','Otros':'cat-other'
 };
+
+const CATEGORY_NORMALIZATION = {
+  'alimentacion': 'Alimentación',
+  'alimentación': 'Alimentación',
+  'food': 'Alimentación',
+  'transporte': 'Transporte',
+  'transport': 'Transporte',
+  'ocio': 'Ocio',
+  'leisure': 'Ocio',
+  'suscripciones': 'Suscripciones',
+  'subscriptions': 'Suscripciones',
+  'salud': 'Salud',
+  'health': 'Salud',
+  'vivienda': 'Vivienda',
+  'housing': 'Vivienda',
+  'otro': 'Otro',
+  'otros': 'Otro',
+  'other': 'Otro'
+};
+
+function normalizeCategoryLabel(rawCategory) {
+  const raw = String(rawCategory || '').trim();
+  const key = raw.toLowerCase();
+  return CATEGORY_NORMALIZATION[key] || raw || 'Otro';
+}
+
+function displayCategory(category) {
+  const normalized = normalizeCategoryLabel(category);
+  const currentLang = (window.getLang ? window.getLang() : localStorage.getItem('klarity-lang') || 'es') === 'en' ? 'en' : 'es';
+  if (currentLang === 'en') {
+    const english = {
+      'Alimentación': 'Food',
+      'Transporte': 'Transport',
+      'Ocio': 'Leisure',
+      'Suscripciones': 'Subscriptions',
+      'Salud': 'Health',
+      'Vivienda': 'Housing',
+      'Otro': 'Other'
+    };
+    return english[normalized] || normalized;
+  }
+  return normalized;
+}
+
 function catDot(cat) {
-  return `<span class="exp-category"><span class="exp-cat-dot ${CAT_COLORS[cat]||'cat-other'}"></span>${escHtml(cat||'Otro')}</span>`;
+  const normalized = normalizeCategoryLabel(cat);
+  return `<span class="exp-category"><span class="exp-cat-dot ${CAT_COLORS[normalized]||'cat-other'}"></span>${escHtml(displayCategory(normalized))}</span>`;
 }
 function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmtDate(d){ if(!d) return '—'; const dt=new Date(d); return isNaN(dt)?d:dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}); }
@@ -868,7 +913,8 @@ function renderChart(data) {
   if (!wrap) return;
   const catTotals = {};
   data.forEach(e => {
-    catTotals[e.category||'Otro'] = (catTotals[e.category||'Otro']||0) + convertAmount(e.amount, e.currency);
+    const normalized = normalizeCategoryLabel(e.category || 'Otro');
+    catTotals[normalized] = (catTotals[normalized]||0) + convertAmount(e.amount, e.currency);
   });
   const entries = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,7);
   if (!entries.length) {
@@ -904,7 +950,7 @@ function renderChart(data) {
       return `
         <span style="display:flex;align-items:center;gap:.35rem;background:var(--k-bg);border:1px solid var(--k-border);padding:.3rem .5rem;border-radius:999px">
           <span style="width:10px;height:10px;border-radius:50%;background:${COLORS[i % COLORS.length]};flex-shrink:0"></span>
-          <span>${escHtml(cat)} · ${pct.toFixed(1)}%</span>
+          <span>${escHtml(displayCategory(cat))} · ${pct.toFixed(1)}%</span>
         </span>`;
     }).join('');
   }
