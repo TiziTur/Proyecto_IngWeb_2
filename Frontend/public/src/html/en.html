@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Klarity - Know where it goes.</title>
   <meta name="description" content="Klarity helps you understand and control your spending. Track receipts, analyse categories and get personal financial guidance.">
+  <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -31,7 +33,6 @@
         <li class="nav-item"><a class="nav-link" href="#como-funciona" data-i18n="nav.how">Como funciona</a></li>
         <li class="nav-item"><a class="nav-link" href="#funciones" data-i18n="nav.features">Funciones</a></li>
         <li class="nav-item"><a class="nav-link" href="#precios" data-i18n="nav.pricing">Precios</a></li>
-        <li class="nav-item"><a class="nav-link" href="#funcionalidades-avanzadas" data-i18n="nav.demo">Demo</a></li>
       </ul>
       <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
         <button class="k-lang-btn active" id="btnES" onclick="setLang('es')" title="Español">ES</button>
@@ -426,215 +427,6 @@
   </div>
 </section>
 
-<!-- ═══════════ ADVANCED FEATURES (LAB) ══════════════════════════ -->
-<section class="k-section" id="funcionalidades-avanzadas" style="background:var(--k-bg2)">
-  <div class="container">
-    <div class="k-section-heading reveal">
-      <span class="k-badge k-badge-cyan mb-3" data-i18n="lab.pill">Lab financiero</span>
-      <h2 data-i18n="lab.title">Demo interactiva completa</h2>
-      <p data-i18n="lab.desc">Proba el sistema en vivo: multi-divisa, suscripciones, gastos compartidos, asesor y gamificacion.</p>
-    </div>
-
-    <div class="row g-3 g-lg-4 mb-4">
-      <div class="col-lg-6">
-        <div class="k-card h-100">
-          <h3 class="h5 fw-bold mb-3" data-i18n="lab.session">Sesion y perfil</h3>
-          <div id="authStatus" class="small mb-3" style="color:var(--k-muted)" data-i18n="lab.nosession">Sin sesion iniciada.</div>
-          <form id="profileForm" class="row g-2">
-            <div class="col-md-6">
-              <label for="profileName" class="form-label" data-i18n="lab.name">Nombre</label>
-              <input id="profileName" name="name" class="form-control" placeholder="Nombre completo">
-            </div>
-            <div class="col-md-6">
-              <label for="profileEmail" class="form-label" data-i18n="lab.email">Email</label>
-              <input id="profileEmail" name="email" type="email" class="form-control" placeholder="correo@dominio.com">
-            </div>
-            <div class="col-12 d-flex flex-wrap gap-2">
-              <button class="btn-k btn-k-outline btn-k-sm" type="submit" data-i18n="lab.saveProfile">Guardar perfil</button>
-              <button class="btn btn-sm btn-outline-danger rounded-pill" type="button" id="logoutBtn" data-i18n="lab.logout">Cerrar sesion</button>
-            </div>
-          </form>
-          <p id="profileMessage" class="small mb-0 mt-2"></p>
-        </div>
-      </div>
-
-      <div class="col-lg-6">
-        <div class="k-card h-100">
-          <h3 class="h5 fw-bold mb-3" data-i18n="lab.ocr">Carga de ticket con OCR (IA)</h3>
-          <form id="ticketForm" class="row g-2" enctype="multipart/form-data">
-            <div class="col-md-8">
-              <label for="ticketImage" class="form-label" data-i18n="lab.ticketImg">Imagen del ticket</label>
-              <input id="ticketImage" name="ticket" class="form-control" type="file" accept="image/*" required>
-            </div>
-            <div class="col-md-4 d-grid align-items-end">
-              <button class="btn-k btn-k-primary btn-k-sm" type="submit" data-i18n="lab.interpret">Interpretar</button>
-            </div>
-          </form>
-          <p id="ticketMessage" class="small mb-0 mt-2"></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-3 g-lg-4">
-      <div class="col-lg-6">
-        <div class="k-card h-100">
-          <h3 class="h5 fw-bold mb-3" data-i18n="lab.multicurrency">1) Registro multi-divisa</h3>
-          <form id="expenseForm" class="row g-2">
-            <div class="col-md-6">
-              <label for="expenseConcept" class="form-label" data-i18n="lab.concept">Concepto</label>
-              <input id="expenseConcept" name="concept" class="form-control" required placeholder="Cena, alquiler, gimnasio">
-            </div>
-            <div class="col-md-6">
-              <label for="expenseCategory" class="form-label" data-i18n="lab.category">Categoria</label>
-              <select id="expenseCategory" name="category" class="form-select" required>
-                <option value="Alimentacion" data-i18n="cat.food">Alimentacion</option>
-                <option value="Transporte" data-i18n="cat.transport">Transporte</option>
-                <option value="Ocio" data-i18n="cat.leisure">Ocio</option>
-                <option value="Suscripciones" data-i18n="cat.subs">Suscripciones</option>
-                <option value="Salud" data-i18n="cat.health">Salud</option>
-                <option value="Vivienda" data-i18n="cat.housing">Vivienda</option>
-                <option value="Otros" data-i18n="cat.other">Otros</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label for="expenseAmount" class="form-label" data-i18n="lab.amount">Monto</label>
-              <input id="expenseAmount" name="amount" class="form-control" type="number" min="0.01" step="0.01" required>
-            </div>
-            <div class="col-md-4">
-              <label for="expenseCurrency" class="form-label" data-i18n="lab.currency">Moneda</label>
-              <select id="expenseCurrency" name="currency" class="form-select" required>
-                <option value="ARS">ARS</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label for="expenseDate" class="form-label" data-i18n="lab.date">Fecha</label>
-              <input id="expenseDate" name="date" class="form-control" type="date" required>
-            </div>
-            <div class="col-md-8">
-              <label for="expenseSplit" class="form-label" data-i18n="lab.split">Personas para dividir</label>
-              <input id="expenseSplit" name="splitWith" class="form-control" type="number" min="0" step="1" value="0">
-            </div>
-            <div class="col-md-4 d-grid align-items-end">
-              <button class="btn-k btn-k-primary btn-k-sm" type="submit" data-i18n="lab.saveExpense">Guardar gasto</button>
-            </div>
-          </form>
-          <div class="mt-3 small" style="color:var(--k-muted)" id="ratesInfo" data-i18n="lab.loadingRates">Cargando cotizaciones...</div>
-          <div class="d-flex flex-wrap gap-2 mt-2" id="kpiSummary"></div>
-        </div>
-      </div>
-
-      <div class="col-lg-6">
-        <div class="k-card h-100">
-          <h3 class="h5 fw-bold mb-3" data-i18n="lab.subs">2) Suscripciones recurrentes</h3>
-          <form id="subscriptionForm" class="row g-2">
-            <div class="col-md-5">
-              <label for="subName" class="form-label" data-i18n="lab.service">Servicio</label>
-              <input id="subName" name="name" class="form-control" required placeholder="Netflix, alquiler">
-            </div>
-            <div class="col-md-3">
-              <label for="subAmount" class="form-label" data-i18n="lab.amount">Monto</label>
-              <input id="subAmount" name="amount" class="form-control" type="number" min="0.01" step="0.01" required>
-            </div>
-            <div class="col-md-2">
-              <label for="subCurrency" class="form-label" data-i18n="lab.currency">Moneda</label>
-              <select id="subCurrency" name="currency" class="form-select">
-                <option value="ARS">ARS</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-              </select>
-            </div>
-            <div class="col-md-2">
-              <label for="subDay" class="form-label" data-i18n="lab.day">Dia</label>
-              <input id="subDay" name="day" class="form-control" type="number" min="1" max="31" required>
-            </div>
-            <div class="col-12 d-grid">
-              <button class="btn-k btn-k-outline btn-k-sm" type="submit" data-i18n="lab.addSub">Agregar suscripcion</button>
-            </div>
-          </form>
-          <div class="mt-3" id="subscriptionCommitted"></div>
-          <ul class="list-group mt-2" id="subscriptionList"></ul>
-          <div class="small mt-2" style="color:var(--k-muted)" id="recurrentHint"></div>
-        </div>
-      </div>
-
-      <div class="col-lg-6">
-        <div class="k-card h-100">
-          <h3 class="h5 fw-bold mb-3" data-i18n="lab.chatbot">3) Chatbot asesor financiero</h3>
-          <div class="row g-2">
-            <div class="col-md-4">
-              <label for="advisorProvider" class="form-label" data-i18n="lab.mode">Modo</label>
-              <select id="advisorProvider" class="form-select">
-                <option value="local" data-i18n="lab.localAdvisor">Asesor local</option>
-                <option value="openai">OpenAI</option>
-                <option value="gemini">Gemini</option>
-              </select>
-            </div>
-            <div class="col-md-8">
-              <label for="advisorApiKey" class="form-label" data-i18n="lab.apiKey">API Key (opcional)</label>
-              <input id="advisorApiKey" class="form-control" placeholder="Solo para pruebas en cliente">
-            </div>
-          </div>
-          <form id="advisorForm" class="mt-3 d-grid gap-2">
-            <label for="advisorQuestion" class="form-label mb-0" data-i18n="lab.question">Tu consulta</label>
-            <textarea id="advisorQuestion" class="form-control" rows="3" placeholder="¿En que gaste mas esta semana?" required></textarea>
-            <button class="btn-k btn-k-primary btn-k-sm" type="submit" data-i18n="lab.ask">Consultar</button>
-          </form>
-          <div class="chat-answer mt-3" id="advisorAnswer" data-i18n="lab.advisorInit">Escribe una pregunta para obtener recomendaciones.</div>
-        </div>
-      </div>
-
-      <div class="col-lg-6">
-        <div class="k-card h-100">
-          <h3 class="h5 fw-bold mb-3" data-i18n="lab.gamification">4) Gamificacion de metas</h3>
-          <form id="budgetForm" class="row g-2">
-            <div class="col-md-6">
-              <label for="budgetCategory" class="form-label" data-i18n="lab.category">Categoria</label>
-              <select id="budgetCategory" name="category" class="form-select">
-                <option value="Ocio">Ocio</option>
-                <option value="Alimentacion">Alimentacion</option>
-                <option value="Transporte">Transporte</option>
-                <option value="Suscripciones">Suscripciones</option>
-                <option value="Salud">Salud</option>
-                <option value="Vivienda">Vivienda</option>
-                <option value="Otros">Otros</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label for="budgetAmount" class="form-label" data-i18n="lab.topARS">Tope ARS/mes</label>
-              <input id="budgetAmount" name="amount" class="form-control" type="number" min="1" step="1" required>
-            </div>
-            <div class="col-md-2 d-grid align-items-end">
-              <button class="btn-k btn-k-outline btn-k-sm" type="submit">OK</button>
-            </div>
-          </form>
-          <div class="small mt-2" style="color:var(--k-muted)" data-i18n="lab.medalHint">Medalla al cumplir 3 meses seguidos por debajo del tope.</div>
-          <div id="badgeList" class="d-flex flex-wrap gap-2 mt-3"></div>
-          <ul id="expenseList" class="list-group mt-3"></ul>
-        </div>
-      </div>
-
-      <div class="col-lg-12">
-        <div class="k-card" id="advisorPanelCard">
-          <h3 class="h5 fw-bold mb-3" data-i18n="lab.advisorPanel">5) Panel de asesor financiero</h3>
-          <div class="row g-2">
-            <div class="col-md-4">
-              <label for="advisorUserId" class="form-label" data-i18n="lab.userIdLabel">User ID a analizar</label>
-              <input id="advisorUserId" class="form-control" placeholder="UUID del usuario">
-            </div>
-            <div class="col-md-8 d-flex gap-2 align-items-end">
-              <button class="btn-k btn-k-outline btn-k-sm" id="advisorOverviewBtn" type="button" data-i18n="lab.globalOverview">Ver overview global</button>
-              <button class="btn-k btn-k-primary btn-k-sm" id="advisorPatternsBtn" type="button" data-i18n="lab.patterns">Ver patrones del usuario</button>
-            </div>
-          </div>
-          <pre class="chat-answer mt-3 mb-0" id="advisorPanelOutput" data-i18n="lab.advisorAvailable">Disponible para cuentas con rol asesor.</pre>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ═══════════ CTA FINAL ════════════════════════════════════════ -->
 <section class="k-section">
   <div class="container">
@@ -673,7 +465,6 @@
         <a href="#funciones" class="k-footer-link" data-i18n="footer.features">Funciones</a>
         <a href="#precios" class="k-footer-link" data-i18n="footer.pricing">Precios</a>
         <a href="#faq" class="k-footer-link" data-i18n="footer.faq">FAQ</a>
-        <a href="#funcionalidades-avanzadas" class="k-footer-link" data-i18n="footer.demo">Demo</a>
       </div>
       <div class="col-6 col-lg-2">
         <h6 data-i18n="footer.company">Empresa</h6>
@@ -708,7 +499,6 @@
 <script src="/src/js/i18n.js"></script>
 <script src="/src/js/universal-i18n.js"></script>
 <script src="/src/js/main.js"></script>
-<script src="/src/js/advanced-features.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
 // Scroll reveal

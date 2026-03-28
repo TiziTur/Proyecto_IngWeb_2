@@ -47,6 +47,10 @@
       setLang('en');
       return;
     }
+    if (path === '/login' || path.endsWith('/src/html/login.html')) {
+      setLang(getLang());
+      return;
+    }
     if (path === '/' || path.endsWith('/src/html/index.html')) {
       if (getLang() === 'en') {
         redirectToLocalizedLanding('en');

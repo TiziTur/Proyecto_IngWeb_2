@@ -141,7 +141,7 @@
         <div class="col-12 col-lg-5">
           <div class="dash-panel h-100">
             <p class="dash-panel-title">Gasto por categoría</p>
-            <div id="barChartWrap" class="dash-chart-placeholder"></div>
+            <div id="barChartWrap" class="pie-chart-wrap"></div>
             <div id="chartLegend" class="d-flex flex-wrap gap-2 mt-2" style="font-size:.76rem"></div>
           </div>
         </div>
@@ -871,15 +871,43 @@ function renderChart(data) {
     catTotals[e.category||'Otro'] = (catTotals[e.category||'Otro']||0) + convertAmount(e.amount, e.currency);
   });
   const entries = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,7);
-  if (!entries.length) { wrap.innerHTML = '<div class="dash-empty w-100"><i class="bi bi-bar-chart d-block"></i>Sin datos</div>'; return; }
-  const maxVal = Math.max(...entries.map(e=>e[1]));
+  if (!entries.length) {
+    wrap.innerHTML = '<div class="dash-empty w-100"><i class="bi bi-pie-chart d-block"></i>Sin datos</div>';
+    if (legend) legend.innerHTML = '';
+    return;
+  }
+
+  const total = entries.reduce((sum, item) => sum + item[1], 0);
   const COLORS = ['#3b82f6','#06b6d4','#f59e0b','#7c3aed','#10b981','#ef4444','#94a3b8'];
-  wrap.innerHTML = entries.map(([cat, val], i) => `
-    <div class="bar-item" style="height:${Math.max(12, (val/maxVal)*100)}%;background:${COLORS[i%COLORS.length]}" title="${cat}: ${formatMoney(val, displayCurrency, 2)}"></div>
-  `).join('');
-  if(legend) legend.innerHTML = entries.map(([cat,val],i)=>`
-    <span style="display:flex;align-items:center;gap:.3rem"><span style="width:9px;height:9px;border-radius:50%;background:${COLORS[i%COLORS.length]};flex-shrink:0"></span>${escHtml(cat)}</span>
-  `).join('');
+  let offset = 0;
+  const gradientStops = entries.map(([_, value], i) => {
+    const pct = total > 0 ? (value / total) * 100 : 0;
+    const start = offset;
+    const end = offset + pct;
+    offset = end;
+    const color = COLORS[i % COLORS.length];
+    return `${color} ${start}% ${end}%`;
+  }).join(', ');
+
+  wrap.innerHTML = `
+    <div class="pie-chart-card">
+      <div class="pie-chart" style="background:conic-gradient(${gradientStops})"></div>
+      <div class="pie-chart-center">
+        <div class="pie-chart-label">Total</div>
+        <div class="pie-chart-value">${formatMoney(total, displayCurrency, 0)}</div>
+      </div>
+    </div>`;
+
+  if (legend) {
+    legend.innerHTML = entries.map(([cat, value], i) => {
+      const pct = total > 0 ? (value / total) * 100 : 0;
+      return `
+        <span style="display:flex;align-items:center;gap:.35rem;background:var(--k-bg);border:1px solid var(--k-border);padding:.3rem .5rem;border-radius:999px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${COLORS[i % COLORS.length]};flex-shrink:0"></span>
+          <span>${escHtml(cat)} · ${pct.toFixed(1)}%</span>
+        </span>`;
+    }).join('');
+  }
 }
 
 // ── Add expense ───────────────────────────────────────────

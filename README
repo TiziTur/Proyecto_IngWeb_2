@@ -90,6 +90,8 @@ Klarity es una plataforma moderna de gestion financiera que permite registrar, a
 - 🧭 Landing separada por idioma (`/` en ES y `/en` en EN) con preferencia persistida.
 - 🌍 Selector de idioma tambien en login, dashboard, advisor y admin.
 - 🧩 Cobertura extendida de traducciones runtime para textos dinamicos y secciones no etiquetadas.
+- 🧹 Landing simplificada sin Demo Lab para foco comercial y mejor claridad visual.
+- 🥧 Resumen de gastos por categoria en dashboard renovado con grafico de torta y porcentajes.
 - 🤖 Chatbot asesor financiero integrado.
 - 🧠 Respuesta de asesor en formato seccionado (Problema, Diagnostico, Solucion, Proximo paso).
 - 📊 Graficos interactivos de gasto por categoria.
@@ -190,7 +192,7 @@ PUT   /api/auth/profile
 - Configurar `DATABASE_URL`, `JWT_SECRET`, `DB_SSL`, `CORS_ORIGIN`, `APP_URL`.
 - Para auth extendido: `GOOGLE_CLIENT_ID`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`.
 - Si SMTP falla por timeout, el backend no bloquea registro/recuperacion: guarda usuario/solicitud y deja fallback por logs.
-- `CORS_ORIGIN` puede incluir multiples dominios separados por coma (sin espacios), por ejemplo: `https://tu-netlify.app,https://tu-vercel.app`.
+- `CORS_ORIGIN` puede incluir multiples dominios separados por coma (sin espacios), por ejemplo: `https://tu-netlify.app,https://tu-frontend.com`.
 - El backend normaliza origenes CORS (mayusculas/minusculas y slash final) para evitar bloqueos por diferencias de formato.
 - Verificacion por correo temporalmente desactivada para no bloquear registro/login en entorno actual.
 
@@ -198,6 +200,8 @@ PUT   /api/auth/profile
 - Public directory: `Frontend/public`.
 - Rutas limpias en `netlify.toml`.
 - Configurar `window.KLARITY_GOOGLE_CLIENT_ID` para Google Sign-In.
+
+Nota: configuracion de Vercel removida porque el entorno activo del proyecto es Netlify.
 
 ---
 

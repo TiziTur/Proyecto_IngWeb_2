@@ -1,6 +1,12 @@
 // Universal runtime translations for pages without explicit data-i18n coverage.
 (function () {
-  var lang = localStorage.getItem('klarity-lang') || 'es';
+  var path = String(window.location.pathname || '').toLowerCase();
+  var htmlLang = String(document.documentElement.getAttribute('lang') || '').toLowerCase();
+  var stored = String(localStorage.getItem('klarity-lang') || 'es').toLowerCase();
+  var lang = stored;
+  if (path === '/en' || path.endsWith('/src/html/en.html') || htmlLang === 'en') {
+    lang = 'en';
+  }
   if (lang !== 'en') return;
 
   var replacements = [
@@ -13,6 +19,9 @@
     ['Sabe exactamente', 'Know exactly'],
     ['adónde va tu dinero.', 'where your money goes.'],
     ['Obtene recomendaciones de un asesor financiero real y convierte tus numeros en decisiones claras.', 'Get recommendations from a real financial advisor and turn your numbers into clear decisions.'],
+    ['Klarity unifica tus gastos, tickets y presupuestos en un solo lugar. Obtene recomendaciones de un asesor financiero real y convierte tus numeros en decisiones claras.', 'Klarity unifies your expenses, receipts and budgets in one place. Get recommendations from a real financial advisor and turn your numbers into clear decisions.'],
+    ['Klarity unifica tus gastos, tickets y presupuestos en un solo lugar. Obtene recomendaciones de un asesor financiero real y convierte tus números en decisiones claras.', 'Klarity unifies your expenses, receipts and budgets in one place. Get recommendations from a real financial advisor and turn your numbers into clear decisions.'],
+    ['Klarity unifica tus gastos, tickets y presupuestos en un solo lugar.', 'Klarity unifies your expenses, receipts and budgets in one place.'],
     ['Registra gastos en segundos, analiza patrones con IA y toma decisiones que realmente importan.', 'Log expenses in seconds, analyse patterns with AI and make decisions that actually matter.'],
     ['Ver demo', 'Watch demo'],
     ['Resumen del mes', 'Monthly overview'],
@@ -236,6 +245,7 @@
     ['Controla cuánto gastas por categoría', 'Control how much you spend by category'],
     ['Moneda de visualización', 'Display currency'],
     ['Comprometido del próximo mes', 'Committed for next month'],
+    ['Comprometido del proximo mes', 'Committed for next month'],
     ['Cargando...', 'Loading...'],
     ['Análisis personalizado de tus finanzas', 'Personalized analysis of your finances'],
     ['Configuración', 'Settings'],
@@ -282,6 +292,7 @@
     ['Todavía no hay suficientes gastos repetidos para estimar compromisos.', 'There are still not enough repeated expenses to estimate commitments.'],
     ['registros', 'records'],
     ['Total estimado próximo mes', 'Estimated total next month'],
+    ['Total estimado proximo mes', 'Estimated total next month'],
     ['Consultando al asesor...', 'Asking the advisor...'],
     ['Problema principal', 'Main problem'],
     ['Diagnóstico', 'Diagnosis'],
@@ -357,8 +368,11 @@
     ['Confirmar cambio de rol para', 'Confirm role change for'],
     ['Error:', 'Error:'],
     ['No se pudo actualizar cotización en vivo, usando referencia local.', 'Could not update live exchange rate, using local fallback.'],
+    ['No se pudo actualizar cotizacion en vivo, usando referencia local.', 'Could not update live exchange rate, using local fallback.'],
     ['Tipo de cambio actualizado:', 'Exchange rate updated:'],
+    ['Tipo de cambio actualizado', 'Exchange rate updated'],
     ['No se pudo actualizar cotización en vivo', 'Could not update live exchange rate'],
+    ['No se pudo actualizar cotizacion en vivo', 'Could not update live exchange rate'],
     ['No se pudo interpretar el ticket.', 'Could not parse the receipt.'],
     ['Necesitas iniciar sesion para usar OCR de tickets del backend.', 'You need to log in to use backend receipt OCR.'],
     ['Procesando imagen con OCR...', 'Processing image with OCR...'],
@@ -393,6 +407,8 @@
     ['Ultima actualizacion:', 'Last update:'],
     ['no disponible', 'not available'],
     ['registros)', 'records)'],
+    ['registros', 'records'],
+    ['% usado', '% used'],
     ['Consultando al asesor...', 'Asking advisor...'],
     ['Problema principal', 'Main issue'],
     ['Diagnóstico', 'Diagnosis'],

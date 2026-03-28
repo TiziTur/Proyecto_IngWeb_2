@@ -227,5 +227,7 @@ Frontend:
 - Se agrego estrategia profesional de idioma con landing separada: ES (`/`) y EN (`/en`).
 - Se agrego selector de idioma persistente en login, dashboard, advisor y admin.
 - Se amplio diccionario runtime universal para cubrir textos hardcodeados restantes en landing y paneles.
+- Se retiro la seccion Demo Lab de la landing para mejorar foco y conversion.
+- Se reemplazo grafico de barras por grafico de torta con porcentajes en resumen de gastos por categoria.
 
 Fin del documento.
