@@ -29,13 +29,19 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   emailVerificationTokenHash: string | null;
 
-  @Column({ nullable: true })
+  @Column({
+    type: process.env.DATABASE_URL ? 'timestamptz' : 'datetime',
+    nullable: true,
+  })
   emailVerificationExpiresAt: Date | null;
 
   @Column({ type: 'varchar', nullable: true })
   passwordResetTokenHash: string | null;
 
-  @Column({ nullable: true })
+  @Column({
+    type: process.env.DATABASE_URL ? 'timestamptz' : 'datetime',
+    nullable: true,
+  })
   passwordResetExpiresAt: Date | null;
 
   @Column({ type: 'varchar', nullable: true })

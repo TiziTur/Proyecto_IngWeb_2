@@ -54,9 +54,9 @@ Arquitectura basada en frontend estatico + backend NestJS REST con JWT.
 - passwordHash
 - emailVerified
 - emailVerificationTokenHash
-- emailVerificationExpiresAt
+- emailVerificationExpiresAt (timestamptz en PostgreSQL / datetime en SQLite)
 - passwordResetTokenHash
-- passwordResetExpiresAt
+- passwordResetExpiresAt (timestamptz en PostgreSQL / datetime en SQLite)
 - authProvider (password/google)
 - role (user/advisor/admin)
 - createdAt
