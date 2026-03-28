@@ -528,6 +528,10 @@ footer, .k-footer { background: var(--k-surface); border-top: 1px solid var(--k-
 /* ── Language / Theme toggles ──────────────────────────────── */
 .k-theme-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--k-border); background: var(--k-surface2); color: var(--k-text2); display: grid; place-items: center; cursor: pointer; font-size: 1rem; transition: all var(--k-transition); }
 .k-theme-btn:hover { background: var(--k-primary-s); color: var(--k-primary); border-color: var(--k-primary); }
+.topbar-lang-switch { display: inline-flex; gap: .35rem; align-items: center; background: var(--k-surface2); border: 1px solid var(--k-border); border-radius: .75rem; padding: .18rem; }
+.topbar-lang-switch .k-lang-btn { width: 32px; height: 32px; border-radius: .6rem; border: 0; background: transparent; color: var(--k-muted); font-size: .73rem; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; display: inline-grid; place-items: center; line-height: 1; cursor: pointer; padding: 0; letter-spacing: .04em; transition: background var(--k-transition), color var(--k-transition); }
+.topbar-lang-switch .k-lang-btn.active { background: var(--k-primary); color: #fff; }
+.topbar-lang-switch .k-lang-btn:not(.active):hover { background: var(--k-primary-s); color: var(--k-primary); }
 .k-lang-btn { font-size: .79rem; font-weight: 700; padding: .3rem .7rem; border-radius: 8px; border: 1px solid var(--k-border); background: var(--k-surface2); color: var(--k-text2); cursor: pointer; transition: all var(--k-transition); letter-spacing: .04em; }
 .k-lang-btn.active, .k-lang-btn:hover { background: var(--k-primary-s); color: var(--k-primary); border-color: var(--k-primary); }
 

@@ -35,8 +35,10 @@
         <li class="nav-item"><a class="nav-link" href="#precios" data-i18n="nav.pricing">Precios</a></li>
       </ul>
       <div class="k-nav-controls mt-3 mt-lg-0">
-        <button class="k-lang-btn" id="btnES" onclick="setLang('es')" title="Español">ES</button>
-        <button class="k-lang-btn active" id="btnEN" onclick="setLang('en')" title="English">EN</button>
+        <div class="topbar-lang-switch" aria-label="Language selector">
+          <button class="k-lang-btn" id="btnES" onclick="setLang('es')" title="Español">ES</button>
+          <button class="k-lang-btn active" id="btnEN" onclick="setLang('en')" title="English">EN</button>
+        </div>
         <button class="k-theme-btn" id="themeToggle" title="Cambiar tema" aria-label="Toggle theme">
           <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
         </button>
