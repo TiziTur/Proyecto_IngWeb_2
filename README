@@ -187,6 +187,8 @@ PUT   /api/auth/profile
 - Configurar `DATABASE_URL`, `JWT_SECRET`, `DB_SSL`, `CORS_ORIGIN`, `APP_URL`.
 - Para auth extendido: `GOOGLE_CLIENT_ID`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`.
 - Si SMTP falla por timeout, el backend no bloquea registro/recuperacion: guarda usuario/solicitud y deja fallback por logs.
+- `CORS_ORIGIN` puede incluir multiples dominios separados por coma (sin espacios), por ejemplo: `https://tu-netlify.app,https://tu-vercel.app`.
+- El backend normaliza origenes CORS (mayusculas/minusculas y slash final) para evitar bloqueos por diferencias de formato.
 
 ### Netlify (Frontend)
 - Public directory: `Frontend/public`.

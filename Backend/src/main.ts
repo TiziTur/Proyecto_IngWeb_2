@@ -5,13 +5,29 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, '').toLowerCase();
+
+  const allowedOrigins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => normalizeOrigin(origin))
+    .filter(Boolean);
+
   // Security headers
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const helmet = require('helmet');
   app.use(helmet());
 
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.length === 0) {
+        callback(null, true);
+        return;
+      }
+
+      const incoming = normalizeOrigin(origin);
+      const isAllowed = allowedOrigins.includes(incoming);
+      callback(isAllowed ? null : new Error('CORS origin not allowed'), isAllowed);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
