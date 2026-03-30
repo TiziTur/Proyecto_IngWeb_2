@@ -47,29 +47,45 @@
 
 /* ── Dark mode ────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --k-bg:          #0f1117;
-  --k-bg2:         #161b27;
-  --k-surface:     #1e2535;
-  --k-surface2:    #252d3d;
-  --k-border:      #2d3748;
-  --k-text:        #f0f4ff;
-  --k-text2:       #cbd5e0;
-  --k-muted:       #90a0b7;
+  /* Backgrounds — deeper hierarchy between levels */
+  --k-bg:          #0c0f18;
+  --k-bg2:         #131724;
+  --k-surface:     #1a2030;
+  --k-surface2:    #222840;
+
+  /* Borders — more visible at dark */
+  --k-border:      #2a3352;
+
+  /* Text — better contrast ratios */
+  --k-text:        #eef2ff;
+  --k-text2:       #b0bdd4;
+  --k-muted:       #6e84a3;
+
+  /* Brand colours — brighter so they pop on dark */
   --k-primary:     #60a5fa;
   --k-primary-h:   #93c5fd;
-  --k-primary-s:   #1e3a5f;
+  --k-primary-s:   #162040;
+
   --k-accent:      #22d3ee;
-  --k-accent-s:    #0f2a33;
-  --k-shadow-sm:   0 1px 3px rgba(0,0,0,.3);
-  --k-shadow:      0 4px 16px rgba(0,0,0,.3);
-  --k-shadow-lg:   0 16px 48px rgba(0,0,0,.4);
-  --app-bg:        var(--k-bg);
-  --app-text:      var(--k-text);
-  --app-muted:     var(--k-muted);
-  --app-primary:   var(--k-primary);
+  --k-accent-s:    #0d2030;
+
+  --k-success:     #34d399;
+  --k-warning:     #fbbf24;
+  --k-danger:      #f87171;
+
+  /* Shadows — slightly more opaque for depth */
+  --k-shadow-sm:   0 1px 4px rgba(0,0,0,.5);
+  --k-shadow:      0 4px 20px rgba(0,0,0,.45);
+  --k-shadow-lg:   0 16px 56px rgba(0,0,0,.6);
+
+  /* Legacy aliases */
+  --app-bg:             var(--k-bg);
+  --app-text:           var(--k-text);
+  --app-muted:          var(--k-muted);
+  --app-primary:        var(--k-primary);
   --app-primary-strong: var(--k-primary-h);
   --app-primary-soft:   var(--k-primary-s);
-  --app-surface:   var(--k-surface);
-  --app-border:    var(--k-border);
-  --app-shadow:    var(--k-shadow);
+  --app-surface:        var(--k-surface);
+  --app-border:         var(--k-border);
+  --app-shadow:         var(--k-shadow);
 }

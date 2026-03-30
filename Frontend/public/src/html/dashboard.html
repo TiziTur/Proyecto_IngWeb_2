@@ -16,9 +16,11 @@
   <!-- Klarity styles -->
   <link rel="stylesheet" href="/src/css/styles.css" />
   <link rel="stylesheet" href="/src/css/dashboard.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
-<div class="dash-layout" id="dashLayout">
+<div class="dash-layout role-user" id="dashLayout">
 
   <!-- ── Top bar ─────────────────────────────────────────── -->
   <header class="dash-topbar">
@@ -539,6 +541,13 @@ function showSection(name, linkEl) {
   });
   document.querySelectorAll('.dash-nav-link').forEach(a => a.classList.remove('active'));
   if (linkEl) linkEl.classList.add('active');
+  // fade+slide animation
+  const activeEl = document.getElementById('section-' + name);
+  if (activeEl) {
+    activeEl.classList.remove('dash-section-active');
+    void activeEl.offsetWidth; // reflow trigger
+    activeEl.classList.add('dash-section-active');
+  }
   if (name === 'expenses') loadExpenses();
   if (name === 'budgets') loadBudgets();
   closeSidebar();
@@ -635,6 +644,11 @@ function normalizeExpenses(list) {
 }
 
 async function loadExpenses() {
+  // Show skeleton rows while loading
+  const recentTb = document.getElementById('recentExpensesTbody');
+  const fullTb   = document.getElementById('allExpensesTbody');
+  if (recentTb) recentTb.innerHTML = skeletonRows(5, 4);
+  if (fullTb)   fullTb.innerHTML   = skeletonRows(6, 6);
   try {
     const res = await fetch(API + '/expenses', { headers: authHeaders() });
     if (res.status === 401) { logout(); return; }
@@ -660,6 +674,22 @@ async function initDashboard() {
 }
 initDashboard();
 
+// ── Count-up animation ────────────────────────────────────
+function countUp(el, target, prefix, suffix, duration) {
+  prefix = prefix || '';
+  suffix = suffix || '';
+  duration = duration || 700;
+  const start = Date.now();
+  const step = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = prefix + Math.round(target * ease) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 // ── KPIs ──────────────────────────────────────────────────
 function renderKPIs(data) {
   const now = new Date();
@@ -675,7 +705,8 @@ function renderKPIs(data) {
   const total = thisMonth.reduce((s, e) => s + convertAmount(e.amount, e.currency), 0);
   const prevTotal = prevMonth.reduce((s, e) => s + convertAmount(e.amount, e.currency), 0);
   document.getElementById('kpiTotal').textContent = formatMoney(total, displayCurrency, 2);
-  document.getElementById('kpiCount').textContent = data.length;
+  const countEl = document.getElementById('kpiCount');
+  if (countEl) countUp(countEl, data.length);
 
   // Top category this month
   const catMap = {};
@@ -723,6 +754,15 @@ function renderKPIs(data) {
 }
 
 // ── Table helpers ─────────────────────────────────────────
+function skeletonRows(colspan, count) {
+  count = count || 5;
+  return Array.from({ length: count }, () =>
+    '<tr>' + Array.from({ length: colspan }, () =>
+      '<td class="sk-cell"><div class="skeleton skeleton-text"></div></td>'
+    ).join('') + '</tr>'
+  ).join('');
+}
+
 const CAT_COLORS = {
   'Alimentación':'cat-food','Transporte':'cat-transport','Ocio':'cat-leisure',
   'Alimentacion':'cat-food','Suscripciones':'cat-subs','Salud':'cat-health','Vivienda':'cat-housing','Otro':'cat-other','Otros':'cat-other'
@@ -880,9 +920,10 @@ function filterExpenses() {
   renderFullTable(filtered);
 }
 
-// ── Bar chart ─────────────────────────────────────────────
+// ── Chart.js Doughnut ─────────────────────────────────────
+let _pieChart = null;
 function renderChart(data) {
-  const wrap = document.getElementById('barChartWrap');
+  const wrap   = document.getElementById('barChartWrap');
   const legend = document.getElementById('chartLegend');
   if (!wrap) return;
   const catTotals = {};
@@ -894,40 +935,52 @@ function renderChart(data) {
   if (!entries.length) {
     wrap.innerHTML = `<div class="dash-empty w-100"><i class="bi bi-pie-chart d-block"></i>${T('dash.js.noData')}</div>`;
     if (legend) legend.innerHTML = '';
+    if (_pieChart) { _pieChart.destroy(); _pieChart = null; }
     return;
   }
 
-  const total = entries.reduce((sum, item) => sum + item[1], 0);
+  const total  = entries.reduce((sum, item) => sum + item[1], 0);
   const COLORS = ['#3b82f6','#06b6d4','#f59e0b','#7c3aed','#10b981','#ef4444','#94a3b8'];
-  let offset = 0;
-  const gradientStops = entries.map(([_, value], i) => {
-    const pct = total > 0 ? (value / total) * 100 : 0;
-    const start = offset;
-    const end = offset + pct;
-    offset = end;
-    const color = COLORS[i % COLORS.length];
-    return `${color} ${start}% ${end}%`;
-  }).join(', ');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-  wrap.innerHTML = `
-    <div class="pie-chart-card">
-      <div class="pie-chart" style="background:conic-gradient(${gradientStops})"></div>
-      <div class="pie-chart-center">
-        <div class="pie-chart-label">Total</div>
-        <div class="pie-chart-value">${formatMoney(total, displayCurrency, 0)}</div>
-      </div>
-    </div>`;
+  // Recreate canvas each time to avoid Chart.js reuse issues
+  wrap.innerHTML = '<div class="k-chart-wrap pie-h"><canvas id="kPieCanvas"></canvas></div>';
+  if (_pieChart) { _pieChart.destroy(); _pieChart = null; }
 
-  if (legend) {
-    legend.innerHTML = entries.map(([cat, value], i) => {
-      const pct = total > 0 ? (value / total) * 100 : 0;
-      return `
-        <span style="display:flex;align-items:center;gap:.35rem;background:var(--k-bg);border:1px solid var(--k-border);padding:.3rem .5rem;border-radius:999px">
-          <span style="width:10px;height:10px;border-radius:50%;background:${COLORS[i % COLORS.length]};flex-shrink:0"></span>
-          <span>${escHtml(displayCategory(cat))} · ${pct.toFixed(1)}%</span>
-        </span>`;
-    }).join('');
-  }
+  _pieChart = new Chart(document.getElementById('kPieCanvas'), {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(([cat]) => displayCategory(cat)),
+      datasets: [{
+        data: entries.map(([,v]) => v),
+        backgroundColor: COLORS,
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: isDark ? '#b0bdd4' : '#4a5568',
+            font: { size: 11 },
+            boxWidth: 10,
+            padding: 10
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + formatMoney(ctx.parsed, displayCurrency, 0) +
+                          ' (' + (total > 0 ? ((ctx.parsed/total)*100).toFixed(1) : 0) + '%)'
+          }
+        }
+      }
+    }
+  });
+
+  if (legend) legend.innerHTML = '';
 }
 
 // ── Add expense ───────────────────────────────────────────

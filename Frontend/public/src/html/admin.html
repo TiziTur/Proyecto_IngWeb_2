@@ -13,27 +13,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="/src/css/styles.css" />
   <link rel="stylesheet" href="/src/css/dashboard.css" />
-  <style>
-    .verified-chip { display:inline-flex;align-items:center;gap:.3rem;font-size:.73rem;padding:.18rem .5rem;border-radius:999px;font-weight:600 }
-    .verified-yes  { background:#dcfce7;color:#15803d }
-    .verified-no   { background:#fee2e2;color:#b91c1c }
-    .pg-bar { display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.75rem;font-size:.83rem;color:var(--k-text2) }
-    .pg-btn { padding:.25rem .6rem;border-radius:.4rem;border:1px solid var(--k-border);background:var(--k-surface);cursor:pointer;font-size:.8rem;color:var(--k-text) }
-    .pg-btn:disabled { opacity:.4;cursor:default }
-    .pg-btn.active { background:var(--k-primary);color:#fff;border-color:var(--k-primary) }
-    .exp-filter-row { display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem }
-    .exp-filter-row .dash-input { padding:.4rem .65rem;font-size:.85rem }
-    .stat-leaderboard { display:flex;flex-direction:column;gap:.55rem }
-    .stat-lb-row { display:flex;align-items:center;gap:.65rem }
-    .stat-lb-rank { font-size:.75rem;color:var(--k-muted);min-width:1.2rem;text-align:right }
-    .stat-lb-bar-wrap { flex:1;background:var(--k-bg);border-radius:999px;height:6px;overflow:hidden }
-    .stat-lb-bar { height:100%;border-radius:999px;background:var(--k-primary) }
-    .stat-lb-label { font-size:.8rem;color:var(--k-text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px }
-    .stat-lb-val { font-size:.8rem;font-weight:600;color:var(--k-text);min-width:3.5rem;text-align:right }
-  </style>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
-<div class="dash-layout" id="dashLayout">
+<div class="dash-layout role-admin" id="dashLayout">
 
   <!-- ── Top bar ─────────────────────────────────────────── -->
   <header class="dash-topbar">
@@ -206,7 +190,7 @@
 
       <div class="dash-panel mt-3">
         <p class="dash-panel-title" data-i18n="adm.users.chart.title">Nuevos usuarios (últimos 6 meses)</p>
-        <div id="usersMonthlyChart" class="dash-chart-placeholder" style="height:140px"></div>
+        <div id="usersMonthlyChart"></div>
       </div>
     </div>
 
@@ -435,6 +419,13 @@ function showSection(name, linkEl) {
   });
   document.querySelectorAll('.dash-nav-link').forEach(a => a.classList.remove('active'));
   if(linkEl) linkEl.classList.add('active');
+  // fade+slide animation
+  const activeEl = document.getElementById('section-' + name);
+  if (activeEl) {
+    activeEl.classList.remove('dash-section-active');
+    void activeEl.offsetWidth;
+    activeEl.classList.add('dash-section-active');
+  }
   if(name === 'users')    loadUsers();
   if(name === 'expenses') loadAdminExpenses();
   if(name === 'health')   checkHealth();
@@ -444,6 +435,16 @@ function showSection(name, linkEl) {
 
 document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
 
+// ── Skeleton rows helper ─────────────────────────────────
+function skeletonRows(colspan, count) {
+  count = count || 5;
+  return Array.from({ length: count }, () =>
+    '<tr>' + Array.from({ length: colspan }, () =>
+      '<td class="sk-cell"><div class="skeleton skeleton-text"></div></td>'
+    ).join('') + '</tr>'
+  ).join('');
+}
+
 // ── Users ─────────────────────────────────────────────────
 let allUsers = [];
 let usersPage = 1;
@@ -451,7 +452,7 @@ const USERS_PER_PAGE = 20;
 
 async function loadUsers() {
   const tb = document.getElementById('allUsersTbody');
-  if(tb) tb.innerHTML = '<tr><td colspan="7" class="dash-empty"><span class="loading-spinner"></span></td></tr>';
+  if(tb) tb.innerHTML = skeletonRows(7, 5);
   try {
     const res = await fetch(API + '/users', { headers: authHeaders() });
     if (res.status === 401) { logout(); return; }
@@ -494,6 +495,7 @@ function renderKPIs(users) {
   renderUsersMonthlyChart(users);
 }
 
+let _usersBarChart = null;
 function renderUsersMonthlyChart(users) {
   const wrap = document.getElementById('usersMonthlyChart');
   if(!wrap) return;
@@ -517,15 +519,29 @@ function renderUsersMonthlyChart(users) {
     const bucket = months.find(m => m.key === key);
     if(bucket) bucket.count += 1;
   });
-  const maxVal = Math.max(1, ...months.map(m => m.count));
-  wrap.innerHTML = months.map((m) => {
-    const h = Math.max(10, (m.count / maxVal) * 100);
-    return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.35rem;flex:1;min-width:0">
-      <span style="font-size:.72rem;color:var(--k-muted)">${m.count}</span>
-      <div class="bar-item" style="width:100%;height:${h}%;min-height:12px"></div>
-      <span style="font-size:.72rem;color:var(--k-text2);text-transform:capitalize">${m.label}</span>
-    </div>`;
-  }).join('');
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  wrap.innerHTML = '<div class="k-chart-wrap bar-h"><canvas id="kUsersBarCanvas"></canvas></div>';
+  if(_usersBarChart) { _usersBarChart.destroy(); _usersBarChart = null; }
+  _usersBarChart = new Chart(document.getElementById('kUsersBarCanvas'), {
+    type: 'bar',
+    data: {
+      labels: months.map(m => m.label),
+      datasets: [{
+        data: months.map(m => m.count),
+        backgroundColor: 'rgba(239,68,68,0.75)',
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: isDark ? '#b0bdd4' : '#4a5568', font: { size: 11 } }, grid: { display: false } },
+        y: { ticks: { color: isDark ? '#b0bdd4' : '#4a5568', font: { size: 11 }, stepSize: 1 }, grid: { color: isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)' } }
+      }
+    }
+  });
 }
 
 function renderRecentTable(users) {
@@ -669,7 +685,7 @@ const EXP_PER_PAGE = 25;
 
 async function loadAdminExpenses() {
   const tb = document.getElementById('adminExpensesTbody');
-  if(tb) tb.innerHTML = '<tr><td colspan="6" class="dash-empty"><span class="loading-spinner"></span></td></tr>';
+  if(tb) tb.innerHTML = skeletonRows(6, 6);
   try {
     const res = await fetch(API + '/expenses', { headers: authHeaders() });
     if (res.status === 401) { logout(); return; }

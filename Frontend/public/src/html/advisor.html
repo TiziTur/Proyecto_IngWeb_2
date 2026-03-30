@@ -13,9 +13,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="/src/css/styles.css" />
   <link rel="stylesheet" href="/src/css/dashboard.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
-<div class="dash-layout" id="dashLayout">
+<div class="dash-layout role-advisor" id="dashLayout">
 
   <!-- ── Top bar ─────────────────────────────────────────── -->
   <header class="dash-topbar">
@@ -292,18 +294,35 @@ function showSection(name, linkEl) {
   });
   document.querySelectorAll('.dash-nav-link').forEach(a => a.classList.remove('active'));
   if(linkEl) linkEl.classList.add('active');
+  // fade+slide animation
+  const activeEl = document.getElementById('section-' + name);
+  if (activeEl) {
+    activeEl.classList.remove('dash-section-active');
+    void activeEl.offsetWidth;
+    activeEl.classList.add('dash-section-active');
+  }
   if(name === 'clients') loadClients();
   closeSidebar();
 }
 
 document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
 
+// Skeleton rows helper
+function skeletonRows(colspan, count) {
+  count = count || 5;
+  return Array.from({ length: count }, () =>
+    '<tr>' + Array.from({ length: colspan }, () =>
+      '<td class="sk-cell"><div class="skeleton skeleton-text"></div></td>'
+    ).join('') + '</tr>'
+  ).join('');
+}
+
 // Load clients
 let allClients = [];
 let clientHealthMap = {};
 async function loadClients() {
   const tb = document.getElementById('clientsTbody');
-  tb.innerHTML = '<tr><td colspan="6" class="dash-empty"><span class="loading-spinner"></span></td></tr>';
+  tb.innerHTML = skeletonRows(6, 5);
   try {
     const [usersRes, healthRes] = await Promise.all([
       fetch(API + '/users', { headers: authHeaders() }),
