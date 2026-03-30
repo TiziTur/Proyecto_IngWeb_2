@@ -1,15 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { Expense } from './expense.entity';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { GamificationService } from '../gamification/gamification.service';
 
 @Injectable()
 export class ExpensesService {
   constructor(
     @InjectRepository(Expense)
     private readonly expensesRepository: Repository<Expense>,
+    @Inject(forwardRef(() => GamificationService))
+    private readonly gamification: GamificationService,
   ) {}
 
   async findFiltered(params: {
@@ -74,7 +77,7 @@ export class ExpensesService {
     };
   }
 
-  async create(userId: string, dto: CreateExpenseDto): Promise<Expense> {
+  async create(userId: string, dto: CreateExpenseDto, context?: { ocrUsed?: boolean }): Promise<Expense> {
     const commerce = dto.commerce || dto.concept || dto.description || 'Sin concepto';
     const expense = this.expensesRepository.create({
       commerce,
@@ -88,7 +91,12 @@ export class ExpensesService {
       user: { id: userId } as Expense['user'],
     });
 
-    return this.expensesRepository.save(expense);
+    const saved = await this.expensesRepository.save(expense);
+
+    // Fire-and-forget badge evaluation
+    void this.gamification.evaluate(userId, { ocrUsed: context?.ocrUsed });
+
+    return saved;
   }
 
   async findAllForUser(userId: string): Promise<Expense[]> {
@@ -122,7 +130,12 @@ export class ExpensesService {
     }
 
     Object.assign(expense, patch);
-    return this.expensesRepository.save(expense);
+    const saved = await this.expensesRepository.save(expense);
+
+    // Re-evaluate after update (isMonthly may have changed, etc.)
+    void this.gamification.evaluate(userId);
+
+    return saved;
   }
 
   async remove(id: string, userId: string): Promise<{ deleted: true }> {
@@ -135,6 +148,11 @@ export class ExpensesService {
     }
 
     await this.expensesRepository.remove(expense);
+
+    // Re-evaluate after deletion (count-based badges may need to be re-checked but
+    // we don't revoke earned badges — the evaluate() is idempotent)
+    void this.gamification.evaluate(userId);
+
     return { deleted: true };
   }
 }

@@ -75,6 +75,13 @@
       <a href="#section-budgets" class="dash-nav-link" onclick="showSection('budgets', this)">
         <i class="bi bi-bar-chart-line"></i> <span data-i18n="dash.budgets">Presupuestos</span>
       </a>
+      <a href="#section-achievements" class="dash-nav-link" onclick="showSection('achievements', this)">
+        <i class="bi bi-award"></i> <span data-i18n="dash.achievements">Logros</span>
+        <span class="nav-badge" id="achievementsBadge"></span>
+      </a>
+      <a href="#section-shared" class="dash-nav-link" onclick="showSection('shared', this)">
+        <i class="bi bi-people"></i> <span data-i18n="dash.shared">Compartidos</span>
+      </a>
     </nav>
 
     <nav class="dash-nav-section" aria-label="Herramientas">
@@ -190,6 +197,19 @@
               <div id="insightsTopMerchant" style="font-weight:700;color:var(--k-text);margin-top:.25rem">—</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Achievements widget -->
+      <div class="dash-panel mt-3" id="achievementsWidget">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem">
+          <p class="dash-panel-title mb-0" data-i18n="dash.achv.widget.title">Mis logros</p>
+          <a href="#section-achievements" style="font-size:.83rem;color:var(--k-primary);text-decoration:none;font-weight:600"
+             onclick="showSection('achievements', document.querySelector('[href=\'#section-achievements\']'));return false;"
+             data-i18n="dash.achv.seeAll">Ver todos mis logros →</a>
+        </div>
+        <div id="achievementsWidgetBody">
+          <div style="color:var(--k-muted);font-size:.87rem" data-i18n="dash.loading">Cargando...</div>
         </div>
       </div>
     </div>
@@ -472,6 +492,161 @@
       </div>
     </div>
 
+    <!-- ====== ACHIEVEMENTS ================================= -->
+    <div id="section-achievements" style="display:none">
+      <div class="dash-page-header">
+        <div>
+          <h1 class="dash-page-title" data-i18n="dash.achv.title">Logros</h1>
+          <p class="dash-page-sub" data-i18n="dash.achv.sub">Tus badges y progreso</p>
+        </div>
+        <button class="btn btn-outline-primary btn-sm" onclick="loadAchievements()">
+          <i class="bi bi-arrow-clockwise me-1"></i> <span data-i18n="dash.loading">Cargando...</span>
+        </button>
+      </div>
+
+      <div class="dash-panel mb-3" id="achievementsStats">
+        <span style="color:var(--k-muted);font-size:.88rem" data-i18n="dash.loading">Cargando...</span>
+      </div>
+
+      <div class="badge-grid" id="achievementsGrid">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- ====== SHARED EXPENSES ============================== -->
+    <div id="section-shared" style="display:none">
+      <div class="dash-page-header">
+        <div>
+          <h1 class="dash-page-title" data-i18n="dash.sh.title">Gastos compartidos</h1>
+          <p class="dash-page-sub" data-i18n="dash.sh.sub">Amigos, gastos y balances</p>
+        </div>
+      </div>
+
+      <div class="row g-3">
+
+        <!-- Panel 1: Mis amigos -->
+        <div class="col-12 col-lg-4">
+          <div class="dash-panel h-100">
+            <p class="dash-panel-title" data-i18n="dash.sh.friends.title">Mis amigos</p>
+
+            <!-- Send request form -->
+            <form id="friendRequestForm" onsubmit="sendFriendRequest(event)" class="mb-3">
+              <label class="dash-label" for="friendEmailInput" data-i18n="dash.sh.friends.addLabel">Añadir amigo por email</label>
+              <div class="d-flex gap-2 mt-1">
+                <input id="friendEmailInput" type="email" class="dash-input" placeholder="email@ejemplo.com" required style="flex:1" />
+                <button type="submit" class="btn btn-primary btn-sm" data-i18n="dash.sh.friends.addBtn">Enviar solicitud</button>
+              </div>
+              <div id="friendRequestMsg" style="font-size:.82rem;min-height:1.3rem;margin-top:.4rem"></div>
+            </form>
+
+            <!-- Pending received requests -->
+            <div id="pendingRequestsSection" style="display:none;margin-bottom:.9rem">
+              <p style="font-size:.8rem;color:var(--k-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem" data-i18n="dash.sh.friends.pending">Solicitudes recibidas</p>
+              <div id="pendingRequestsList"></div>
+            </div>
+
+            <!-- Friends list -->
+            <div id="friendsList">
+              <div style="color:var(--k-muted);font-size:.87rem" data-i18n="dash.loading">Cargando...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Gastos compartidos -->
+        <div class="col-12 col-lg-8">
+          <div class="dash-panel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <p class="dash-panel-title mb-0" data-i18n="dash.sh.expenses.title">Gastos compartidos</p>
+              <button class="btn btn-primary btn-sm" onclick="toggleSharedExpenseForm()" id="newSharedExpenseBtn">
+                <i class="bi bi-plus-lg me-1"></i> <span data-i18n="dash.sh.expenses.newBtn">Crear gasto</span>
+              </button>
+            </div>
+
+            <!-- Create shared expense form (hidden by default) -->
+            <div id="sharedExpenseForm" style="display:none;background:var(--k-bg);border:1px solid var(--k-border);border-radius:.9rem;padding:1rem;margin-bottom:1rem">
+              <p style="font-weight:700;font-size:.92rem;margin-bottom:.75rem" data-i18n="dash.sh.expenses.create">Crear gasto compartido</p>
+              <div class="row g-2 mb-2">
+                <div class="col-sm-6">
+                  <label class="dash-label" data-i18n="dash.sh.expenses.concept">Concepto</label>
+                  <input id="shConcept" type="text" class="dash-input" placeholder="ej. Cena" required />
+                </div>
+                <div class="col-sm-3">
+                  <label class="dash-label" data-i18n="dash.sh.expenses.amount">Importe</label>
+                  <input id="shAmount" type="number" min="0" step="0.01" class="dash-input" placeholder="0.00" required />
+                </div>
+                <div class="col-sm-3">
+                  <label class="dash-label">Moneda</label>
+                  <select id="shCurrency" class="dash-input">
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                    <option value="ARS">ARS</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-sm-6">
+                  <label class="dash-label" data-i18n="dash.sh.expenses.date">Fecha</label>
+                  <input id="shDate" type="date" class="dash-input" />
+                </div>
+              </div>
+              <p style="font-size:.82rem;color:var(--k-muted);margin:.6rem 0 .4rem" data-i18n="dash.sh.expenses.addPart">Añadir participante</p>
+              <div id="shParticipants" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.5rem">
+                <!-- rows injected by JS -->
+              </div>
+              <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="addParticipantRow()">
+                <i class="bi bi-person-plus me-1"></i> <span data-i18n="dash.sh.expenses.addPart">Añadir participante</span>
+              </button>
+              <div id="sharedExpenseMsg" style="font-size:.82rem;min-height:1.3rem;margin-top:.25rem"></div>
+              <div class="d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-primary btn-sm" onclick="submitSharedExpense()" data-i18n="dash.sh.expenses.saveBtn">Guardar</button>
+                <button type="button" class="btn btn-light btn-sm" onclick="toggleSharedExpenseForm()" data-i18n="dash.sh.expenses.cancelBtn">Cancelar</button>
+              </div>
+            </div>
+
+            <!-- Shared expenses table -->
+            <div style="overflow-x:auto">
+              <table class="dash-table" id="sharedExpensesTable">
+                <thead>
+                  <tr>
+                    <th data-i18n="dash.sh.expenses.concept">Concepto</th>
+                    <th data-i18n="dash.sh.expenses.amount">Importe</th>
+                    <th data-i18n="dash.sh.expenses.date">Fecha</th>
+                    <th data-i18n="dash.sh.expenses.status">Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="sharedExpensesTbody">
+                  <tr><td colspan="5" class="dash-empty"><span class="loading-spinner"></span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Balance -->
+        <div class="col-12">
+          <div class="dash-panel">
+            <p class="dash-panel-title" data-i18n="dash.sh.balance.title">Balance</p>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <p style="font-size:.8rem;color:var(--k-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.6rem" data-i18n="dash.sh.balance.owedTo">Me deben</p>
+                <div id="balanceOwedToMe">
+                  <div style="color:var(--k-muted);font-size:.87rem" data-i18n="dash.loading">Cargando...</div>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <p style="font-size:.8rem;color:var(--k-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.6rem" data-i18n="dash.sh.balance.iOwe">Debo</p>
+                <div id="balanceIOwe">
+                  <div style="color:var(--k-muted);font-size:.87rem" data-i18n="dash.loading">Cargando...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </main>
 </div><!-- /dash-layout -->
 
@@ -533,7 +708,7 @@
 })();
 
 // ── Navigation ────────────────────────────────────────────
-const SECTIONS = ['overview','expenses','add','ocr','budgets','advisor','profile'];
+const SECTIONS = ['overview','expenses','add','ocr','budgets','achievements','shared','advisor','profile'];
 function showSection(name, linkEl) {
   SECTIONS.forEach(id => {
     const el = document.getElementById('section-' + id);
@@ -550,6 +725,8 @@ function showSection(name, linkEl) {
   }
   if (name === 'expenses') loadExpenses();
   if (name === 'budgets') loadBudgets();
+  if (name === 'achievements') loadAchievements();
+  if (name === 'shared') loadShared();
   closeSidebar();
 }
 
@@ -671,6 +848,7 @@ async function initDashboard() {
   await refreshExchangeRates();
   await loadExpenses();
   loadBudgets();
+  loadAchievementsWidget();
 }
 initDashboard();
 
@@ -1125,11 +1303,22 @@ const DEFAULT_BUDGETS_EUR = {
   'Alimentación': 300, 'Transporte': 100, 'Ocio': 80,
   'Suscripciones': 50, 'Salud': 100, 'Vivienda': 600, 'Otro': 150
 };
-function loadBudgets() {
+async function loadBudgets() {
   const grid = document.getElementById('budgetGrid');
   if (!grid) return;
-  const saved = JSON.parse(localStorage.getItem('klarity_budgets') || '{}');
-  const budgetsEur = Object.assign({}, DEFAULT_BUDGETS_EUR, saved);
+  let budgetsEur = { ...DEFAULT_BUDGETS_EUR };
+  try {
+    const res = await fetch(API + '/budgets', { headers: authHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length) {
+        const fromApi = {};
+        data.forEach(b => { fromApi[b.category] = Number(b.limitAmount); });
+        budgetsEur = Object.assign({}, DEFAULT_BUDGETS_EUR, fromApi);
+      }
+    }
+  } catch (e) { /* fallback to defaults silently */ }
+
   const now = new Date();
   const monthExpenses = allExpenses.filter(e => {
     const d = new Date(e.date || e.createdAt);
@@ -1154,11 +1343,32 @@ function loadBudgets() {
         <div style="font-size:.76rem;margin-top:.4rem;color:${color}">
           ${pct >= 90 ? T('dash.js.limitReached') : pct >= 70 ? T('dash.js.highSpend') : pct === 0 ? T('dash.js.noSpend') : Math.round(pct) + T('dash.js.used')}
         </div>
+        <div style="margin-top:.5rem;text-align:right">
+          <button class="btn btn-outline-secondary btn-sm" style="font-size:.73rem;padding:.2rem .55rem"
+            onclick="promptBudgetEdit('${escHtml(cat)}',${limitEur})">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </div>
       </div>
     </div>`;
   }).join('');
 
   renderRecurringCommitments(allExpenses);
+}
+
+async function promptBudgetEdit(cat, currentLimitEur) {
+  const input = prompt((window.getLang && window.getLang()==='en' ? 'New monthly limit for ' : 'Nuevo límite mensual para ') + cat + ' (EUR):', currentLimitEur);
+  if (input === null) return;
+  const val = parseFloat(input);
+  if (!Number.isFinite(val) || val < 0) return;
+  try {
+    const res = await fetch(API + '/budgets/' + encodeURIComponent(cat), {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ limitAmount: val })
+    });
+    if (res.ok) loadBudgets();
+  } catch(e) { console.error('Budget save error', e); }
 }
 
 function renderRecurringCommitments(data) {
@@ -1198,6 +1408,411 @@ function renderRecurringCommitments(data) {
       <strong style="color:var(--k-primary)">${formatMoney(total, displayCurrency, 2)}</strong>
     </div>
   </div>`;
+}
+
+// ── Achievements ──────────────────────────────────────────
+const BADGE_ICONS = {
+  first_expense:    'bi-receipt',
+  ten_expenses:     'bi-list-check',
+  fifty_expenses:   'bi-journal-check',
+  hundred_expenses: 'bi-award-fill',
+  monthly_budget:   'bi-piggy-bank',
+  streak_months:    'bi-calendar-check',
+  five_categories:  'bi-tags',
+  all_categories:   'bi-collection',
+  no_overspend:     'bi-shield-check',
+  shared_expense:   'bi-people',
+  five_friends:     'bi-people-fill',
+  early_adopter:    'bi-star-fill',
+};
+
+let _badgesCache = null;
+
+async function loadAchievements() {
+  _badgesCache = null;
+  const grid = document.getElementById('achievementsGrid');
+  const stats = document.getElementById('achievementsStats');
+  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem;color:var(--k-muted)"><span class="loading-spinner me-2"></span>' + T('dash.loading') + '</div>';
+  try {
+    const res = await fetch(API + '/gamification/badges', { headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    const badges = await res.json();
+    _badgesCache = badges;
+    renderBadgeGrid(badges, grid);
+    renderBadgeStats(badges, stats);
+    renderAchievementsWidget(badges);
+    const earnedCount = badges.filter(b => b.earned).length;
+    const navBadge = document.getElementById('achievementsBadge');
+    if (navBadge) navBadge.textContent = earnedCount > 0 ? earnedCount : '';
+  } catch(e) {
+    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;color:var(--k-danger,#ef4444);padding:.5rem">Error: ' + escHtml(e.message) + '</div>';
+  }
+}
+
+function renderBadgeGrid(badges, container) {
+  if (!container) return;
+  if (!badges.length) {
+    container.innerHTML = '<div style="grid-column:1/-1" class="dash-empty">' + T('dash.achv.noBadges') + '</div>';
+    return;
+  }
+  container.innerHTML = badges.map(b => {
+    const iconClass = BADGE_ICONS[b.key] || 'bi-patch-check';
+    const isEarned = !!b.earned;
+    const earnedDate = b.earnedAt ? fmtDate(b.earnedAt) : '';
+    const pct = (!isEarned && b.progress != null && b.total > 0)
+      ? Math.min(100, (b.progress / b.total) * 100).toFixed(1) : 0;
+    const progressHtml = (!isEarned && b.progress != null && b.total != null) ? `
+      <div style="width:100%;margin-top:.35rem">
+        <div style="background:var(--k-bg);border-radius:999px;height:5px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:var(--k-primary);border-radius:999px"></div>
+        </div>
+        <div style="font-size:.7rem;color:var(--k-muted);margin-top:.2rem">${b.progress} / ${b.total}</div>
+      </div>` : '';
+    return `<div class="badge-card ${isEarned ? 'earned' : 'locked'}" title="${escHtml(b.description || b.name)}">
+      <div class="badge-icon"><i class="bi ${iconClass}"></i></div>
+      <div class="badge-name">${escHtml(b.name)}</div>
+      ${isEarned
+        ? `<div class="badge-earned-date"><i class="bi bi-check-circle-fill text-success me-1"></i>${T('dash.achv.earnedOn')} ${earnedDate}</div>`
+        : `<div class="badge-desc">${escHtml(b.description || '')}${progressHtml}</div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function renderBadgeStats(badges, container) {
+  if (!container) return;
+  const earned = badges.filter(b => b.earned).length;
+  container.innerHTML = `<span style="font-weight:700;font-size:1.05rem;color:var(--k-primary)">${earned}</span>
+    <span style="color:var(--k-muted);font-size:.88rem"> ${T('dash.achv.of')} ${badges.length} ${T('dash.achv.badges')} ${T('dash.achv.earned')}</span>`;
+}
+
+function renderAchievementsWidget(badges) {
+  const body = document.getElementById('achievementsWidgetBody');
+  if (!body) return;
+  const earned = badges.filter(b => b.earned).sort((a,b) => new Date(b.earnedAt) - new Date(a.earnedAt)).slice(0,3);
+  const nextBadge = badges.find(b => !b.earned);
+  if (!earned.length) {
+    body.innerHTML = `<p style="color:var(--k-muted);font-size:.87rem">${T('dash.achv.noBadges')}</p>`;
+    return;
+  }
+  const earnedHtml = earned.map(b => {
+    const iconClass = BADGE_ICONS[b.key] || 'bi-patch-check';
+    return `<div class="achv-widget-item">
+      <div class="achv-widget-icon"><i class="bi ${iconClass}"></i></div>
+      <div>
+        <div style="font-size:.85rem;font-weight:600;color:var(--k-text)">${escHtml(b.name)}</div>
+        <div style="font-size:.74rem;color:var(--k-muted)">${T('dash.achv.earnedOn')} ${fmtDate(b.earnedAt)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  let nextHtml = '';
+  if (nextBadge) {
+    const pct = (nextBadge.progress != null && nextBadge.total > 0)
+      ? Math.min(100, (nextBadge.progress / nextBadge.total) * 100).toFixed(1) : 0;
+    const nextIcon = BADGE_ICONS[nextBadge.key] || 'bi-patch-check';
+    nextHtml = `<div style="margin-top:.8rem;padding-top:.75rem;border-top:1px solid var(--k-border)">
+      <div style="font-size:.78rem;color:var(--k-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem">${T('dash.achv.nextBadge')}</div>
+      <div style="display:flex;align-items:center;gap:.65rem">
+        <div class="achv-widget-icon" style="opacity:.55"><i class="bi ${nextIcon}"></i></div>
+        <div style="flex:1">
+          <div style="font-size:.83rem;font-weight:600;color:var(--k-text2)">${escHtml(nextBadge.name)}</div>
+          <div style="background:var(--k-bg);border-radius:999px;height:5px;overflow:hidden;margin-top:.3rem">
+            <div style="width:${pct}%;height:100%;background:var(--k-primary);border-radius:999px;transition:width .4s"></div>
+          </div>
+          ${nextBadge.progress != null ? `<div style="font-size:.7rem;color:var(--k-muted);margin-top:.15rem">${nextBadge.progress} / ${nextBadge.total}</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  } else {
+    nextHtml = `<div style="margin-top:.8rem;padding-top:.75rem;border-top:1px solid var(--k-border);color:var(--k-success,#16a34a);font-size:.85rem;font-weight:600">
+      <i class="bi bi-trophy-fill me-1"></i>${T('dash.achv.noNext')}
+    </div>`;
+  }
+  body.innerHTML = earnedHtml + nextHtml;
+}
+
+async function loadAchievementsWidget() {
+  try {
+    const res = await fetch(API + '/gamification/badges', { headers: authHeaders() });
+    if (!res.ok) return;
+    const badges = await res.json();
+    _badgesCache = badges;
+    renderAchievementsWidget(badges);
+    const earnedCount = badges.filter(b => b.earned).length;
+    const navBadge = document.getElementById('achievementsBadge');
+    if (navBadge) navBadge.textContent = earnedCount > 0 ? earnedCount : '';
+  } catch(e) { /* non-critical, fail silently */ }
+}
+
+// ── Friends & Shared Expenses ─────────────────────────────
+let _friendsCache = [];
+
+async function loadShared() {
+  await Promise.all([loadFriends(), loadSharedExpenses(), loadBalance()]);
+}
+
+async function loadFriends() {
+  const list = document.getElementById('friendsList');
+  if (list) list.innerHTML = '<div style="color:var(--k-muted);font-size:.87rem"><span class="loading-spinner me-2"></span>' + T('dash.loading') + '</div>';
+  try {
+    const res = await fetch(API + '/friendships', { headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    const data = await res.json();
+    const accepted = Array.isArray(data) ? data.filter(f => f.status === 'accepted') : (data.friends || []);
+    const pending  = Array.isArray(data) ? data.filter(f => f.status === 'pending') : (data.pending || []);
+    _friendsCache = accepted;
+    const myId = getUserData()?.id || getUserData()?.sub;
+
+    const pendingSection = document.getElementById('pendingRequestsSection');
+    const pendingList = document.getElementById('pendingRequestsList');
+    if (pendingSection && pendingList) {
+      const incomingPending = pending.filter(f => {
+        const addresseeId = f.addressee?.id || f.addresseeId;
+        return String(addresseeId) === String(myId);
+      });
+      if (incomingPending.length) {
+        pendingSection.style.display = '';
+        pendingList.innerHTML = incomingPending.map(f => {
+          const name = f.requester?.name || f.requester?.email || '?';
+          return `<div class="friend-item">
+            <div class="friend-avatar">${name[0].toUpperCase()}</div>
+            <div class="friend-info">
+              <div class="friend-name">${escHtml(name)}</div>
+              <div class="friend-email">${escHtml(f.requester?.email || '')}</div>
+            </div>
+            <button class="btn btn-success btn-sm me-1" onclick="respondFriendRequest('${f.id}','accept')">${T('dash.sh.friends.accept')}</button>
+            <button class="btn btn-outline-danger btn-sm" onclick="respondFriendRequest('${f.id}','reject')">${T('dash.sh.friends.reject')}</button>
+          </div>`;
+        }).join('');
+      } else {
+        pendingSection.style.display = 'none';
+      }
+    }
+
+    if (list) {
+      if (!accepted.length) {
+        list.innerHTML = `<p style="color:var(--k-muted);font-size:.87rem">${T('dash.sh.friends.empty')}</p>`;
+      } else {
+        list.innerHTML = accepted.map(f => {
+          const other = String(f.requester?.id) === String(myId) ? f.addressee : f.requester;
+          const name = other?.name || other?.email || '?';
+          return `<div class="friend-item">
+            <div class="friend-avatar">${name[0].toUpperCase()}</div>
+            <div class="friend-info">
+              <div class="friend-name">${escHtml(name)}</div>
+              <div class="friend-email">${escHtml(other?.email || '')}</div>
+            </div>
+            <button class="dash-btn-icon danger" onclick="removeFriend('${f.id}')" title="${T('dash.sh.friends.remove')}"><i class="bi bi-person-dash"></i></button>
+          </div>`;
+        }).join('');
+      }
+    }
+  } catch(e) {
+    if (list) list.innerHTML = `<span style="color:var(--k-danger,#ef4444)">${escHtml(e.message)}</span>`;
+  }
+}
+
+async function sendFriendRequest(e) {
+  e.preventDefault();
+  const emailInput = document.getElementById('friendEmailInput');
+  const msg = document.getElementById('friendRequestMsg');
+  msg.textContent = '';
+  try {
+    const res = await fetch(API + '/friendships/request', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ email: emailInput.value.trim() })
+    });
+    if (res.status === 401) { logout(); return; }
+    if (!res.ok) throw new Error((await res.json()).message || 'Error');
+    msg.innerHTML = `<span style="color:var(--k-success)"><i class="bi bi-check-circle me-1"></i>${T('dash.js.friendSent')}</span>`;
+    emailInput.value = '';
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+    loadFriends();
+  } catch(err) {
+    msg.innerHTML = `<span style="color:var(--k-danger,#ef4444)"><i class="bi bi-exclamation-circle me-1"></i>${escHtml(err.message)}</span>`;
+  }
+}
+
+async function respondFriendRequest(id, action) {
+  try {
+    const endpoint = action === 'accept'
+      ? `/friendships/${id}/accept`
+      : `/friendships/${id}/reject`;
+    const res = await fetch(API + endpoint, { method: 'PATCH', headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    loadFriends();
+    if (action === 'accept') loadBalance();
+  } catch(e) { console.error(e); }
+}
+
+async function removeFriend(id) {
+  try {
+    await fetch(API + '/friendships/' + id, { method: 'DELETE', headers: authHeaders() });
+    loadFriends();
+  } catch(e) { console.error(e); }
+}
+
+async function loadSharedExpenses() {
+  const tbody = document.getElementById('sharedExpensesTbody');
+  if (tbody) tbody.innerHTML = skeletonRows(5, 4);
+  try {
+    const res = await fetch(API + '/shared-expenses', { headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    const data = await res.json();
+    if (!tbody) return;
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="5" class="dash-empty">${T('dash.sh.expenses.empty')}</td></tr>`;
+      return;
+    }
+    const myId = getUserData()?.id || getUserData()?.sub;
+    tbody.innerHTML = data.map(se => {
+      const myParticipant = (se.participants || []).find(p =>
+        String(p.userId) === String(myId) || String(p.user?.id) === String(myId)
+      );
+      const isSettled = myParticipant?.settled;
+      const settledLabel = isSettled ? T('dash.sh.expenses.settled') : T('dash.sh.expenses.pending');
+      const settledColor = isSettled ? 'var(--k-success,#16a34a)' : 'var(--k-warning,#f59e0b)';
+      const isCreator = String(se.creator?.id) === String(myId) || String(se.creatorId) === String(myId);
+      return `<tr>
+        <td><strong>${escHtml(se.concept || se.description || '—')}</strong></td>
+        <td>${formatMoney(se.amount, se.currency || 'EUR', 2)}</td>
+        <td>${fmtDate(se.date || se.createdAt)}</td>
+        <td><span style="color:${settledColor};font-weight:600">${settledLabel}</span></td>
+        <td>${isCreator ? `<button class="dash-btn-icon danger" onclick="deleteSharedExpense('${se.id}')" title="Eliminar"><i class="bi bi-trash3"></i></button>` : ''}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:var(--k-danger,#ef4444)">${escHtml(e.message)}</td></tr>`;
+  }
+}
+
+let _sharedFormVisible = false;
+function toggleSharedExpenseForm() {
+  _sharedFormVisible = !_sharedFormVisible;
+  const form = document.getElementById('sharedExpenseForm');
+  if (form) form.style.display = _sharedFormVisible ? '' : 'none';
+  if (_sharedFormVisible) {
+    document.getElementById('shDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('shParticipants').innerHTML = '';
+    addParticipantRow();
+  }
+}
+
+function addParticipantRow() {
+  const container = document.getElementById('shParticipants');
+  if (!container) return;
+  const myId = getUserData()?.id || getUserData()?.sub;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:.5rem;align-items:center';
+  const friendOptions = _friendsCache.map(f => {
+    const other = String(f.requester?.id) === String(myId) ? f.addressee : f.requester;
+    return `<option value="${escHtml(String(other?.id || ''))}">${escHtml(other?.name || other?.email || '')}</option>`;
+  }).join('');
+  row.innerHTML = `
+    <select class="dash-input sh-part-user" style="flex:1">
+      <option value="">— ${window.getLang && window.getLang()==='en' ? 'Select friend' : 'Selecciona amigo'} —</option>
+      ${friendOptions}
+    </select>
+    <input type="number" min="0" step="0.01" placeholder="0.00" class="dash-input sh-part-amount" style="width:110px" />
+    <button type="button" class="dash-btn-icon danger" onclick="this.closest('div').remove()"><i class="bi bi-x"></i></button>`;
+  container.appendChild(row);
+}
+
+async function submitSharedExpense() {
+  const msg = document.getElementById('sharedExpenseMsg');
+  msg.textContent = '';
+  const concept = document.getElementById('shConcept').value.trim();
+  const amount = parseFloat(document.getElementById('shAmount').value);
+  const currency = document.getElementById('shCurrency').value;
+  const date = document.getElementById('shDate').value || new Date().toISOString().split('T')[0];
+  const partRows = document.querySelectorAll('#shParticipants > div');
+  const participants = [];
+  partRows.forEach(row => {
+    const userId = row.querySelector('.sh-part-user')?.value;
+    const shareAmount = parseFloat(row.querySelector('.sh-part-amount')?.value || 0);
+    if (userId && Number.isFinite(shareAmount) && shareAmount > 0) {
+      participants.push({ userId, shareAmount });
+    }
+  });
+  if (!concept || !Number.isFinite(amount) || amount <= 0) {
+    msg.innerHTML = `<span style="color:var(--k-danger,#ef4444)">${T('dash.add.concept.label').replace(' *','')} ${T('dash.add.amount.label').replace(' *','')} ${window.getLang && window.getLang()==='en' ? 'are required.' : 'son obligatorios.'}</span>`;
+    return;
+  }
+  try {
+    const res = await fetch(API + '/shared-expenses', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ concept, amount, currency, date, participants })
+    });
+    if (res.status === 401) { logout(); return; }
+    if (!res.ok) throw new Error((await res.json()).message || 'Error');
+    msg.innerHTML = `<span style="color:var(--k-success)"><i class="bi bi-check-circle me-1"></i>${T('dash.js.sharedSaved')}</span>`;
+    setTimeout(() => { toggleSharedExpenseForm(); loadSharedExpenses(); loadBalance(); }, 800);
+  } catch(err) {
+    msg.innerHTML = `<span style="color:var(--k-danger,#ef4444)"><i class="bi bi-exclamation-circle me-1"></i>${escHtml(err.message)}</span>`;
+  }
+}
+
+async function deleteSharedExpense(id) {
+  try {
+    const res = await fetch(API + '/shared-expenses/' + id, { method: 'DELETE', headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    loadSharedExpenses();
+    loadBalance();
+  } catch(e) { console.error(e); }
+}
+
+async function loadBalance() {
+  const owedToMe = document.getElementById('balanceOwedToMe');
+  const iOwe = document.getElementById('balanceIOwe');
+  if (owedToMe) owedToMe.innerHTML = '<span class="loading-spinner"></span>';
+  if (iOwe) iOwe.innerHTML = '<span class="loading-spinner"></span>';
+  try {
+    const res = await fetch(API + '/shared-expenses/balance', { headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    const data = await res.json();
+    const edges = Array.isArray(data) ? data : (data.edges || []);
+    const myId = getUserData()?.id || getUserData()?.sub;
+    const creditor = edges.filter(e => String(e.creditorId) === String(myId) || String(e.creditor?.id) === String(myId));
+    const debtor   = edges.filter(e => String(e.debtorId) === String(myId) || String(e.debtor?.id) === String(myId));
+
+    const renderEdges = (list, amountClass, showSettle) => {
+      if (!list.length) return `<p style="color:var(--k-muted);font-size:.87rem">${T('dash.sh.balance.empty')}</p>`;
+      return list.map(e => {
+        const other = showSettle
+          ? (e.debtor?.name || e.debtor?.email || e.debtorId)
+          : (e.creditor?.name || e.creditor?.email || e.creditorId);
+        const settleHtml = showSettle
+          ? `<button class="btn btn-outline-success btn-sm" style="font-size:.76rem;padding:.2rem .5rem;white-space:nowrap"
+               onclick="settleDebt('${e.sharedExpenseId}','${e.debtorId}')">${T('dash.sh.balance.settle')}</button>`
+          : '';
+        return `<div class="debt-row">
+          <span style="font-size:.87rem;flex:1">${escHtml(String(other))}</span>
+          <span class="${amountClass}">${formatMoney(e.amount, e.currency || 'EUR', 2)}</span>
+          ${settleHtml}
+        </div>`;
+      }).join('');
+    };
+
+    if (owedToMe) owedToMe.innerHTML = renderEdges(creditor, 'debt-amount-pos', true);
+    if (iOwe) iOwe.innerHTML = renderEdges(debtor, 'debt-amount-neg', false);
+  } catch(e) {
+    if (owedToMe) owedToMe.innerHTML = `<span style="color:var(--k-danger,#ef4444)">${escHtml(e.message)}</span>`;
+    if (iOwe) iOwe.innerHTML = '';
+  }
+}
+
+async function settleDebt(sharedExpenseId, userId) {
+  try {
+    const res = await fetch(API + `/shared-expenses/${sharedExpenseId}/settle/${userId}`, {
+      method: 'PATCH',
+      headers: authHeaders()
+    });
+    if (res.status === 401) { logout(); return; }
+    loadBalance();
+    loadSharedExpenses();
+  } catch(e) { console.error(e); }
 }
 
 // ── AI Advisor ────────────────────────────────────────────

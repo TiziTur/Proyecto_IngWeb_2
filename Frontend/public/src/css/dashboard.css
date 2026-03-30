@@ -838,3 +838,123 @@
   .dash-topbar-brand { font-size: 1rem; }
   #roleModal > div { border-radius: .75rem; }
 }
+
+/* ── Badge cards (Gamification) ──────────────────────────── */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.badge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .55rem;
+  padding: 1.1rem .9rem;
+  border-radius: 1rem;
+  border: 1.5px solid var(--k-border);
+  background: var(--k-surface);
+  text-align: center;
+  transition: box-shadow .2s, border-color .2s;
+  position: relative;
+}
+
+.badge-card.earned {
+  border-color: var(--k-primary);
+  background: color-mix(in srgb, var(--k-primary) 7%, var(--k-surface));
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--k-primary) 18%, transparent);
+}
+
+.badge-card.locked {
+  opacity: .55;
+  filter: grayscale(.7);
+}
+
+.badge-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.55rem;
+  background: color-mix(in srgb, var(--k-primary) 14%, var(--k-bg));
+  color: var(--k-primary);
+}
+
+.badge-card.locked .badge-icon {
+  background: var(--k-bg);
+  color: var(--k-muted);
+}
+
+.badge-card .badge-name {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--k-text);
+  line-height: 1.25;
+}
+
+.badge-card .badge-earned-date {
+  font-size: .72rem;
+  color: var(--k-muted);
+}
+
+.badge-card .badge-desc {
+  font-size: .74rem;
+  color: var(--k-text2);
+  line-height: 1.35;
+}
+
+/* Achievement widget (overview) */
+.achv-widget-item {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .6rem .5rem;
+  border-radius: .7rem;
+  transition: background .15s;
+}
+.achv-widget-item:hover { background: var(--k-bg); }
+.achv-widget-icon {
+  width: 40px; height: 40px; min-width: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  background: color-mix(in srgb, var(--k-primary) 12%, var(--k-bg));
+  color: var(--k-primary);
+}
+
+/* ── Friend list ─────────────────────────────────────────── */
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--k-border);
+}
+.friend-item:last-child { border-bottom: none; }
+.friend-avatar {
+  width: 36px; height: 36px; min-width: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--k-primary) 15%, var(--k-bg));
+  color: var(--k-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .88rem;
+}
+.friend-info { flex: 1; min-width: 0; }
+.friend-name { font-size: .88rem; font-weight: 600; color: var(--k-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.friend-email { font-size: .76rem; color: var(--k-muted); }
+
+/* ── Debt rows (balance) ─────────────────────────────────── */
+.debt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .65rem 0;
+  border-bottom: 1px dashed var(--k-border);
+}
+.debt-row:last-child { border-bottom: none; }
+.debt-amount-pos { color: var(--k-success, #16a34a); font-weight: 700; }
+.debt-amount-neg { color: var(--k-danger, #ef4444); font-weight: 700; }
