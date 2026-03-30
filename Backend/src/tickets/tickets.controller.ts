@@ -1,16 +1,22 @@
 /**
  * tickets.controller.ts
  *
- * OCR pipeline — Gemini Vision first, OCR.space fallback, Tesseract last resort.
+ * OCR pipeline — Gemini Vision only (+ text-based fallback when no key).
  *
- * Primary strategy: send the image directly to Google Gemini 1.5 Flash Vision
- * with a structured prompt. The model reads the ticket as a human would and
- * returns a JSON object with commerce, amount, date, currency and category.
- * This eliminates the fragile "OCR text → regex extraction" chain entirely.
+ * Primary strategy (GEMINI_API_KEY set):
+ *   • Prepare image: HEIC decode → sharp rotate + resize (colour preserved)
+ *   • Send image directly to Gemini 1.5 Flash Vision with a structured prompt
+ *   • Model returns JSON: { commerce, amount, date, currency, category, rawText }
+ *   • No OCR pre-processing, no regex — Gemini reads the ticket like a human
  *
- * Fallback chain (when GEMINI_API_KEY is absent or Gemini fails):
- *   1. OCR.space (engine 2 → engine 1) + regex extraction
- *   2. Tesseract.js local + regex extraction
+ * Colour is intentionally preserved for Gemini: the model uses visual context
+ * (logos, layout, colour-coded sections) in addition to text, which makes it
+ * more accurate than sending a grayscale pre-processed image.
+ *
+ * Fallback chain (only when GEMINI_API_KEY is absent or Gemini call fails):
+ *   1. OCR.space (engine 2 → engine 1) — grayscale-preprocessed image
+ *   2. Tesseract.js local             — grayscale-preprocessed image
+ *   Both use regex-based field extraction (less accurate but functional).
  */
 
 import {
@@ -60,48 +66,97 @@ function isAllowedFile(f: Express.Multer.File): boolean {
   return ALLOWED_EXTS.has(ext);
 }
 
-// ─── Image normalisation ───────────────────────────────────────────────────────
+// ─── Image preparation ─────────────────────────────────────────────────────────
 
 /**
- * Convert any supported image to a clean JPEG optimised for both Gemini
- * Vision and Tesseract/OCR.space.
+ * Prepare image for Gemini Vision.
  *
- * HEIC → heic-convert (pure JS, no libheif on Railway)
- * All others → sharp pipeline:
- *   rotate (EXIF) → grayscale → normalise → sharpen → upscale ≥ 1800 px → JPEG 95
+ * Keeps the image in FULL COLOUR — Gemini uses colour and layout context
+ * (logos, headings, price columns) to improve accuracy. We only:
+ *   1. Decode HEIC/HEIF (pure JS, no libheif)
+ *   2. Auto-rotate based on EXIF so the image is right-side-up
+ *   3. Resize: cap longest side at 3000 px (Gemini inline limit) and
+ *      upscale tiny images to ≥ 1200 px so small text is legible
+ *   4. Re-encode as JPEG 92 (good quality, reasonable payload size)
  *
- * For Gemini we also produce a base64 string (inlineData part).
+ * Intentionally NOT grayscale / NOT aggressive contrast — those hurt Gemini.
  */
-async function normalizeImage(f: Express.Multer.File): Promise<{
-  buffer:   Buffer;
-  mimetype: string;
-  filename: string;
-  base64:   string;        // base64 of the processed JPEG (for Gemini)
+async function prepareForGemini(f: Express.Multer.File): Promise<{
+  base64:   string;
+  mimeType: string;   // mime type to pass to Gemini inlineData
 }> {
   const mime = (f.mimetype || '').toLowerCase();
   const ext  = (f.originalname || '').toLowerCase().match(/\.[^.]+$/)?.[0] ?? '';
 
+  // PDFs: pass through as-is (Gemini supports application/pdf)
   if (mime === 'application/pdf' || ext === '.pdf') {
-    const b64 = f.buffer.toString('base64');
-    return { buffer: f.buffer, mimetype: 'application/pdf', filename: f.originalname || 'ticket.pdf', base64: b64 };
+    return { base64: f.buffer.toString('base64'), mimeType: 'application/pdf' };
   }
 
   let src = f.buffer;
 
+  // HEIC/HEIF decode
   const isHeic = mime === 'image/heic' || mime === 'image/heif' || ext === '.heic' || ext === '.heif';
   if (isHeic) {
     const ab = await heicConvert({ buffer: src, format: 'JPEG', quality: 1.0 });
     src = Buffer.from(ab);
   }
 
-  // Determine upscale target: longest side ≥ 1800 px
   const meta = await sharp(src).metadata();
   const longest = Math.max(meta.width ?? 0, meta.height ?? 0);
-  const resizeOpts = longest > 0 && longest < 1800
-    ? { width: (meta.width ?? 0) >= (meta.height ?? 0) ? 1800 : undefined,
-        height: (meta.height ?? 0) > (meta.width ?? 0)  ? 1800 : undefined,
-        fit:  'inside' as const, withoutEnlargement: false, kernel: 'lanczos3' as const }
-    : null;
+
+  // Upscale if too small, cap if too large
+  let targetLongest: number | null = null;
+  if (longest > 0 && longest < 1200)  targetLongest = 1200;   // upscale small
+  if (longest > 0 && longest > 3000)  targetLongest = 3000;   // cap large
+
+  let pipeline = sharp(src).rotate();  // EXIF orientation only
+
+  if (targetLongest !== null) {
+    const isLandscape = (meta.width ?? 0) >= (meta.height ?? 0);
+    pipeline = pipeline.resize(
+      isLandscape ? targetLongest : undefined,
+      isLandscape ? undefined     : targetLongest,
+      { fit: 'inside', withoutEnlargement: longest >= 1200, kernel: 'lanczos3' },
+    );
+  }
+
+  const buffer = await pipeline.jpeg({ quality: 92 }).toBuffer();
+  return { base64: buffer.toString('base64'), mimeType: 'image/jpeg' };
+}
+
+/**
+ * Prepare image for OCR fallback (OCR.space / Tesseract).
+ *
+ * Applies aggressive receipt-oriented preprocessing:
+ *   rotate → grayscale → normalise contrast → sharpen → upscale ≥ 1800 px
+ *
+ * Grayscale + contrast normalisation significantly improves text recognition
+ * on thermal receipt paper and shadowed photos.
+ */
+async function prepareForOcr(f: Express.Multer.File): Promise<{
+  buffer:   Buffer;
+  mimetype: string;
+  filename: string;
+}> {
+  const mime = (f.mimetype || '').toLowerCase();
+  const ext  = (f.originalname || '').toLowerCase().match(/\.[^.]+$/)?.[0] ?? '';
+
+  if (mime === 'application/pdf' || ext === '.pdf') {
+    return { buffer: f.buffer, mimetype: 'application/pdf', filename: f.originalname || 'ticket.pdf' };
+  }
+
+  let src = f.buffer;
+  const isHeic = mime === 'image/heic' || mime === 'image/heif' || ext === '.heic' || ext === '.heif';
+  if (isHeic) {
+    const ab = await heicConvert({ buffer: src, format: 'JPEG', quality: 1.0 });
+    src = Buffer.from(ab);
+  }
+
+  const meta = await sharp(src).metadata();
+  const longest = Math.max(meta.width ?? 0, meta.height ?? 0);
+  const isLandscape = (meta.width ?? 0) >= (meta.height ?? 0);
+  const needsUpscale = longest > 0 && longest < 1800;
 
   let pipeline = sharp(src)
     .rotate()
@@ -109,12 +164,16 @@ async function normalizeImage(f: Express.Multer.File): Promise<{
     .normalise()
     .sharpen({ sigma: 1.5, m1: 2, m2: 3.5 });
 
-  if (resizeOpts) pipeline = pipeline.resize(resizeOpts);
+  if (needsUpscale) {
+    pipeline = pipeline.resize(
+      isLandscape ? 1800 : undefined,
+      isLandscape ? undefined : 1800,
+      { fit: 'inside', withoutEnlargement: false, kernel: 'lanczos3' },
+    );
+  }
 
   const buffer = await pipeline.jpeg({ quality: 95 }).toBuffer();
-  const base64 = buffer.toString('base64');
-
-  return { buffer, mimetype: 'image/jpeg', filename: 'ticket.jpg', base64 };
+  return { buffer, mimetype: 'image/jpeg', filename: 'ticket.jpg' };
 }
 
 // ─── Gemini Vision ─────────────────────────────────────────────────────────────
@@ -244,15 +303,17 @@ export class TicketsController {
       );
     }
 
-    const norm = await normalizeImage(file);
+    // ── 1. Gemini Vision — colour image, no OCR pre-processing ───────────────
+    if (process.env.GEMINI_API_KEY) {
+      const { base64, mimeType } = await prepareForGemini(file);
+      const result = await analyzeWithGemini(base64, mimeType);
+      if (result) return result;
+      console.warn('Gemini failed — falling back to OCR text pipeline');
+    }
 
-    // ── 1. Try Gemini Vision (best quality) ───────────────────────────────────
-    const geminiResult = await analyzeWithGemini(norm.base64, norm.mimetype);
-    if (geminiResult) return geminiResult;
-
-    // ── 2. Fallback: OCR text extraction + regex parsing ──────────────────────
-    console.warn('Gemini unavailable — falling back to OCR text pipeline');
-    const rawText = await this.extractTextFallback(norm);
+    // ── 2. Fallback: grayscale-preprocessed image → OCR → regex ──────────────
+    const ocrPrepped = await prepareForOcr(file);
+    const rawText    = await this.extractTextFallback(ocrPrepped);
     return this.parseFromText(rawText);
   }
 
