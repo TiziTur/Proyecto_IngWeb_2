@@ -498,30 +498,13 @@
 <script src="/src/js/lang.js"></script>
 <script src="/src/js/i18n.js"></script>
 <script src="/src/js/universal-i18n.js"></script>
+<script src="/src/js/shared-helpers.js"></script>
 <script>
 // ============================================================
 // DASHBOARD — core logic
 // ============================================================
 
-const API = window.WISEPOCKET_API_BASE_URL || 'https://proyectoingweb2-production.up.railway.app/api';
-
-// ── i18n helper ───────────────────────────────────────────
-function T(key) {
-  const lang = window.getLang ? window.getLang() : (localStorage.getItem('klarity-lang') || 'es');
-  const dict = window.__klarityI18n && window.__klarityI18n[lang];
-  return (dict && dict[key] !== undefined) ? dict[key] : key;
-}
-
 // ── Auth guard ────────────────────────────────────────────
-function getToken() {
-  return localStorage.getItem('klarity_token') || sessionStorage.getItem('klarity_token');
-}
-function getUserData() {
-  try {
-    const raw = localStorage.getItem('klarity_user') || sessionStorage.getItem('klarity_user');
-    return raw ? JSON.parse(raw) : null;
-  } catch {return null;}
-}
 (function guardAuth() {
   const token = getToken();
   if (!token) { window.location.href = '/login'; return; }
@@ -561,26 +544,7 @@ function showSection(name, linkEl) {
   closeSidebar();
 }
 
-// ── Sidebar mobile ────────────────────────────────────────
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebarOverlay');
-  sb.classList.toggle('open');
-  ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
-}
-function closeSidebar() {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebarOverlay');
-  sb.classList.remove('open');
-  ov.style.display = 'none';
-}
-
 document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
-
-// ── Auth header ───────────────────────────────────────────
-function authHeaders() {
-  return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
-}
 
 // ── Load expenses (overview + full list) ──────────────────
 let allExpenses = [];
@@ -811,8 +775,7 @@ function catDot(cat) {
   const normalized = normalizeCategoryLabel(cat);
   return `<span class="exp-category"><span class="exp-cat-dot ${CAT_COLORS[normalized]||'cat-other'}"></span>${escHtml(displayCategory(normalized))}</span>`;
 }
-function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmtDate(d){ if(!d) return '—'; const dt=new Date(d); const locale=(window.getLang&&window.getLang()==='en')?'en-GB':'es-ES'; return isNaN(dt)?d:dt.toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'}); }
+// escHtml, fmtDate — provided by shared-helpers.js
 function getExpenseConcept(e){ return e?.concept || e?.commerce || e?.description || T('dash.js.noConcept'); }
 
 function isMonthlyConcept(rawConcept) {
@@ -1272,15 +1235,6 @@ async function updateProfile(e) {
   } catch(err) {
     msg.innerHTML = `<span style="color:var(--k-danger,#ef4444)"><i class="bi bi-exclamation-circle me-1"></i>${escHtml(err.message)}</span>`;
   }
-}
-
-// ── Logout ────────────────────────────────────────────────
-function logout() {
-  localStorage.removeItem('klarity_token');
-  localStorage.removeItem('klarity_user');
-  sessionStorage.removeItem('klarity_token');
-  sessionStorage.removeItem('klarity_user');
-  window.location.href = '/login';
 }
 
 // ── Set today as default date ─────────────────────────────

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
+import { normalizeEmail } from '../common/utils/normalize-email';
 
 type CounterBucket = {
   count: number;
@@ -19,11 +20,11 @@ export class AuthSecurityService {
   }
 
   normalizeEmail(email: string) {
-    return String(email || '').trim().toLowerCase();
+    return normalizeEmail(email);
   }
 
   assertLoginRateLimit(email: string) {
-    const key = this.normalizeEmail(email);
+    const key = normalizeEmail(email);
     const now = Date.now();
     const maxAttempts = 8;
     const windowMs = 15 * 60 * 1000;
@@ -41,7 +42,7 @@ export class AuthSecurityService {
   }
 
   clearLoginRateLimit(email: string) {
-    const key = this.normalizeEmail(email);
+    const key = normalizeEmail(email);
     this.loginAttempts.delete(key);
   }
 }

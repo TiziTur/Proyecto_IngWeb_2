@@ -266,24 +266,8 @@
 <script src="/src/js/lang.js"></script>
 <script src="/src/js/i18n.js"></script>
 <script src="/src/js/universal-i18n.js"></script>
+<script src="/src/js/shared-helpers.js"></script>
 <script>
-const API = window.WISEPOCKET_API_BASE_URL || 'https://proyectoingweb2-production.up.railway.app/api';
-
-// ── T() helper ───────────────────────────────────────────
-function T(key) {
-  const lang = window.getLang ? window.getLang() : (localStorage.getItem('klarity-lang') || 'es');
-  const dict = window.__klarityI18n && window.__klarityI18n[lang];
-  return (dict && dict[key] !== undefined) ? dict[key] : key;
-}
-
-function getToken() { return localStorage.getItem('klarity_token') || sessionStorage.getItem('klarity_token'); }
-function getUserData() {
-  try { const r = localStorage.getItem('klarity_user')||sessionStorage.getItem('klarity_user'); return r?JSON.parse(r):null; }
-  catch { return null; }
-}
-function authHeaders() { return {'Content-Type':'application/json','Authorization':'Bearer '+getToken()}; }
-function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
 // Guard
 (function() {
   const token = getToken();
@@ -310,17 +294,6 @@ function showSection(name, linkEl) {
   if(linkEl) linkEl.classList.add('active');
   if(name === 'clients') loadClients();
   closeSidebar();
-}
-
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebarOverlay');
-  sb.classList.toggle('open');
-  ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').style.display = 'none';
 }
 
 document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
@@ -568,12 +541,6 @@ async function loadRecommendationHistory(userId) {
   } catch (e) {
     wrap.innerHTML = `<span style="color:var(--k-danger,#ef4444)">${escHtml(e.message)}</span>`;
   }
-}
-
-function logout() {
-  localStorage.removeItem('klarity_token'); localStorage.removeItem('klarity_user');
-  sessionStorage.removeItem('klarity_token'); sessionStorage.removeItem('klarity_user');
-  window.location.href = '/login';
 }
 
 // Init

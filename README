@@ -4,7 +4,7 @@ Aplicacion web full-stack para la gestion financiera personal con dashboards por
 
 **Proyecto:** Ingenieria Web II (2026)  
 **Estado:** Completo  
-**Ultima actualizacion:** 28 de Marzo de 2026
+**Ultima actualizacion:** 30 de Marzo de 2026
 
 > Nota operativa: los campos de expiracion de tokens usan `type: Date` en TypeORM para asegurar compatibilidad entre PostgreSQL (Railway) y SQLite (local).
 
@@ -114,7 +114,7 @@ Frontend/public/src/js/
                           (solo corre cuando lang === 'en')
 ```
 
-**T() helper** (usado en dashboard.html, advisor.html, admin.html):
+**T() helper** — definido en `shared-helpers.js` y disponible en todos los paneles:
 ```js
 function T(key) {
   const lang = window.getLang ? window.getLang() : (localStorage.getItem('klarity-lang') || 'es');
@@ -125,7 +125,7 @@ function T(key) {
 
 **Orden de carga de scripts** requerido en todas las paginas de app:
 ```
-runtime-config.js → theme.js → lang.js → i18n.js → universal-i18n.js → script de pagina
+runtime-config.js → theme.js → lang.js → i18n.js → universal-i18n.js → shared-helpers.js → script de pagina
 ```
 
 ---
@@ -250,6 +250,10 @@ Proyecto_IngWeb_2/
 │   │   ├── expenses/
 │   │   ├── tickets/
 │   │   ├── advisor/
+│   │   ├── common/
+│   │   │   ├── roles/          — role.enum.ts, roles.guard.ts, roles.decorator.ts
+│   │   │   └── utils/
+│   │   │       └── normalize-email.ts   — utilitario compartido de normalizacion de email
 │   │   └── main.ts
 │   └── .env.example
 ├── Frontend/
@@ -262,7 +266,12 @@ Proyecto_IngWeb_2/
 │   │   │   ├── advisor.html
 │   │   │   └── admin.html
 │   │   ├── css/
+│   │   │   ├── variables.css   — tokens CSS unificados (importado por styles.css y login.css)
+│   │   │   ├── styles.css      — sistema de diseno global
+│   │   │   ├── dashboard.css   — layout y componentes de los paneles
+│   │   │   └── login.css       — estilos de la pagina de autenticacion
 │   │   └── js/
+│   │       ├── shared-helpers.js   — helpers compartidos entre paneles (API, T, auth, logout, sidebar...)
 │   │       ├── i18n.js
 │   │       ├── universal-i18n.js
 │   │       ├── lang.js
@@ -276,6 +285,39 @@ Proyecto_IngWeb_2/
 │   └── MATRIZ_QA_DEPLOY.txt
 └── README
 ```
+
+---
+
+## Optimizaciones de Codigo (Marzo 2026)
+
+Se realizo un refactor completo orientado a eliminar duplicacion y mejorar el rendimiento:
+
+### Frontend — JavaScript
+- **`shared-helpers.js`** (nuevo): centraliza `API`, `T()`, `getToken()`, `getUserData()`,
+  `authHeaders()`, `escHtml()`, `fmtDate()`, `fmtMoney()`, `logout()`, `toggleSidebar()`,
+  `closeSidebar()`. Estas funciones estaban copiadas en los tres paneles (`dashboard.html`,
+  `admin.html`, `advisor.html`).
+- **`API` constante**: eliminadas las re-declaraciones inline en cada panel; ahora todas
+  dependen exclusivamente de `window.WISEPOCKET_API_BASE_URL` via `runtime-config.js`.
+
+### Frontend — CSS
+- **`variables.css`** (nuevo): unica fuente de verdad para los custom properties de CSS
+  (`:root` modo claro + `[data-theme="dark"]` modo oscuro) y el `@import` de Google Fonts.
+- **`styles.css`** y **`login.css`**: sustituyen sus bloques `:root` y `@import` propios
+  por un `@import url('./variables.css')`, eliminando ~90 lineas duplicadas y garantizando
+  que los tokens sean siempre identicos en ambas hojas.
+- **`dashboard.css`**: eliminado el bloque `.topbar-lang-switch` / `.k-lang-btn` duplicado
+  (ya definido en `styles.css`, que se carga primero en todos los paneles).
+
+### Backend — TypeScript
+- **`common/utils/normalize-email.ts`** (nuevo): extrae la funcion `normalizeEmail()` que
+  estaba duplicada en `AuthSecurityService` y `UsersService`.
+- **`auth-security.service.ts`** y **`users/users.service.ts`**: importan el utilitario
+  compartido; eliminada la logica local redundante.
+- **`advisor.service.ts` — `getClientsHealth()`**: corregida consulta N+1. El codigo
+  anterior ejecutaba una query SQL por cada cliente via `findAllForUser()` dentro de un
+  `Promise.all`. Ahora se llama a `findAllUsersExpenses()` una sola vez y se agrupa el
+  resultado en memoria con un `Map<userId, expenses[]>`.
 
 ---
 

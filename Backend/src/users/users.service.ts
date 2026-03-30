@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { Role } from '../common/roles/role.enum';
+import { normalizeEmail } from '../common/utils/normalize-email';
 import * as bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 
@@ -94,7 +95,7 @@ export class UsersService implements OnModuleInit {
   }
 
   findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email: this.normalizeEmail(email) } });
+    return this.usersRepository.findOne({ where: { email: normalizeEmail(email) } });
   }
 
   findByEmailVerificationTokenHash(tokenHash: string): Promise<User | null> {
@@ -122,7 +123,7 @@ export class UsersService implements OnModuleInit {
     authProvider?: string | null;
   }): Promise<User> {
     const user = this.usersRepository.create({
-      email: this.normalizeEmail(data.email),
+      email: normalizeEmail(data.email),
       name: String(data.name || '').trim(),
       passwordHash: data.passwordHash,
       role: data.role ?? Role.USER,
@@ -148,7 +149,7 @@ export class UsersService implements OnModuleInit {
     }
 
     if (payload.email) {
-      user.email = this.normalizeEmail(payload.email);
+      user.email = normalizeEmail(payload.email);
     }
 
     return this.usersRepository.save(user);
@@ -173,10 +174,6 @@ export class UsersService implements OnModuleInit {
 
   async save(user: User): Promise<User> {
     return this.usersRepository.save(user);
-  }
-
-  private normalizeEmail(email: string): string {
-    return String(email || '').trim().toLowerCase();
   }
 
 }

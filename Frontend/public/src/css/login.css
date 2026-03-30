@@ -2,35 +2,7 @@
    KLARITY — Login / Auth page styles
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
-
-:root {
-  --k-bg:        #f4f6fa;
-  --k-surface:   #ffffff;
-  --k-border:    #e2e8f0;
-  --k-text:      #1a202c;
-  --k-text2:     #4a5568;
-  --k-muted:     #718096;
-  --k-primary:   #3b82f6;
-  --k-primary-h: #2563eb;
-  --k-primary-s: #dbeafe;
-  --k-accent:    #06b6d4;
-  --k-success:   #10b981;
-  --k-transition: 0.2s cubic-bezier(.4,0,.2,1);
-}
-
-[data-theme="dark"] {
-  --k-bg:        #0f1117;
-  --k-surface:   #1e2535;
-  --k-border:    #2d3748;
-  --k-text:      #f0f4ff;
-  --k-text2:     #cbd5e0;
-  --k-muted:     #90a0b7;
-  --k-primary:   #60a5fa;
-  --k-primary-h: #93c5fd;
-  --k-primary-s: #1e3a5f;
-  --k-accent:    #22d3ee;
-}
+@import url('./variables.css');
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-font-smoothing: antialiased; }

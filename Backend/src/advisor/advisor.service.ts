@@ -189,29 +189,37 @@ export class AdvisorService {
     const users = Array.isArray(usersResult) ? usersResult : usersResult.data;
     const clients = users.filter((u) => String(u.role).toLowerCase() === 'user');
 
-    const result = await Promise.all(
-      clients.map(async (client) => {
-        const expenses = await this.expensesService.findAllForUser(client.id);
-        const now = new Date();
-        const monthTotal = expenses
-          .filter((e) => {
-            const d = new Date(e.date || e.createdAt);
-            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-          })
-          .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+    // Fetch all expenses in a single query, then group by userId in memory
+    // to avoid the N+1 problem (one DB call per client).
+    const allExpenses = await this.expensesService.findAllUsersExpenses();
+    const now = new Date();
 
-        const status = monthTotal > 1800 ? 'red' : monthTotal > 900 ? 'yellow' : 'green';
+    const expensesByUser = new Map<string, typeof allExpenses>();
+    for (const expense of allExpenses) {
+      const uid = expense.user?.id;
+      if (!uid) continue;
+      if (!expensesByUser.has(uid)) expensesByUser.set(uid, []);
+      expensesByUser.get(uid)!.push(expense);
+    }
 
-        return {
-          userId: client.id,
-          name: client.name,
-          monthlySpent: Number(monthTotal.toFixed(2)),
-          status,
-        };
-      }),
-    );
+    return clients.map((client) => {
+      const expenses = expensesByUser.get(client.id) ?? [];
+      const monthTotal = expenses
+        .filter((e) => {
+          const d = new Date(e.date || e.createdAt);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        })
+        .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
-    return result;
+      const status = monthTotal > 1800 ? 'red' : monthTotal > 900 ? 'yellow' : 'green';
+
+      return {
+        userId: client.id,
+        name: client.name,
+        monthlySpent: Number(monthTotal.toFixed(2)),
+        status,
+      };
+    });
   }
 
   private getMonthlyAverage(expenses: Array<{ date: string; amount: number; participants: number }>) {

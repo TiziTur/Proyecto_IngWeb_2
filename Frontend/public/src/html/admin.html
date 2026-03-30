@@ -409,32 +409,8 @@
 <script src="/src/js/lang.js"></script>
 <script src="/src/js/i18n.js"></script>
 <script src="/src/js/universal-i18n.js"></script>
+<script src="/src/js/shared-helpers.js"></script>
 <script>
-const API = window.WISEPOCKET_API_BASE_URL || 'https://proyectoingweb2-production.up.railway.app/api';
-
-// ── T() helper ───────────────────────────────────────────
-function T(key) {
-  const lang = window.getLang ? window.getLang() : (localStorage.getItem('klarity-lang') || 'es');
-  const dict = window.__klarityI18n && window.__klarityI18n[lang];
-  return (dict && dict[key] !== undefined) ? dict[key] : key;
-}
-
-function getToken()   { return localStorage.getItem('klarity_token') || sessionStorage.getItem('klarity_token'); }
-function getUserData() {
-  try { const r = localStorage.getItem('klarity_user')||sessionStorage.getItem('klarity_user'); return r?JSON.parse(r):null; }
-  catch { return null; }
-}
-function authHeaders() { return {'Content-Type':'application/json','Authorization':'Bearer '+getToken()}; }
-function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmtDate(d){
-  if(!d) return '—';
-  const dt = new Date(d);
-  if(isNaN(dt)) return d;
-  const locale = (window.getLang && window.getLang() === 'en') ? 'en-GB' : 'es-ES';
-  return dt.toLocaleDateString(locale, {day:'2-digit', month:'short', year:'numeric'});
-}
-function fmtMoney(n){ return isNaN(+n) ? '—' : (+n).toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2}); }
-
 // ── Auth guard ───────────────────────────────────────────
 (function() {
   const token = getToken();
@@ -466,16 +442,6 @@ function showSection(name, linkEl) {
   closeSidebar();
 }
 
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebarOverlay');
-  sb.classList.toggle('open');
-  ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').style.display = 'none';
-}
 document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
 
 // ── Users ─────────────────────────────────────────────────
@@ -922,11 +888,6 @@ async function checkHealth() {
 
 // ── Init ──────────────────────────────────────────────────
 function loadAll() { loadUsers(); loadAdminExpenses(); }
-function logout() {
-  localStorage.removeItem('klarity_token');  localStorage.removeItem('klarity_user');
-  sessionStorage.removeItem('klarity_token'); sessionStorage.removeItem('klarity_user');
-  window.location.href = '/login';
-}
 loadAll();
 </script>
 </body>

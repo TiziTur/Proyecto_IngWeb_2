@@ -6,75 +6,7 @@
    Modes: Light (default) / Dark via [data-theme="dark"]
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
-
-/* ── CSS Variables ─────────────────────────────────────────── */
-:root {
-  --k-bg:          #f4f6fa;
-  --k-bg2:         #eef1f7;
-  --k-surface:     #ffffff;
-  --k-surface2:    #f9fafc;
-  --k-border:      #e2e8f0;
-  --k-text:        #1a202c;
-  --k-text2:       #4a5568;
-  --k-muted:       #718096;
-  --k-primary:     #3b82f6;
-  --k-primary-h:   #2563eb;
-  --k-primary-s:   #dbeafe;
-  --k-accent:      #06b6d4;
-  --k-accent-s:    #cffafe;
-  --k-success:     #10b981;
-  --k-warning:     #f59e0b;
-  --k-danger:      #ef4444;
-  --k-shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-  --k-shadow:      0 4px 16px rgba(30,50,90,.08);
-  --k-shadow-lg:   0 16px 48px rgba(30,50,90,.12);
-  --k-radius:      0.875rem;
-  --k-radius-sm:   0.5rem;
-  --k-radius-xl:   1.5rem;
-  --k-transition:  0.2s cubic-bezier(.4,0,.2,1);
-  --navbar-h:      66px;
-
-  /* legacy aliases – used by advanced-features section */
-  --app-bg:            var(--k-bg);
-  --app-text:          var(--k-text);
-  --app-muted:         var(--k-muted);
-  --app-primary:       var(--k-primary);
-  --app-primary-strong:var(--k-primary-h);
-  --app-primary-soft:  var(--k-primary-s);
-  --app-surface:       var(--k-surface);
-  --app-border:        var(--k-border);
-  --app-shadow:        var(--k-shadow);
-}
-
-/* ── Dark mode variables ────────────────────────────────────── */
-[data-theme="dark"] {
-  --k-bg:          #0f1117;
-  --k-bg2:         #161b27;
-  --k-surface:     #1e2535;
-  --k-surface2:    #252d3d;
-  --k-border:      #2d3748;
-  --k-text:        #f0f4ff;
-  --k-text2:       #cbd5e0;
-  --k-muted:       #90a0b7;
-  --k-primary:     #60a5fa;
-  --k-primary-h:   #93c5fd;
-  --k-primary-s:   #1e3a5f;
-  --k-accent:      #22d3ee;
-  --k-accent-s:    #0f2a33;
-  --k-shadow-sm:   0 1px 3px rgba(0,0,0,.3);
-  --k-shadow:      0 4px 16px rgba(0,0,0,.3);
-  --k-shadow-lg:   0 16px 48px rgba(0,0,0,.4);
-  --app-bg:        var(--k-bg);
-  --app-text:      var(--k-text);
-  --app-muted:     var(--k-muted);
-  --app-primary:   var(--k-primary);
-  --app-primary-strong: var(--k-primary-h);
-  --app-primary-soft:   var(--k-primary-s);
-  --app-surface:   var(--k-surface);
-  --app-border:    var(--k-border);
-  --app-shadow:    var(--k-shadow);
-}
+@import url('./variables.css');
 
 /* ── Base ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
