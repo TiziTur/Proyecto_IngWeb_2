@@ -378,6 +378,42 @@
       'dash.edit.saving':        'Guardando…',
       'dash.edit.btnTitle':      'Editar',
 
+      // Dashboard — Monthly bar chart
+      'dash.ov.bar.title':       'Evolución mensual del gasto',
+      'dash.ov.bar.6m':          'Últimos 6 meses',
+      'dash.ov.bar.12m':         'Últimos 12 meses',
+
+      // Dashboard — Advanced search / filter
+      'dash.exp.filter.text':    'Concepto / comercio',
+      'dash.exp.filter.textPh':  'Buscar...',
+      'dash.exp.filter.cat':     'Categoría',
+      'dash.exp.filter.from':    'Desde',
+      'dash.exp.filter.to':      'Hasta',
+      'dash.exp.filter.min':     'Mín.',
+      'dash.exp.filter.max':     'Máx.',
+      'dash.exp.filter.clear':   'Limpiar',
+      'dash.exp.exportCSV':      'Exportar CSV',
+
+      // Dashboard — Anomaly detection
+      'dash.ov.anomaly.title':   'Gastos inusuales detectados',
+      'dash.ov.anomaly.vsAvg':   'vs promedio cat.',
+
+      // Dashboard — Financial profile (Extra 16)
+      'dash.adv.profile.title':           'Tu perfil financiero',
+      'dash.adv.profile.noData':          'Añade más gastos para calcular tu perfil.',
+      'dash.adv.profile.impulsive':       'Impulsivo',
+      'dash.adv.profile.balanced':        'Equilibrado',
+      'dash.adv.profile.saver':           'Ahorrador',
+      'dash.adv.profile.impulsive.desc':  'Tus gastos muestran compras frecuentes en ocio y picos inusuales. Considera establecer límites por categoría.',
+      'dash.adv.profile.balanced.desc':   'Tienes un buen equilibrio entre necesidades y ocio. Pequeños ajustes pueden mejorar tu ahorro.',
+      'dash.adv.profile.saver.desc':      'Gastas con disciplina, tus pagos son regulares y controlados. Buen trabajo.',
+      'dash.adv.profile.score':           'Índice',
+      'dash.adv.profile.avgMonth':        'Gasto mensual medio',
+      'dash.adv.profile.leisure':         'Ocio',
+      'dash.adv.profile.recurring':       'Gastos fijos',
+      'dash.adv.profile.impulsiveLabel':  'Impulsivo',
+      'dash.adv.profile.saverLabel':      'Ahorrador',
+
       // Dashboard — JS runtime strings
       'dash.js.noExpenses':      'Sin gastos aún',
       'dash.js.noData':          'Sin datos',
@@ -1049,6 +1085,42 @@
       'dash.edit.save':          'Save changes',
       'dash.edit.saving':        'Saving…',
       'dash.edit.btnTitle':      'Edit',
+
+      // Dashboard — Monthly bar chart
+      'dash.ov.bar.title':       'Monthly spending evolution',
+      'dash.ov.bar.6m':          'Last 6 months',
+      'dash.ov.bar.12m':         'Last 12 months',
+
+      // Dashboard — Advanced search / filter
+      'dash.exp.filter.text':    'Concept / merchant',
+      'dash.exp.filter.textPh':  'Search...',
+      'dash.exp.filter.cat':     'Category',
+      'dash.exp.filter.from':    'From',
+      'dash.exp.filter.to':      'To',
+      'dash.exp.filter.min':     'Min.',
+      'dash.exp.filter.max':     'Max.',
+      'dash.exp.filter.clear':   'Clear',
+      'dash.exp.exportCSV':      'Export CSV',
+
+      // Dashboard — Anomaly detection
+      'dash.ov.anomaly.title':   'Unusual expenses detected',
+      'dash.ov.anomaly.vsAvg':   'vs cat. avg.',
+
+      // Dashboard — Financial profile (Extra 16)
+      'dash.adv.profile.title':           'Your financial profile',
+      'dash.adv.profile.noData':          'Add more expenses to compute your profile.',
+      'dash.adv.profile.impulsive':       'Impulsive',
+      'dash.adv.profile.balanced':        'Balanced',
+      'dash.adv.profile.saver':           'Saver',
+      'dash.adv.profile.impulsive.desc':  'Your spending shows frequent leisure purchases and unusual spikes. Consider setting category limits.',
+      'dash.adv.profile.balanced.desc':   'You have a good balance between needs and leisure. Small adjustments can improve your savings.',
+      'dash.adv.profile.saver.desc':      'You spend with discipline, your payments are regular and controlled. Great job.',
+      'dash.adv.profile.score':           'Score',
+      'dash.adv.profile.avgMonth':        'Avg monthly spend',
+      'dash.adv.profile.leisure':         'Leisure',
+      'dash.adv.profile.recurring':       'Fixed expenses',
+      'dash.adv.profile.impulsiveLabel':  'Impulsive',
+      'dash.adv.profile.saverLabel':      'Saver',
 
       // Dashboard — JS runtime strings
       'dash.js.noExpenses':      'No expenses yet',

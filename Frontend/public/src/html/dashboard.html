@@ -200,6 +200,29 @@
         </div>
       </div>
 
+      <!-- Bar chart by month -->
+      <div class="dash-panel mt-3" id="monthlyBarPanel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+          <p class="dash-panel-title mb-0" data-i18n="dash.ov.bar.title">Evolución mensual del gasto</p>
+          <select id="barChartMonths" class="dash-input" style="width:auto;padding:.3rem .65rem;font-size:.8rem" onchange="renderBarChart(allExpenses)">
+            <option value="6" data-i18n="dash.ov.bar.6m">Últimos 6 meses</option>
+            <option value="12" selected data-i18n="dash.ov.bar.12m">Últimos 12 meses</option>
+          </select>
+        </div>
+        <div class="k-chart-wrap" style="height:220px;position:relative">
+          <canvas id="kBarCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Anomalous expenses alert -->
+      <div class="dash-panel mt-3" id="anomalyPanel" style="display:none">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem">
+          <i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;font-size:1.2rem"></i>
+          <p class="dash-panel-title mb-0" data-i18n="dash.ov.anomaly.title">Gastos inusuales detectados</p>
+        </div>
+        <div id="anomalyList"></div>
+      </div>
+
       <!-- Achievements widget -->
       <div class="dash-panel mt-3" id="achievementsWidget">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem">
@@ -222,20 +245,56 @@
           <p class="dash-page-sub" data-i18n="dash.exp.sub">Historial completo</p>
         </div>
         <div class="d-flex gap-2">
-          <select class="dash-input" id="filterCategory" onchange="filterExpenses()" style="width:auto;padding:.45rem .75rem">
-            <option value="" data-i18n="dash.exp.allCats">Todas las categorías</option>
-            <option value="Alimentación" data-i18n="dash.cat.food">Alimentación</option>
-            <option value="Transporte" data-i18n="dash.cat.transport">Transporte</option>
-            <option value="Ocio" data-i18n="dash.cat.leisure">Ocio</option>
-            <option value="Suscripciones" data-i18n="dash.cat.subs">Suscripciones</option>
-            <option value="Salud" data-i18n="dash.cat.health">Salud</option>
-            <option value="Vivienda" data-i18n="dash.cat.housing">Vivienda</option>
-            <option value="Otro" data-i18n="dash.cat.other">Otro</option>
-          </select>
+          <button class="btn btn-outline-secondary btn-sm" onclick="exportExpensesCSV()" title="Exportar CSV">
+            <i class="bi bi-download me-1"></i><span data-i18n="dash.exp.exportCSV">Exportar CSV</span>
+          </button>
           <button class="btn btn-primary btn-sm" onclick="showSection('add', null)">
             <i class="bi bi-plus-lg me-1"></i> <span data-i18n="dash.exp.newBtn">Nuevo</span>
           </button>
         </div>
+      </div>
+
+      <!-- Advanced search / filter bar -->
+      <div class="dash-panel mb-3" style="padding:.75rem 1rem">
+        <div class="row g-2 align-items-end">
+          <div class="col-12 col-sm-6 col-md-3">
+            <label class="dash-label mb-1" for="filterText" data-i18n="dash.exp.filter.text">Concepto / comercio</label>
+            <input id="filterText" type="text" class="dash-input" data-i18n-placeholder="dash.exp.filter.textPh" placeholder="Buscar..." oninput="filterExpenses()" />
+          </div>
+          <div class="col-12 col-sm-6 col-md-2">
+            <label class="dash-label mb-1" for="filterCategory" data-i18n="dash.exp.filter.cat">Categoría</label>
+            <select class="dash-input" id="filterCategory" onchange="filterExpenses()" style="padding:.45rem .75rem">
+              <option value="" data-i18n="dash.exp.allCats">Todas</option>
+              <option value="Alimentación" data-i18n="dash.cat.food">Alimentación</option>
+              <option value="Transporte" data-i18n="dash.cat.transport">Transporte</option>
+              <option value="Ocio" data-i18n="dash.cat.leisure">Ocio</option>
+              <option value="Suscripciones" data-i18n="dash.cat.subs">Suscripciones</option>
+              <option value="Salud" data-i18n="dash.cat.health">Salud</option>
+              <option value="Vivienda" data-i18n="dash.cat.housing">Vivienda</option>
+              <option value="Otro" data-i18n="dash.cat.other">Otro</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="dash-label mb-1" for="filterDateFrom" data-i18n="dash.exp.filter.from">Desde</label>
+            <input id="filterDateFrom" type="date" class="dash-input" onchange="filterExpenses()" />
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="dash-label mb-1" for="filterDateTo" data-i18n="dash.exp.filter.to">Hasta</label>
+            <input id="filterDateTo" type="date" class="dash-input" onchange="filterExpenses()" />
+          </div>
+          <div class="col-6 col-md-1">
+            <label class="dash-label mb-1" for="filterAmtMin" data-i18n="dash.exp.filter.min">Mín.</label>
+            <input id="filterAmtMin" type="number" min="0" step="0.01" class="dash-input" oninput="filterExpenses()" />
+          </div>
+          <div class="col-6 col-md-1">
+            <label class="dash-label mb-1" for="filterAmtMax" data-i18n="dash.exp.filter.max">Máx.</label>
+            <input id="filterAmtMax" type="number" min="0" step="0.01" class="dash-input" oninput="filterExpenses()" />
+          </div>
+          <div class="col-12 col-md-1 d-flex align-items-end">
+            <button class="btn btn-outline-secondary btn-sm w-100" onclick="clearExpenseFilters()" data-i18n="dash.exp.filter.clear">Limpiar</button>
+          </div>
+        </div>
+        <div id="filterResultCount" style="font-size:.78rem;color:var(--k-muted);margin-top:.45rem"></div>
       </div>
 
       <div class="dash-table-wrap">
@@ -410,6 +469,12 @@
           <h1 class="dash-page-title" data-i18n="dash.adv.title">Asesor IA</h1>
           <p class="dash-page-sub" data-i18n="dash.adv.sub">Análisis personalizado de tus finanzas</p>
         </div>
+      </div>
+
+      <!-- Financial profile card -->
+      <div class="dash-panel mb-3" id="financialProfilePanel">
+        <p class="dash-panel-title" data-i18n="dash.adv.profile.title">Tu perfil financiero</p>
+        <div id="financialProfileBody" style="font-size:.9rem;color:var(--k-text2)">—</div>
       </div>
 
       <div class="row g-3">
@@ -867,6 +932,9 @@ function setupDisplayCurrencySelector() {
       renderKPIs(allExpenses);
       renderRecentTable(allExpenses.slice(0, 6));
       renderChart(allExpenses);
+      renderBarChart(allExpenses);
+      detectAnomalies(allExpenses);
+      renderFinancialProfile(allExpenses);
       renderFullTable(allExpenses);
       loadBudgets();
     });
@@ -893,6 +961,9 @@ async function loadExpenses() {
     renderKPIs(allExpenses);
     renderRecentTable(allExpenses.slice(0, 6));
     renderChart(allExpenses);
+    renderBarChart(allExpenses);
+    detectAnomalies(allExpenses);
+    renderFinancialProfile(allExpenses);
     renderFullTable(allExpenses);
     updateConceptSuggestions(allExpenses);
     renderRecurringCommitments(allExpenses);
@@ -1166,12 +1237,139 @@ function suggestCategoryFromConcept() {
 }
 
 function filterExpenses() {
-  const cat = document.getElementById('filterCategory').value;
-  const filtered = cat ? allExpenses.filter(e => e.category === cat) : allExpenses;
+  const text    = (document.getElementById('filterText')    || {}).value?.trim().toLowerCase() || '';
+  const cat     = (document.getElementById('filterCategory')|| {}).value || '';
+  const dateFrom= (document.getElementById('filterDateFrom')|| {}).value || '';
+  const dateTo  = (document.getElementById('filterDateTo')  || {}).value || '';
+  const amtMin  = parseFloat((document.getElementById('filterAmtMin')||{}).value) || null;
+  const amtMax  = parseFloat((document.getElementById('filterAmtMax')||{}).value) || null;
+
+  const filtered = allExpenses.filter(e => {
+    const label = ((e.concept || '') + ' ' + (e.commerce || '') + ' ' + (e.description || '')).toLowerCase();
+    if (text     && !label.includes(text)) return false;
+    if (cat      && (e.category || '') !== cat) return false;
+    if (dateFrom && (e.date || e.createdAt || '') < dateFrom) return false;
+    if (dateTo   && (e.date || e.createdAt || '') > dateTo + 'T23:59:59') return false;
+    const amt = convertAmount(e.amount, e.currency);
+    if (amtMin !== null && amt < amtMin) return false;
+    if (amtMax !== null && amt > amtMax) return false;
+    return true;
+  });
+
   renderFullTable(filtered);
+  const countEl = document.getElementById('filterResultCount');
+  if (countEl) {
+    countEl.textContent = filtered.length === allExpenses.length
+      ? ''
+      : filtered.length + T('dash.js.records') + ' / ' + allExpenses.length;
+  }
 }
 
-// ── Chart.js Doughnut ─────────────────────────────────────
+function clearExpenseFilters() {
+  ['filterText','filterDateFrom','filterDateTo','filterAmtMin','filterAmtMax'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const cat = document.getElementById('filterCategory'); if (cat) cat.value = '';
+  filterExpenses();
+}
+
+function exportExpensesCSV() {
+  const text    = (document.getElementById('filterText')    || {}).value?.trim().toLowerCase() || '';
+  const cat     = (document.getElementById('filterCategory')|| {}).value || '';
+  const dateFrom= (document.getElementById('filterDateFrom')|| {}).value || '';
+  const dateTo  = (document.getElementById('filterDateTo')  || {}).value || '';
+  const amtMin  = parseFloat((document.getElementById('filterAmtMin')||{}).value) || null;
+  const amtMax  = parseFloat((document.getElementById('filterAmtMax')||{}).value) || null;
+  const rows = allExpenses.filter(e => {
+    const label = ((e.concept || '') + ' ' + (e.commerce || '') + ' ' + (e.description || '')).toLowerCase();
+    if (text     && !label.includes(text)) return false;
+    if (cat      && (e.category || '') !== cat) return false;
+    if (dateFrom && (e.date || e.createdAt || '') < dateFrom) return false;
+    if (dateTo   && (e.date || e.createdAt || '') > dateTo + 'T23:59:59') return false;
+    const amt = convertAmount(e.amount, e.currency);
+    if (amtMin !== null && amt < amtMin) return false;
+    if (amtMax !== null && amt > amtMax) return false;
+    return true;
+  });
+  const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const header = ['Concepto','Categoría','Importe','Moneda','Importe (' + displayCurrency + ')','Fecha','Mensual','Descripción'];
+  const lines = [header.map(esc).join(',')];
+  rows.forEach(e => {
+    lines.push([
+      esc(e.concept || e.commerce || ''),
+      esc(e.category || ''),
+      esc(e.amount),
+      esc(e.currency),
+      esc(convertAmount(e.amount, e.currency).toFixed(2)),
+      esc((e.date || e.createdAt || '').split('T')[0]),
+      esc(e.isMonthly ? 'Sí' : 'No'),
+      esc(e.description || ''),
+    ].join(','));
+  });
+  const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'klarity-gastos-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── Anomaly detection ─────────────────────────────────────
+function detectAnomalies(data) {
+  const panel = document.getElementById('anomalyPanel');
+  const list  = document.getElementById('anomalyList');
+  if (!panel || !list) return;
+
+  // Need at least 3 expenses per category to compute meaningful stats
+  const byCategory = {};
+  data.forEach(e => {
+    const cat = normalizeCategoryLabel(e.category || 'Otro');
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(convertAmount(e.amount, e.currency));
+  });
+
+  const anomalies = [];
+  data.forEach(e => {
+    const cat    = normalizeCategoryLabel(e.category || 'Otro');
+    const values = byCategory[cat] || [];
+    if (values.length < 3) return;                      // not enough data
+    const mean  = values.reduce((s, v) => s + v, 0) / values.length;
+    const std   = Math.sqrt(values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length);
+    const threshold = mean + 1.5 * std;
+    const normalized = convertAmount(e.amount, e.currency);
+    if (normalized > threshold && normalized > mean * 1.5) {
+      anomalies.push({ e, normalized, mean, threshold });
+    }
+  });
+
+  // Keep the 5 most anomalous
+  anomalies.sort((a, b) => (b.normalized / b.mean) - (a.normalized / a.mean));
+  const top = anomalies.slice(0, 5);
+
+  if (!top.length) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = '';
+  const locale = (window.getLang && window.getLang() === 'en') ? 'en-GB' : 'es-ES';
+  list.innerHTML = top.map(({ e, normalized, mean }) => {
+    const label    = escHtml(e.concept || e.commerce || T('dash.js.noConcept'));
+    const cat      = escHtml(displayCategory(normalizeCategoryLabel(e.category || 'Otro')));
+    const dateStr  = new Date(e.date || e.createdAt).toLocaleDateString(locale, { day:'2-digit', month:'short', year:'numeric' });
+    const ratio    = (normalized / mean).toFixed(1);
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--k-border);gap:.75rem;flex-wrap:wrap">
+      <div>
+        <span style="font-weight:600;color:var(--k-text)">${label}</span>
+        <span style="font-size:.78rem;color:var(--k-muted);margin-left:.4rem">${cat} · ${dateStr}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6rem;white-space:nowrap">
+        <span style="font-weight:700;color:#ef4444">${formatMoney(normalized, displayCurrency, 2)}</span>
+        <span style="font-size:.78rem;color:var(--k-muted)">${T('dash.ov.anomaly.vsAvg')} ${formatMoney(mean, displayCurrency, 2)} (${ratio}×)</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 let _pieChart = null;
 function renderChart(data) {
   const wrap   = document.getElementById('barChartWrap');
@@ -1232,6 +1430,79 @@ function renderChart(data) {
   });
 
   if (legend) legend.innerHTML = '';
+}
+
+// ── Bar chart by month ────────────────────────────────────
+let _barChart = null;
+function renderBarChart(data) {
+  const canvas = document.getElementById('kBarCanvas');
+  if (!canvas) return;
+  const months = parseInt((document.getElementById('barChartMonths') || {value:'12'}).value, 10) || 12;
+  const now = new Date();
+  const labels = [];
+  const totals = [];
+  const locale = (window.getLang && window.getLang() === 'en') ? 'en-GB' : 'es-ES';
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    labels.push(d.toLocaleDateString(locale, { month: 'short', year: '2-digit' }));
+    const sum = data
+      .filter(e => {
+        const ed = new Date(e.date || e.createdAt);
+        return ed.getMonth() === d.getMonth() && ed.getFullYear() === d.getFullYear();
+      })
+      .reduce((s, e) => s + convertAmount(e.amount, e.currency), 0);
+    totals.push(parseFloat(sum.toFixed(2)));
+  }
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const textColor = isDark ? '#b0bdd4' : '#4a5568';
+  const gridColor = isDark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.07)';
+  const barColor  = '#3b82f6';
+
+  if (_barChart) { _barChart.destroy(); _barChart = null; }
+  _barChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: displayCurrency,
+        data: totals,
+        backgroundColor: totals.map((v, i) => {
+          // highlight current month
+          const isCurrentMonth = i === totals.length - 1;
+          return isCurrentMonth ? '#7c3aed' : barColor;
+        }),
+        borderRadius: 5,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + formatMoney(ctx.parsed.y, displayCurrency, 2)
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: textColor, font: { size: 11 } },
+          grid: { color: gridColor }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: textColor,
+            font: { size: 11 },
+            callback: v => formatMoney(v, displayCurrency, 0)
+          },
+          grid: { color: gridColor }
+        }
+      }
+    }
+  });
 }
 
 // ── Add expense ───────────────────────────────────────────
@@ -1976,6 +2247,109 @@ async function settleDebt(sharedExpenseId, userId) {
     loadBalance();
     loadSharedExpenses();
   } catch(e) { console.error(e); }
+}
+
+// ── Financial profile ─────────────────────────────────────
+function renderFinancialProfile(data) {
+  const el = document.getElementById('financialProfileBody');
+  if (!el) return;
+  if (!data || data.length < 3) {
+    el.innerHTML = `<span style="color:var(--k-muted)">${T('dash.adv.profile.noData')}</span>`;
+    return;
+  }
+
+  // Compute metrics
+  const now = new Date();
+  const months = {};
+  data.forEach(e => {
+    const d = new Date(e.date || e.createdAt);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    months[key] = (months[key] || 0) + convertAmount(e.amount, e.currency);
+  });
+  const monthTotals = Object.values(months);
+  const avgMonthly  = monthTotals.length ? monthTotals.reduce((s,v)=>s+v,0)/monthTotals.length : 0;
+
+  // Category distribution (leisure & dining = impulsive indicator)
+  const catTotals = {};
+  data.forEach(e => {
+    const cat = normalizeCategoryLabel(e.category || 'Otro');
+    catTotals[cat] = (catTotals[cat]||0) + convertAmount(e.amount, e.currency);
+  });
+  const grandTotal  = Object.values(catTotals).reduce((s,v)=>s+v,0) || 1;
+  const leisurePct  = ((catTotals['Ocio'] || 0) / grandTotal) * 100;
+  const foodPct     = ((catTotals['Alimentación'] || 0) / grandTotal) * 100;
+  const housingPct  = ((catTotals['Vivienda'] || 0) / grandTotal) * 100;
+
+  // Savings proxies: recurring (monthly) expenses = disciplined behavior
+  const recurringCount = data.filter(e => e.isMonthly).length;
+  const recurringRatio = (recurringCount / data.length) * 100;
+
+  // Anomaly count
+  const byCategory = {};
+  data.forEach(e => {
+    const cat = normalizeCategoryLabel(e.category || 'Otro');
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(convertAmount(e.amount, e.currency));
+  });
+  let anomalyCount = 0;
+  data.forEach(e => {
+    const cat = normalizeCategoryLabel(e.category || 'Otro');
+    const vals = byCategory[cat] || [];
+    if (vals.length < 3) return;
+    const mean = vals.reduce((s,v)=>s+v,0)/vals.length;
+    const std  = Math.sqrt(vals.reduce((s,v)=>s+(v-mean)**2,0)/vals.length);
+    if (convertAmount(e.amount,e.currency) > mean + 1.5*std) anomalyCount++;
+  });
+  const anomalyRatio = (anomalyCount / data.length) * 100;
+
+  // Scoring: 0=ahorrador, 50=equilibrado, 100=impulsivo
+  let score = 0;
+  score += Math.min(leisurePct * 0.7, 35);        // leisure spending weight
+  score += Math.min(anomalyRatio * 1.5, 30);       // irregular spikes
+  score -= Math.min(recurringRatio * 0.3, 15);     // planned recurring = discipline
+  score  = Math.max(0, Math.min(100, score));
+
+  let profileKey, emoji, color, descKey;
+  if (score >= 60) {
+    profileKey = 'impulsive'; emoji = '⚡'; color = '#ef4444'; descKey = 'dash.adv.profile.impulsive.desc';
+  } else if (score >= 30) {
+    profileKey = 'balanced';  emoji = '⚖️'; color = '#f59e0b'; descKey = 'dash.adv.profile.balanced.desc';
+  } else {
+    profileKey = 'saver';     emoji = '💰'; color = '#10b981'; descKey = 'dash.adv.profile.saver.desc';
+  }
+
+  const profileLabel = T('dash.adv.profile.' + profileKey);
+  const desc         = T(descKey);
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap">
+      <div style="text-align:center;min-width:90px">
+        <div style="font-size:2.5rem;line-height:1">${emoji}</div>
+        <div style="font-weight:800;font-size:1.05rem;color:${color};margin-top:.3rem">${profileLabel}</div>
+        <div style="font-size:.74rem;color:var(--k-muted);margin-top:.15rem">${T('dash.adv.profile.score')}: ${Math.round(score)}/100</div>
+      </div>
+      <div style="flex:1;min-width:180px">
+        <div style="margin-bottom:.6rem;font-size:.88rem;line-height:1.5">${desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.55rem;font-size:.78rem">
+          <span style="background:var(--k-bg);border:1px solid var(--k-border);border-radius:.5rem;padding:.18rem .55rem">
+            ${T('dash.adv.profile.avgMonth')}: <b>${formatMoney(avgMonthly, displayCurrency, 0)}</b>
+          </span>
+          <span style="background:var(--k-bg);border:1px solid var(--k-border);border-radius:.5rem;padding:.18rem .55rem">
+            ${T('dash.adv.profile.leisure')}: <b>${leisurePct.toFixed(0)}%</b>
+          </span>
+          <span style="background:var(--k-bg);border:1px solid var(--k-border);border-radius:.5rem;padding:.18rem .55rem">
+            ${T('dash.adv.profile.recurring')}: <b>${recurringRatio.toFixed(0)}%</b>
+          </span>
+        </div>
+      </div>
+      <div style="min-width:120px">
+        <div style="font-size:.75rem;color:var(--k-muted);margin-bottom:.35rem;text-align:right">${T('dash.adv.profile.impulsiveLabel')} ↗</div>
+        <div style="background:var(--k-border);border-radius:99px;height:10px;overflow:hidden">
+          <div style="height:100%;width:${Math.round(score)}%;background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444);border-radius:99px;transition:width .6s"></div>
+        </div>
+        <div style="font-size:.75rem;color:var(--k-muted);margin-top:.35rem;text-align:left">↙ ${T('dash.adv.profile.saverLabel')}</div>
+      </div>
+    </div>`;
 }
 
 // ── AI Advisor ────────────────────────────────────────────
