@@ -21,6 +21,8 @@ import { FriendshipsModule } from './friendships/friendships.module';
 import { SharedExpense } from './shared-expenses/shared-expense.entity';
 import { SharedExpenseParticipant } from './shared-expenses/shared-expense-participant.entity';
 import { SharedExpensesModule } from './shared-expenses/shared-expenses.module';
+import { Goal } from './goals/goal.entity';
+import { GoalsModule } from './goals/goals.module';
 
 const ALL_ENTITIES = [
   User,
@@ -32,6 +34,7 @@ const ALL_ENTITIES = [
   Friendship,
   SharedExpense,
   SharedExpenseParticipant,
+  Goal,
 ];
 
 @Module({
@@ -74,6 +77,7 @@ const ALL_ENTITIES = [
     GamificationModule,
     FriendshipsModule,
     SharedExpensesModule,
+    GoalsModule,
   ],
   providers: [
     {

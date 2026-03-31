@@ -45,9 +45,21 @@
         <button class="k-lang-btn active" id="btnES" type="button" onclick="setLang('es')" title="Español">ES</button>
         <button class="k-lang-btn" id="btnEN" type="button" onclick="setLang('en')" title="English">EN</button>
       </div>
-      <button class="dash-btn-icon" data-i18n-title="dash.notif.title" title="Notificaciones" data-i18n-aria="dash.notif.aria" aria-label="Notificaciones">
-        <i class="bi bi-bell"></i>
-      </button>
+      <div style="position:relative" id="notifWrap">
+        <button class="dash-btn-icon" id="notifBtn" onclick="toggleNotifDropdown()" data-i18n-title="dash.notif.title" title="Notificaciones" aria-label="Notificaciones">
+          <i class="bi bi-bell"></i>
+          <span id="notifBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--k-surface)"></span>
+        </button>
+        <div id="notifDropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);width:320px;background:var(--k-surface);border:1px solid var(--k-border);border-radius:.9rem;box-shadow:0 8px 32px rgba(0,0,0,.14);z-index:1000;overflow:hidden">
+          <div style="padding:.75rem 1rem;border-bottom:1px solid var(--k-border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:700;font-size:.93rem;color:var(--k-text)" data-i18n="dash.notif.title">Notificaciones</span>
+            <button class="dash-btn-icon" onclick="clearNotifications()" style="font-size:.78rem;color:var(--k-muted)" data-i18n="dash.notif.clear">Limpiar</button>
+          </div>
+          <div id="notifList" style="max-height:320px;overflow-y:auto;padding:.5rem 0">
+            <div class="dash-empty" style="padding:1.5rem" data-i18n="dash.notif.empty">Sin notificaciones</div>
+          </div>
+        </div>
+      </div>
       <button class="dash-btn-icon" id="themeToggle" data-i18n-title="dash.theme.title" title="Cambiar tema" data-i18n-aria="dash.theme.aria" aria-label="Cambiar tema" data-theme-toggle>
         <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
       </button>
@@ -81,6 +93,9 @@
       </a>
       <a href="#section-shared" class="dash-nav-link" onclick="showSection('shared', this)">
         <i class="bi bi-people"></i> <span data-i18n="dash.shared">Compartidos</span>
+      </a>
+      <a href="#section-goals" class="dash-nav-link" onclick="showSection('goals', this)">
+        <i class="bi bi-bullseye"></i> <span data-i18n="dash.goals">Metas de ahorro</span>
       </a>
     </nav>
 
@@ -221,6 +236,14 @@
           <p class="dash-panel-title mb-0" data-i18n="dash.ov.anomaly.title">Gastos inusuales detectados</p>
         </div>
         <div id="anomalyList"></div>
+      </div>
+
+      <!-- Month comparison chart -->
+      <div class="dash-panel mt-3" id="comparisonPanel">
+        <p class="dash-panel-title mb-2" data-i18n="dash.ov.cmp.title">Este mes vs. mes anterior — por categoría</p>
+        <div class="k-chart-wrap" style="height:240px;position:relative">
+          <canvas id="kCmpCanvas"></canvas>
+        </div>
       </div>
 
       <!-- Achievements widget -->
@@ -514,6 +537,23 @@
       </div>
     </div>
 
+    <!-- ====== GOALS ======================================== -->
+    <div id="section-goals" style="display:none">
+      <div class="dash-page-header">
+        <div>
+          <h1 class="dash-page-title" data-i18n="dash.goals.title">Metas de ahorro</h1>
+          <p class="dash-page-sub" data-i18n="dash.goals.sub">Define objetivos y sigue tu progreso</p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openGoalModal()">
+          <i class="bi bi-plus-lg me-1"></i><span data-i18n="dash.goals.newBtn">Nueva meta</span>
+        </button>
+      </div>
+
+      <div class="row g-3" id="goalsGrid">
+        <div class="col-12 dash-empty" data-i18n="dash.loading">Cargando...</div>
+      </div>
+    </div>
+
     <!-- ====== PROFILE ====================================== -->
     <div id="section-profile" style="display:none">
       <div class="dash-page-header">
@@ -790,6 +830,47 @@
   </div>
 </div>
 
+<!-- ── Goal Modal ─────────────────────────────────────────── -->
+<div id="goalModal" class="klarity-modal" aria-hidden="true">
+  <div class="klarity-modal-card" role="dialog" aria-modal="true" aria-labelledby="goalModalTitle" style="max-width:440px;width:95%">
+    <h3 id="goalModalTitle" class="mb-3" style="font-size:1.05rem" data-i18n="dash.goals.modal.title">Nueva meta</h3>
+    <form id="goalForm" onsubmit="submitGoal(event)">
+      <div class="mb-3">
+        <label class="dash-label" for="goalName" data-i18n="dash.goals.name.label">Nombre de la meta *</label>
+        <input id="goalName" type="text" class="dash-input" data-i18n-placeholder="dash.goals.name.ph" placeholder="ej. Vacaciones en Japón" required />
+      </div>
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="dash-label" for="goalTarget" data-i18n="dash.goals.target.label">Objetivo *</label>
+          <input id="goalTarget" type="number" min="0.01" step="0.01" class="dash-input" placeholder="0.00" required />
+        </div>
+        <div class="col-sm-6">
+          <label class="dash-label" for="goalSaved" data-i18n="dash.goals.saved.label">Ya ahorrado</label>
+          <input id="goalSaved" type="number" min="0" step="0.01" class="dash-input" placeholder="0.00" />
+        </div>
+        <div class="col-sm-6">
+          <label class="dash-label" for="goalCurrency" data-i18n="dash.goals.currency.label">Moneda</label>
+          <select id="goalCurrency" class="dash-input">
+            <option value="EUR">EUR (€)</option>
+            <option value="USD">USD ($)</option>
+            <option value="ARS">ARS ($)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+        </div>
+        <div class="col-sm-6">
+          <label class="dash-label" for="goalDeadline" data-i18n="dash.goals.deadline.label">Fecha límite</label>
+          <input id="goalDeadline" type="date" class="dash-input" />
+        </div>
+      </div>
+      <div id="goalMsg" class="mt-2" style="font-size:.87rem;min-height:1.4rem"></div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-light btn-sm" onclick="closeGoalModal()" data-i18n="dash.goals.modal.cancel">Cancelar</button>
+        <button type="submit" id="goalSaveBtn" class="btn btn-primary btn-sm" data-i18n="dash.goals.modal.save">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- ── Overlay for mobile sidebar ──────────────────────── -->
 <button id="sidebarOverlay" type="button" data-i18n-aria="dash.overlay.aria" aria-label="Cerrar menú lateral"
   style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:998;border:0;padding:0;cursor:pointer"></button>
@@ -833,7 +914,7 @@
 })();
 
 // ── Navigation ────────────────────────────────────────────
-const SECTIONS = ['overview','expenses','add','ocr','budgets','achievements','shared','advisor','profile'];
+const SECTIONS = ['overview','expenses','add','ocr','budgets','achievements','shared','goals','advisor','profile'];
 function showSection(name, linkEl) {
   SECTIONS.forEach(id => {
     const el = document.getElementById('section-' + id);
@@ -852,6 +933,7 @@ function showSection(name, linkEl) {
   if (name === 'budgets') loadBudgets();
   if (name === 'achievements') loadAchievements();
   if (name === 'shared') loadShared();
+  if (name === 'goals') loadGoals();
   closeSidebar();
 }
 
@@ -933,6 +1015,7 @@ function setupDisplayCurrencySelector() {
       renderRecentTable(allExpenses.slice(0, 6));
       renderChart(allExpenses);
       renderBarChart(allExpenses);
+      renderComparisonChart(allExpenses);
       detectAnomalies(allExpenses);
       renderFinancialProfile(allExpenses);
       renderFullTable(allExpenses);
@@ -962,6 +1045,7 @@ async function loadExpenses() {
     renderRecentTable(allExpenses.slice(0, 6));
     renderChart(allExpenses);
     renderBarChart(allExpenses);
+    renderComparisonChart(allExpenses);
     detectAnomalies(allExpenses);
     renderFinancialProfile(allExpenses);
     renderFullTable(allExpenses);
@@ -1311,6 +1395,101 @@ function exportExpensesCSV() {
   const a = document.createElement('a');
   a.href = url; a.download = 'klarity-gastos-' + new Date().toISOString().split('T')[0] + '.csv';
   a.click(); URL.revokeObjectURL(url);
+}
+
+// ── Month comparison chart ────────────────────────────────
+let _cmpChart = null;
+function renderComparisonChart(data) {
+  const canvas = document.getElementById('kCmpCanvas');
+  if (!canvas) return;
+
+  const now = new Date();
+  const thisM = new Date(now.getFullYear(), now.getMonth(), 1);
+  const prevM = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const CATS = ['Alimentación','Transporte','Ocio','Suscripciones','Salud','Vivienda','Otro'];
+
+  const thisTotals = {};
+  const prevTotals = {};
+  data.forEach(e => {
+    const d   = new Date(e.date || e.createdAt);
+    const cat = normalizeCategoryLabel(e.category || 'Otro');
+    const amt = convertAmount(e.amount, e.currency);
+    if (d.getMonth() === thisM.getMonth() && d.getFullYear() === thisM.getFullYear()) {
+      thisTotals[cat] = (thisTotals[cat] || 0) + amt;
+    } else if (d.getMonth() === prevM.getMonth() && d.getFullYear() === prevM.getFullYear()) {
+      prevTotals[cat] = (prevTotals[cat] || 0) + amt;
+    }
+  });
+
+  // Only show categories that have data in at least one of the two months
+  const activeCats = CATS.filter(c => (thisTotals[c] || 0) + (prevTotals[c] || 0) > 0);
+
+  if (!activeCats.length) {
+    canvas.parentElement.innerHTML =
+      `<div class="dash-empty w-100"><i class="bi bi-bar-chart d-block mb-1"></i>${T('dash.js.noData')}</div>`;
+    if (_cmpChart) { _cmpChart.destroy(); _cmpChart = null; }
+    return;
+  }
+
+  const isDark    = document.documentElement.getAttribute('data-theme') === 'dark';
+  const textColor = isDark ? '#b0bdd4' : '#4a5568';
+  const gridColor = isDark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.07)';
+
+  const locale = (window.getLang && window.getLang() === 'en') ? 'en-GB' : 'es-ES';
+  const labelThis = thisM.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
+  const labelPrev = prevM.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
+
+  if (_cmpChart) { _cmpChart.destroy(); _cmpChart = null; }
+  _cmpChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: activeCats.map(c => displayCategory(c)),
+      datasets: [
+        {
+          label: labelPrev,
+          data: activeCats.map(c => parseFloat((prevTotals[c] || 0).toFixed(2))),
+          backgroundColor: 'rgba(148,163,184,.65)',
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+        {
+          label: labelThis,
+          data: activeCats.map(c => parseFloat((thisTotals[c] || 0).toFixed(2))),
+          backgroundColor: '#3b82f6',
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { color: textColor, font: { size: 11 }, boxWidth: 12, padding: 12 }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.dataset.label + ': ' + formatMoney(ctx.parsed.y, displayCurrency, 2)
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: textColor, font: { size: 11 } }, grid: { color: gridColor } },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: textColor,
+            font: { size: 11 },
+            callback: v => formatMoney(v, displayCurrency, 0)
+          },
+          grid: { color: gridColor }
+        }
+      }
+    }
+  });
 }
 
 // ── Anomaly detection ─────────────────────────────────────
@@ -1777,6 +1956,12 @@ async function loadBudgets() {
   }).join('');
 
   renderRecurringCommitments(allExpenses);
+
+  // Fire budget notifications
+  const budgetObjects = Object.entries(budgetsEur).map(([cat, limitEur]) => ({
+    category: cat, limitAmount: limitEur, currency: 'EUR'
+  }));
+  checkBudgetNotifications(allExpenses, budgetObjects);
 }
 
 async function promptBudgetEdit(cat, currentLimitEur) {
@@ -2423,6 +2608,237 @@ document.getElementById('editExpenseModal').addEventListener('click', (event) =>
     closeEditModal();
   }
 });
+
+document.getElementById('goalModal').addEventListener('click', (event) => {
+  if (event.target && event.target.id === 'goalModal') {
+    closeGoalModal();
+  }
+});
+
+// ── Notifications ─────────────────────────────────────────
+let _notifications = [];
+
+function pushNotification(type, message) {
+  // avoid duplicates within the same session
+  if (_notifications.find(n => n.message === message)) return;
+  _notifications.unshift({ type, message, time: new Date() });
+  renderNotifications();
+}
+
+function renderNotifications() {
+  const badge = document.getElementById('notifBadge');
+  const list  = document.getElementById('notifList');
+  if (badge) badge.style.display = _notifications.length ? '' : 'none';
+  if (!list) return;
+  if (!_notifications.length) {
+    list.innerHTML = `<div class="dash-empty" style="padding:1.5rem">${T('dash.notif.empty')}</div>`;
+    return;
+  }
+  const locale = (window.getLang && window.getLang() === 'en') ? 'en-GB' : 'es-ES';
+  const ICONS  = { warning: '⚠️', success: '✅', info: 'ℹ️' };
+  list.innerHTML = _notifications.map(n => `
+    <div style="padding:.6rem 1rem;border-bottom:1px solid var(--k-border);display:flex;gap:.6rem;align-items:flex-start">
+      <span style="font-size:1rem;line-height:1.4;flex-shrink:0">${ICONS[n.type] || 'ℹ️'}</span>
+      <div style="flex:1">
+        <div style="font-size:.86rem;color:var(--k-text);line-height:1.4">${escHtml(n.message)}</div>
+        <div style="font-size:.74rem;color:var(--k-muted);margin-top:.15rem">${n.time.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+    </div>`).join('');
+}
+
+function clearNotifications() {
+  _notifications = [];
+  renderNotifications();
+  document.getElementById('notifDropdown').style.display = 'none';
+}
+
+function toggleNotifDropdown() {
+  const dd = document.getElementById('notifDropdown');
+  if (!dd) return;
+  dd.style.display = dd.style.display === 'none' ? '' : 'none';
+}
+
+// Close notification dropdown when clicking outside
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('notifWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    const dd = document.getElementById('notifDropdown');
+    if (dd) dd.style.display = 'none';
+  }
+});
+
+/** Called after budgets + expenses are loaded */
+function checkBudgetNotifications(expenses, budgets) {
+  const now = new Date();
+  const thisMonth = expenses.filter(e => {
+    const d = new Date(e.date || e.createdAt);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  budgets.forEach(b => {
+    const spent = thisMonth
+      .filter(e => normalizeCategoryLabel(e.category || 'Otro') === normalizeCategoryLabel(b.category) || b.category === 'total')
+      .reduce((s, e) => s + convertAmount(e.amount, e.currency), 0);
+    const limitConverted = convertAmount(b.limitAmount, b.currency);
+    if (limitConverted <= 0) return;
+    const pct = (spent / limitConverted) * 100;
+    if (pct >= 100) {
+      pushNotification('warning', T('dash.notif.budgetOver').replace('{cat}', b.category).replace('{pct}', pct.toFixed(0)));
+    } else if (pct >= 90) {
+      pushNotification('warning', T('dash.notif.budgetNear').replace('{cat}', b.category).replace('{pct}', pct.toFixed(0)));
+    }
+  });
+}
+
+/** Called after goals are loaded */
+function checkGoalNotifications(goals) {
+  goals.forEach(g => {
+    if (g.targetAmount > 0 && g.savedAmount >= g.targetAmount) {
+      pushNotification('success', T('dash.notif.goalReached').replace('{name}', g.name));
+    }
+  });
+}
+
+// ── Goals ─────────────────────────────────────────────────
+let _editingGoalId = null;
+
+function openGoalModal(goal) {
+  _editingGoalId = goal ? goal.id : null;
+  const titleEl = document.getElementById('goalModalTitle');
+  if (titleEl) titleEl.textContent = goal ? T('dash.goals.modal.titleEdit') : T('dash.goals.modal.title');
+  document.getElementById('goalName').value      = goal ? goal.name : '';
+  document.getElementById('goalTarget').value    = goal ? goal.targetAmount : '';
+  document.getElementById('goalSaved').value     = goal ? goal.savedAmount : '';
+  document.getElementById('goalCurrency').value  = goal ? (goal.currency || 'EUR') : (displayCurrency || 'EUR');
+  document.getElementById('goalDeadline').value  = goal && goal.deadline ? goal.deadline.split('T')[0] : '';
+  document.getElementById('goalMsg').textContent = '';
+  const modal = document.getElementById('goalModal');
+  if (modal) { modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
+}
+
+function closeGoalModal() {
+  const modal = document.getElementById('goalModal');
+  if (modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  _editingGoalId = null;
+}
+
+async function submitGoal(e) {
+  e.preventDefault();
+  const btn = document.getElementById('goalSaveBtn');
+  const msg = document.getElementById('goalMsg');
+  btn.disabled = true;
+  msg.textContent = '';
+  const body = {
+    name:        document.getElementById('goalName').value.trim(),
+    targetAmount: parseFloat(document.getElementById('goalTarget').value),
+    savedAmount:  parseFloat(document.getElementById('goalSaved').value || '0'),
+    currency:    document.getElementById('goalCurrency').value,
+    deadline:    document.getElementById('goalDeadline').value || null,
+  };
+  try {
+    const url    = API + '/goals' + (_editingGoalId ? '/' + _editingGoalId : '');
+    const method = _editingGoalId ? 'PATCH' : 'POST';
+    const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(body) });
+    if (res.status === 401) { logout(); return; }
+    if (!res.ok) throw new Error((await res.json()).message || 'Error');
+    closeGoalModal();
+    loadGoals();
+  } catch(err) {
+    msg.innerHTML = `<span style="color:var(--k-danger,#ef4444)"><i class="bi bi-exclamation-circle me-1"></i>${escHtml(err.message)}</span>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function deleteGoal(id) {
+  if (!confirm(T('dash.goals.deleteConfirm'))) return;
+  try {
+    const res = await fetch(API + '/goals/' + id, { method: 'DELETE', headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    loadGoals();
+  } catch(err) {
+    console.error('Error deleting goal', err);
+  }
+}
+
+async function contributeGoal(id, current, currency) {
+  const amtStr = prompt(T('dash.goals.contributePrompt'));
+  if (!amtStr) return;
+  const amt = parseFloat(amtStr);
+  if (isNaN(amt) || amt <= 0) return;
+  try {
+    const res = await fetch(API + '/goals/' + id, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ savedAmount: parseFloat((current + amt).toFixed(2)) })
+    });
+    if (res.status === 401) { logout(); return; }
+    loadGoals();
+  } catch(err) {
+    console.error('Error contributing to goal', err);
+  }
+}
+
+async function loadGoals() {
+  const grid = document.getElementById('goalsGrid');
+  if (!grid) return;
+  grid.innerHTML = `<div class="col-12 dash-empty"><span class="loading-spinner"></span></div>`;
+  try {
+    const res = await fetch(API + '/goals', { headers: authHeaders() });
+    if (res.status === 401) { logout(); return; }
+    const goals = await res.json();
+    checkGoalNotifications(goals);
+    if (!goals.length) {
+      grid.innerHTML = `<div class="col-12 dash-empty" style="padding:2.5rem 0">
+        <i class="bi bi-bullseye d-block mb-2" style="font-size:2rem;color:var(--k-muted)"></i>
+        <span data-i18n="dash.goals.empty">${T('dash.goals.empty')}</span>
+      </div>`;
+      return;
+    }
+    const locale = (window.getLang && window.getLang() === 'en') ? 'en-GB' : 'es-ES';
+    grid.innerHTML = goals.map(g => {
+      const pct     = Math.min(100, g.targetAmount > 0 ? (g.savedAmount / g.targetAmount) * 100 : 0);
+      const reached = pct >= 100;
+      const color   = reached ? '#10b981' : pct >= 75 ? '#f59e0b' : '#3b82f6';
+      const deadlineStr = g.deadline
+        ? new Date(g.deadline).toLocaleDateString(locale, { day:'2-digit', month:'short', year:'numeric' })
+        : '—';
+      const remaining = Math.max(0, g.targetAmount - g.savedAmount);
+      return `<div class="col-12 col-md-6 col-lg-4">
+        <div class="dash-panel h-100" style="padding:1.1rem">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;margin-bottom:.7rem">
+            <div style="font-weight:700;color:var(--k-text);font-size:.97rem;flex:1">${escHtml(g.name)}</div>
+            <div style="display:flex;gap:.4rem;flex-shrink:0">
+              <button class="dash-btn-icon" onclick="openGoalModal(${JSON.stringify(g).replace(/"/g,'&quot;')})" title="${T('dash.edit.btnTitle')}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="dash-btn-icon" onclick="deleteGoal('${g.id}')" title="${T('dash.goals.deleteBtn')}" style="color:var(--k-danger)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--k-muted);margin-bottom:.45rem">
+            <span>${T('dash.goals.deadline.label')}: <b style="color:var(--k-text2)">${deadlineStr}</b></span>
+            <span style="color:${color};font-weight:700">${pct.toFixed(0)}%</span>
+          </div>
+          <div style="background:var(--k-border);border-radius:99px;height:8px;margin-bottom:.6rem;overflow:hidden">
+            <div style="height:100%;width:${pct.toFixed(1)}%;background:${color};border-radius:99px;transition:width .6s"></div>
+          </div>
+          <div style="font-size:.85rem;color:var(--k-text2);margin-bottom:.8rem">
+            <b style="color:var(--k-text)">${formatMoney(g.savedAmount, g.currency, 2)}</b>
+            ${T('dash.goals.of')} <b>${formatMoney(g.targetAmount, g.currency, 2)}</b>
+            ${!reached ? `· ${T('dash.goals.remaining')}: <b>${formatMoney(remaining, g.currency, 2)}</b>` : `<span style="color:#10b981;font-weight:700"> ✓ ${T('dash.goals.reached')}</span>`}
+          </div>
+          ${!reached ? `<button class="btn btn-outline-primary btn-sm w-100" onclick="contributeGoal('${g.id}', ${g.savedAmount}, '${g.currency}')">
+            <i class="bi bi-plus-circle me-1"></i>${T('dash.goals.contributeBtn')}
+          </button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(err) {
+    console.error('Error loading goals', err);
+    grid.innerHTML = `<div class="col-12 dash-empty">${T('dash.js.noData')}</div>`;
+  }
+}
 
 // ── Profile update ────────────────────────────────────────
 async function updateProfile(e) {

@@ -249,6 +249,7 @@
       'dash.budgets':            'Presupuestos',
       'dash.achievements':       'Logros',
       'dash.shared':             'Compartidos',
+      'dash.goals':              'Metas de ahorro',
       'dash.advisor':            'Asesor IA',
       'dash.profile':            'Perfil',
       'dash.logout':             'Cerrar sesión',
@@ -264,6 +265,11 @@
       'dash.search.aria':        'Buscar',
       'dash.notif.title':        'Notificaciones',
       'dash.notif.aria':         'Notificaciones',
+      'dash.notif.clear':        'Limpiar',
+      'dash.notif.empty':        'Sin notificaciones',
+      'dash.notif.budgetNear':   'Presupuesto de {cat} al {pct}% — casi al límite',
+      'dash.notif.budgetOver':   'Presupuesto de {cat} superado ({pct}%)',
+      'dash.notif.goalReached':  'Meta alcanzada: {name} ✓',
       'dash.theme.title':        'Cambiar tema',
       'dash.theme.aria':         'Cambiar tema',
       'dash.avatar.title':       'Mi perfil',
@@ -383,6 +389,9 @@
       'dash.ov.bar.6m':          'Últimos 6 meses',
       'dash.ov.bar.12m':         'Últimos 12 meses',
 
+      // Dashboard — Month comparison chart (Extra 6)
+      'dash.ov.cmp.title':       'Este mes vs. mes anterior — por categoría',
+
       // Dashboard — Advanced search / filter
       'dash.exp.filter.text':    'Concepto / comercio',
       'dash.exp.filter.textPh':  'Buscar...',
@@ -414,7 +423,30 @@
       'dash.adv.profile.impulsiveLabel':  'Impulsivo',
       'dash.adv.profile.saverLabel':      'Ahorrador',
 
-      // Dashboard — JS runtime strings
+      // Dashboard — Goals section (Extra 5)
+      'dash.goals.title':               'Metas de ahorro',
+      'dash.goals.sub':                 'Define objetivos y sigue tu progreso',
+      'dash.goals.newBtn':              'Nueva meta',
+      'dash.goals.empty':               'Aún no tienes metas. ¡Crea la primera!',
+      'dash.goals.modal.title':         'Nueva meta',
+      'dash.goals.modal.titleEdit':     'Editar meta',
+      'dash.goals.modal.cancel':        'Cancelar',
+      'dash.goals.modal.save':          'Guardar',
+      'dash.goals.name.label':          'Nombre de la meta *',
+      'dash.goals.name.ph':             'ej. Vacaciones en Japón',
+      'dash.goals.target.label':        'Objetivo *',
+      'dash.goals.saved.label':         'Ya ahorrado',
+      'dash.goals.currency.label':      'Moneda',
+      'dash.goals.deadline.label':      'Fecha límite',
+      'dash.goals.deleteConfirm':       '¿Eliminar esta meta? Esta acción no se puede deshacer.',
+      'dash.goals.deleteBtn':           'Eliminar',
+      'dash.goals.contributeBtn':       'Añadir ahorro',
+      'dash.goals.contributePrompt':    'Importe a añadir:',
+      'dash.goals.of':                  'de',
+      'dash.goals.remaining':           'Pendiente',
+      'dash.goals.reached':             '¡Meta alcanzada!',
+
+
       'dash.js.noExpenses':      'Sin gastos aún',
       'dash.js.noData':          'Sin datos',
       'dash.js.noConcept':       'Sin concepto',
@@ -957,6 +989,7 @@
       'dash.budgets':            'Budgets',
       'dash.achievements':       'Achievements',
       'dash.shared':             'Shared',
+      'dash.goals':              'Saving goals',
       'dash.advisor':            'AI Advisor',
       'dash.profile':            'Profile',
       'dash.logout':             'Log out',
@@ -972,6 +1005,11 @@
       'dash.search.aria':        'Search',
       'dash.notif.title':        'Notifications',
       'dash.notif.aria':         'Notifications',
+      'dash.notif.clear':        'Clear',
+      'dash.notif.empty':        'No notifications',
+      'dash.notif.budgetNear':   '{cat} budget at {pct}% — almost at the limit',
+      'dash.notif.budgetOver':   '{cat} budget exceeded ({pct}%)',
+      'dash.notif.goalReached':  'Goal reached: {name} ✓',
       'dash.theme.title':        'Toggle theme',
       'dash.theme.aria':         'Toggle theme',
       'dash.avatar.title':       'My profile',
@@ -1091,6 +1129,9 @@
       'dash.ov.bar.6m':          'Last 6 months',
       'dash.ov.bar.12m':         'Last 12 months',
 
+      // Dashboard — Month comparison chart (Extra 6)
+      'dash.ov.cmp.title':       'This month vs. last month — by category',
+
       // Dashboard — Advanced search / filter
       'dash.exp.filter.text':    'Concept / merchant',
       'dash.exp.filter.textPh':  'Search...',
@@ -1122,7 +1163,30 @@
       'dash.adv.profile.impulsiveLabel':  'Impulsive',
       'dash.adv.profile.saverLabel':      'Saver',
 
-      // Dashboard — JS runtime strings
+      // Dashboard — Goals section (Extra 5)
+      'dash.goals.title':               'Saving goals',
+      'dash.goals.sub':                 'Set targets and track your progress',
+      'dash.goals.newBtn':              'New goal',
+      'dash.goals.empty':               'No goals yet. Create your first one!',
+      'dash.goals.modal.title':         'New goal',
+      'dash.goals.modal.titleEdit':     'Edit goal',
+      'dash.goals.modal.cancel':        'Cancel',
+      'dash.goals.modal.save':          'Save',
+      'dash.goals.name.label':          'Goal name *',
+      'dash.goals.name.ph':             'e.g. Vacation in Japan',
+      'dash.goals.target.label':        'Target *',
+      'dash.goals.saved.label':         'Already saved',
+      'dash.goals.currency.label':      'Currency',
+      'dash.goals.deadline.label':      'Deadline',
+      'dash.goals.deleteConfirm':       'Delete this goal? This action cannot be undone.',
+      'dash.goals.deleteBtn':           'Delete',
+      'dash.goals.contributeBtn':       'Add savings',
+      'dash.goals.contributePrompt':    'Amount to add:',
+      'dash.goals.of':                  'of',
+      'dash.goals.remaining':           'Remaining',
+      'dash.goals.reached':             'Goal reached!',
+
+
       'dash.js.noExpenses':      'No expenses yet',
       'dash.js.noData':          'No data',
       'dash.js.noConcept':       'No description',
