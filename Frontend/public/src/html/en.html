@@ -202,38 +202,54 @@
             <div class="k-step-num">3</div>
             <div class="k-step-body">
               <h3 data-i18n="steps.s3.title">Optimiza con tu asesor financiero</h3>
-              <p data-i18n="steps.s3.desc">Accede al panel del asesor, consulta el chatbot financiero personalizado y cumple tus metas con gamificacion.</p>
+              <p data-i18n="steps.s3.desc">Access the advisor panel, consult the personalised financial chatbot, define saving goals and reach your targets with gamification.</p>
             </div>
           </div>
         </div>
       </div>
       <div class="col-lg-6 reveal reveal-delay">
-        <div class="k-card" style="border-color:var(--k-primary)">
-          <div class="d-flex align-items-center gap-3 mb-4">
-            <div class="k-feature-icon fi-blue"><i class="bi bi-lightning-charge-fill"></i></div>
-            <div>
-              <div class="fw-700" style="font-weight:700;font-family:'Plus Jakarta Sans',sans-serif" data-i18n="steps.highlight.title">Empieza en minutos, no dias</div>
-              <div class="small" style="color:var(--k-muted)" data-i18n="steps.highlight.desc">Sin integraciones bancarias complejas ni migraciones manuales.</div>
+        <!-- ── Animated add-expense demo ── -->
+        <div class="k-card" style="border-color:var(--k-primary);position:relative;overflow:hidden" id="expenseDemo">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="k-feature-icon fi-blue" style="width:36px;height:36px;font-size:1rem"><i class="bi bi-plus-circle-fill"></i></div>
+            <span class="fw-700" style="font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem" data-i18n="demo.addTitle">New expense</span>
+          </div>
+
+          <div class="k-demo-form">
+            <div class="k-demo-label" data-i18n="demo.commerce">Merchant</div>
+            <div class="k-demo-field" id="demoCommerce"><span id="demoCText"></span><span class="k-demo-cursor" id="demoCCursor" style="display:none"></span></div>
+          </div>
+
+          <div class="k-demo-form">
+            <div class="k-demo-label" data-i18n="demo.amount">Amount</div>
+            <div class="k-demo-field" id="demoAmount"><span id="demoAText"></span><span class="k-demo-cursor" id="demoACursor" style="display:none"></span></div>
+          </div>
+
+          <div class="k-demo-form">
+            <div class="k-demo-label" data-i18n="demo.category">Category</div>
+            <div class="d-flex gap-2 flex-wrap mt-1" id="demoCatOptions">
+              <div class="k-demo-select-opt" data-cat="🍔 Food">🍔 Food</div>
+              <div class="k-demo-select-opt" data-cat="🚗 Transport">🚗 Transport</div>
+              <div class="k-demo-select-opt" data-cat="🛒 Groceries">🛒 Groceries</div>
+              <div class="k-demo-select-opt" data-cat="💊 Health">💊 Health</div>
             </div>
           </div>
-          <div class="d-grid gap-2">
-            <div class="d-flex align-items-center gap-2 py-2" style="border-bottom:1px solid var(--k-border)">
-              <i class="bi bi-check-circle-fill" style="color:var(--k-success)"></i>
-              <span class="small" data-i18n="steps.li1">Ingreso rapido de gastos</span>
-            </div>
-            <div class="d-flex align-items-center gap-2 py-2" style="border-bottom:1px solid var(--k-border)">
-              <i class="bi bi-check-circle-fill" style="color:var(--k-success)"></i>
-              <span class="small" data-i18n="steps.li2">OCR para tickets fisicos y digitales</span>
-            </div>
-            <div class="d-flex align-items-center gap-2 py-2" style="border-bottom:1px solid var(--k-border)">
-              <i class="bi bi-check-circle-fill" style="color:var(--k-success)"></i>
-              <span class="small" data-i18n="steps.li3">Asesor financiero incluido</span>
-            </div>
-            <div class="d-flex align-items-center gap-2 py-2">
-              <i class="bi bi-check-circle-fill" style="color:var(--k-success)"></i>
-              <span class="small" data-i18n="steps.li4">Gamificacion y metas mensuales</span>
-            </div>
+
+          <div class="k-demo-form">
+            <div class="k-demo-label" data-i18n="demo.date">Date</div>
+            <div class="k-demo-field" id="demoDate"><span id="demoDText" style="color:var(--k-muted)"></span></div>
           </div>
+
+          <button class="k-demo-save-btn" id="demoSaveBtn" data-i18n="demo.save">Save expense</button>
+
+          <!-- Existing rows -->
+          <div class="mt-3">
+            <div class="k-demo-expense-row visible"><span><span class="k-demo-dot" style="background:#3b82f6"></span>Groceries</span><span style="font-weight:700;color:var(--k-text)">$43.20</span></div>
+            <div class="k-demo-expense-row visible"><span><span class="k-demo-dot" style="background:#06b6d4"></span>Streaming</span><span style="font-weight:700;color:var(--k-text)">$8.70</span></div>
+            <div class="k-demo-expense-row" id="demoNewRow"><span><span class="k-demo-dot" style="background:#10b981"></span><span id="demoNewCat">Food</span></span><span style="font-weight:700;color:var(--k-primary)" id="demoNewAmt">$1.50</span></div>
+          </div>
+
+          <div class="k-demo-toast" id="demoToast" data-i18n="demo.toast">✓ Expense saved successfully</div>
         </div>
       </div>
     </div>
@@ -250,46 +266,64 @@
     </div>
     <div class="row g-4">
       <div class="col-sm-6 col-lg-4 reveal">
-        <div class="k-card k-card-hover h-100">
-          <div class="k-feature-icon fi-blue"><i class="bi bi-camera-fill"></i></div>
-          <h3 data-i18n="feat.f1.title">OCR de tickets</h3>
-          <p data-i18n="feat.f1.desc">Fotografia cualquier comprobante y la inteligencia artificial extrae monto, fecha y categoria automaticamente.</p>
-        </div>
+        <button class="k-feat-card-btn h-100" onclick="openModal('modal-ocr')" aria-label="View OCR demo">
+          <div class="k-card h-100">
+            <div class="k-feature-icon fi-blue"><i class="bi bi-camera-fill"></i></div>
+            <h3 data-i18n="feat.f1.title">Receipt OCR</h3>
+            <p data-i18n="feat.f1.desc">Photograph or upload a receipt (including multi-page PDFs) and Gemini Vision by Google extracts the amount, date and category automatically.</p>
+            <span class="k-feat-hint">View demo ›</span>
+          </div>
+        </button>
       </div>
       <div class="col-sm-6 col-lg-4 reveal reveal-delay">
-        <div class="k-card k-card-hover h-100">
-          <div class="k-feature-icon fi-cyan"><i class="bi bi-currency-exchange"></i></div>
-          <h3 data-i18n="feat.f2.title">Multi-divisa</h3>
-          <p data-i18n="feat.f2.desc">Registra en ARS, USD o EUR. Klarity convierte en tiempo real y unifica tu vision financiera sin importar la moneda.</p>
-        </div>
+        <button class="k-feat-card-btn h-100" onclick="openModal('modal-currency')" aria-label="View multi-currency demo">
+          <div class="k-card h-100">
+            <div class="k-feature-icon fi-cyan"><i class="bi bi-currency-exchange"></i></div>
+            <h3 data-i18n="feat.f2.title">Multi-currency</h3>
+            <p data-i18n="feat.f2.desc">Log expenses in ARS, USD or EUR. Klarity converts in real time and unifies your financial view no matter the currency.</p>
+            <span class="k-feat-hint">View demo ›</span>
+          </div>
+        </button>
       </div>
       <div class="col-sm-6 col-lg-4 reveal reveal-delay-2">
-        <div class="k-card k-card-hover h-100">
-          <div class="k-feature-icon fi-purple"><i class="bi bi-robot"></i></div>
-          <h3 data-i18n="feat.f3.title">Chatbot asesor</h3>
-          <p data-i18n="feat.f3.desc">Preguntale al chatbot sobre tus patrones de consumo, proyecciones y estrategias de ahorro. Disponible 24/7.</p>
-        </div>
+        <button class="k-feat-card-btn h-100" onclick="openModal('modal-chat')" aria-label="View chatbot demo">
+          <div class="k-card h-100">
+            <div class="k-feature-icon fi-purple"><i class="bi bi-robot"></i></div>
+            <h3 data-i18n="feat.f3.title">AI advisor chatbot</h3>
+            <p data-i18n="feat.f3.desc">Ask the chatbot about your spending patterns, projections and saving strategies. Powered by OpenAI and Anthropic. Available 24/7.</p>
+            <span class="k-feat-hint">View demo ›</span>
+          </div>
+        </button>
       </div>
       <div class="col-sm-6 col-lg-4 reveal">
-        <div class="k-card k-card-hover h-100">
-          <div class="k-feature-icon fi-green"><i class="bi bi-arrow-repeat"></i></div>
-          <h3 data-i18n="feat.f4.title">Suscripciones</h3>
-          <p data-i18n="feat.f4.desc">Gestiona tus gastos recurrentes. Klarity te avisa antes de cada vencimiento y calcula el total mensual comprometido.</p>
-        </div>
+        <button class="k-feat-card-btn h-100" onclick="openModal('modal-goals')" aria-label="View saving goals demo">
+          <div class="k-card h-100">
+            <div class="k-feature-icon fi-green"><i class="bi bi-piggy-bank-fill"></i></div>
+            <h3 data-i18n="feat.f4.title">Saving goals</h3>
+            <p data-i18n="feat.f4.desc">Define monthly or project-based saving targets. Klarity tracks your progress in real time and notifies you when you're close to hitting the goal.</p>
+            <span class="k-feat-hint">View demo ›</span>
+          </div>
+        </button>
       </div>
       <div class="col-sm-6 col-lg-4 reveal reveal-delay">
-        <div class="k-card k-card-hover h-100">
-          <div class="k-feature-icon fi-amber"><i class="bi bi-people-fill"></i></div>
-          <h3 data-i18n="feat.f5.title">Gastos compartidos</h3>
-          <p data-i18n="feat.f5.desc">Divide cualquier gasto entre varias personas. Klarity calcula cuanto le corresponde a cada uno automaticamente.</p>
-        </div>
+        <button class="k-feat-card-btn h-100" onclick="openModal('modal-shared')" aria-label="View shared expenses demo">
+          <div class="k-card h-100">
+            <div class="k-feature-icon fi-amber"><i class="bi bi-people-fill"></i></div>
+            <h3 data-i18n="feat.f5.title">Shared expenses</h3>
+            <p data-i18n="feat.f5.desc">Split any expense among multiple people. Klarity automatically calculates each person's share and tracks who has paid.</p>
+            <span class="k-feat-hint">View demo ›</span>
+          </div>
+        </button>
       </div>
       <div class="col-sm-6 col-lg-4 reveal reveal-delay-2">
-        <div class="k-card k-card-hover h-100">
-          <div class="k-feature-icon fi-rose"><i class="bi bi-trophy-fill"></i></div>
-          <h3 data-i18n="feat.f6.title">Gamificacion</h3>
-          <p data-i18n="feat.f6.desc">Cumple metas de gasto mensual y gana medallas. La motivacion hace que ahorrar sea algo que quieras hacer.</p>
-        </div>
+        <button class="k-feat-card-btn h-100" onclick="openModal('modal-gamif')" aria-label="View gamification demo">
+          <div class="k-card h-100">
+            <div class="k-feature-icon fi-rose"><i class="bi bi-trophy-fill"></i></div>
+            <h3 data-i18n="feat.f6.title">Gamification</h3>
+            <p data-i18n="feat.f6.desc">Hit monthly goals and unlock badges: Elite Saver, On Time, Debt-Free and more. Motivation makes saving something you actually want to do.</p>
+            <span class="k-feat-hint">View demo ›</span>
+          </div>
+        </button>
       </div>
     </div>
   </div>
@@ -424,7 +458,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" data-i18n="faq.q3">¿Como funciona el OCR de tickets?</button></h2>
             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body" data-i18n="faq.a3">Subis una foto o PDF del comprobante y nuestra IA (Tesseract.js) extrae automaticamente el monto, la fecha y sugiere una categoria. En el plan Free tenes 5 escaneos por mes, ilimitados en Pro.</div>
+              <div class="accordion-body" data-i18n="faq.a3">Upload a photo or PDF of your receipt and our AI (Gemini Vision by Google) automatically extracts the amount, date and suggests a category. Free plan includes 5 scans per month, unlimited on Pro.</div>
             </div>
           </div>
           <div class="accordion-item">
@@ -518,8 +552,147 @@
 <script src="/src/js/universal-i18n.js"></script>
 <script src="/src/js/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<!-- ═══════════ FEATURE MODALS ═══════════════════════════════════ -->
+<div class="k-modal-backdrop" id="k-modal-backdrop" role="dialog" aria-modal="true">
+
+  <!-- Modal 1: Receipt OCR -->
+  <div class="k-modal-panel" id="modal-ocr">
+    <button class="k-modal-close" onclick="closeModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div class="k-feature-icon fi-blue" style="width:38px;height:38px;font-size:1rem"><i class="bi bi-camera-fill"></i></div>
+      <h2 class="k-modal-title mb-0">Receipt OCR</h2>
+    </div>
+    <p class="k-modal-desc">Photograph or upload a receipt (including multi-page PDFs) and Gemini Vision by Google extracts the amount, date and category in seconds — automatically.</p>
+    <div class="k-modal-mockup" id="mockup-ocr">
+      <div class="k-ocr-ticket" id="ocrTicket">
+        <div class="k-ocr-scan-bar" id="ocrScanBar"></div>
+        <div class="k-ocr-ticket-header">🧾 Receipt — Walmart</div>
+        <div class="k-ocr-ticket-line"><span>Milk x2</span><span>$3.80</span></div>
+        <div class="k-ocr-ticket-line"><span>Wholegrain bread</span><span>$2.50</span></div>
+        <div class="k-ocr-ticket-line"><span>Yoghurt x4</span><span>$5.20</span></div>
+        <div class="k-ocr-ticket-total"><span>TOTAL</span><span>$11.50</span></div>
+      </div>
+      <div class="k-ocr-field-row">
+        <div class="k-ocr-field" id="ocrFieldMonto">Amount</div>
+        <div class="k-ocr-field" id="ocrFieldFecha">Date</div>
+        <div class="k-ocr-field" id="ocrFieldCat">Category</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Multi-currency -->
+  <div class="k-modal-panel" id="modal-currency">
+    <button class="k-modal-close" onclick="closeModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div class="k-feature-icon fi-cyan" style="width:38px;height:38px;font-size:1rem"><i class="bi bi-currency-exchange"></i></div>
+      <h2 class="k-modal-title mb-0">Multi-currency</h2>
+    </div>
+    <p class="k-modal-desc">Log in ARS, USD or EUR and Klarity converts everything in real time to your base currency. One unified financial view.</p>
+    <div class="k-modal-mockup" id="mockup-currency">
+      <div class="k-curr-tabs">
+        <div class="k-curr-tab active" id="currTabARS">🇦🇷 ARS</div>
+        <div class="k-curr-tab" id="currTabUSD">🇺🇸 USD</div>
+        <div class="k-curr-tab" id="currTabEUR">🇪🇺 EUR</div>
+      </div>
+      <div class="k-curr-row"><span>☕ Coffee</span><span class="k-curr-amount" id="currRow1">$2.50</span></div>
+      <div class="k-curr-row"><span>✈️ Flight MAD</span><span class="k-curr-amount" id="currRow2">$850.00</span></div>
+      <div class="k-curr-row"><span>🛒 Shopping</span><span class="k-curr-amount" id="currRow3">$43.20</span></div>
+      <div class="mt-3 text-center" style="font-size:.78rem;color:var(--k-muted)">Exchange rate updated in real time</div>
+    </div>
+  </div>
+
+  <!-- Modal 3: AI advisor chatbot -->
+  <div class="k-modal-panel" id="modal-chat">
+    <button class="k-modal-close" onclick="closeModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div class="k-feature-icon fi-purple" style="width:38px;height:38px;font-size:1rem"><i class="bi bi-robot"></i></div>
+      <h2 class="k-modal-title mb-0">AI advisor chatbot</h2>
+    </div>
+    <p class="k-modal-desc">Ask about your spending patterns, projections and saving strategies. Powered by OpenAI and Anthropic. Available 24/7.</p>
+    <div class="k-modal-mockup" id="mockup-chat">
+      <div class="k-chat-window" id="chatWindow">
+        <div class="k-chat-bubble k-chat-user">What did I spend the most on this month?</div>
+        <div class="k-chat-bubble k-chat-bot k-chat-typing" id="chatTyping">
+          <div class="k-chat-dot"></div>
+          <div class="k-chat-dot"></div>
+          <div class="k-chat-dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Saving goals -->
+  <div class="k-modal-panel" id="modal-goals">
+    <button class="k-modal-close" onclick="closeModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div class="k-feature-icon fi-green" style="width:38px;height:38px;font-size:1rem"><i class="bi bi-piggy-bank-fill"></i></div>
+      <h2 class="k-modal-title mb-0">Saving goals</h2>
+    </div>
+    <p class="k-modal-desc">Set monthly or project saving targets. Klarity tracks your progress in real time and notifies you when you're close to hitting the goal.</p>
+    <div class="k-modal-mockup" id="mockup-goals">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span style="font-weight:700;font-size:.9rem">🎯 Goal: Europe Trip 2026</span>
+        <span class="k-goal-pct" id="goalPct">0%</span>
+      </div>
+      <div class="k-goal-bar-wrap"><div class="k-goal-bar-fill" id="goalBar"></div></div>
+      <div class="d-flex justify-content-between" style="font-size:.78rem;color:var(--k-muted);margin-top:.35rem">
+        <span>$0</span><span>Goal: $2,500</span>
+      </div>
+      <div class="k-confetti-wrap" id="confettiWrap"></div>
+      <div class="mt-2 text-center" style="font-size:.82rem;color:var(--k-success);font-weight:700;opacity:0;transition:opacity .5s" id="goalMsg">🎉 Goal reached!</div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Shared expenses -->
+  <div class="k-modal-panel" id="modal-shared">
+    <button class="k-modal-close" onclick="closeModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div class="k-feature-icon fi-amber" style="width:38px;height:38px;font-size:1rem"><i class="bi bi-people-fill"></i></div>
+      <h2 class="k-modal-title mb-0">Shared expenses</h2>
+    </div>
+    <p class="k-modal-desc">Split any expense among friends or housemates. Klarity assigns each person's share and tracks who has paid.</p>
+    <div class="k-modal-mockup" id="mockup-shared">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="k-shared-avatars">
+          <div class="k-shared-avatar" style="background:#3b82f6">M</div>
+          <div class="k-shared-avatar" style="background:#10b981">L</div>
+          <div class="k-shared-avatar" style="background:#f59e0b">S</div>
+        </div>
+        <div style="font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem">$45.00</div>
+      </div>
+      <div style="font-size:.78rem;color:var(--k-muted);margin-bottom:.6rem">🍕 Dinner — 3 people</div>
+      <div class="k-shared-part-row"><span>M — Maria</span><span class="d-flex align-items-center gap-2"><strong>$15.00</strong><span class="k-shared-badge" id="sharedBadge1">Paid ✓</span></span></div>
+      <div class="k-shared-part-row"><span>L — Lucas</span><span class="d-flex align-items-center gap-2"><strong>$15.00</strong><span class="k-shared-badge" id="sharedBadge2">Paid ✓</span></span></div>
+      <div class="k-shared-part-row"><span>S — Sofia</span><span class="d-flex align-items-center gap-2"><strong>$15.00</strong><span class="k-shared-badge" id="sharedBadge3">Paid ✓</span></span></div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Gamification -->
+  <div class="k-modal-panel" id="modal-gamif">
+    <button class="k-modal-close" onclick="closeModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div class="k-feature-icon fi-rose" style="width:38px;height:38px;font-size:1rem"><i class="bi bi-trophy-fill"></i></div>
+      <h2 class="k-modal-title mb-0">Gamification</h2>
+    </div>
+    <p class="k-modal-desc">Hit monthly goals and unlock badges: Elite Saver, On Time, Debt-Free and more. Motivation makes saving something you actually want to do.</p>
+    <div class="k-modal-mockup" id="mockup-gamif">
+      <div class="k-badges-grid">
+        <div class="k-badge-item" id="badge1"><div class="k-badge-burst" id="burst1"></div><i class="bi bi-trophy-fill" style="color:#f59e0b"></i><span>Elite Saver</span></div>
+        <div class="k-badge-item" id="badge2"><i class="bi bi-clock-fill" style="color:#3b82f6"></i><span>On Time</span></div>
+        <div class="k-badge-item" id="badge3"><i class="bi bi-shield-fill-check" style="color:#10b981"></i><span>Debt-Free</span></div>
+        <div class="k-badge-item" id="badge4"><i class="bi bi-star-fill" style="color:#7c3aed"></i><span>Goal x3</span></div>
+      </div>
+      <div class="k-unlock-toast" id="unlockToast">🏆 You unlocked "Elite Saver"!</div>
+    </div>
+  </div>
+
+</div><!-- /k-modal-backdrop -->
+
 <script>
-// Navbar auth state
+// ───────────────────────────────────────────────────────────
+// NAVBAR AUTH STATE
+// ───────────────────────────────────────────────────────────
 (function () {
   function T(key) {
     var lang = window.getLang ? window.getLang() : (localStorage.getItem('klarity-lang') || 'es');
@@ -536,9 +709,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     var user  = getUser();
     var token = getToken();
-    if (!user || !token) return; // not logged in – show default login button
+    if (!user || !token) return;
 
-    // Hide login button, show authenticated controls
     var loginBtn   = document.getElementById('navLoginBtn');
     var goBtn      = document.getElementById('navGoBtn');
     var avatarWrap = document.getElementById('navAvatarWrap');
@@ -560,8 +732,6 @@
       avatar.textContent = initial;
       avatar.setAttribute('aria-label', user.name || user.email || T('nav.myAccount'));
     }
-
-    // Dropdown toggle
     if (avatar && dropdown) {
       avatar.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -569,8 +739,6 @@
       });
       document.addEventListener('click', function () { dropdown.classList.remove('open'); });
     }
-
-    // Logout
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function () {
         localStorage.removeItem('klarity_token');
@@ -583,14 +751,18 @@
   });
 })();
 
-// Scroll reveal
+// ───────────────────────────────────────────────────────────
+// SCROLL REVEAL
+// ───────────────────────────────────────────────────────────
 const revealEls = document.querySelectorAll('.reveal');
 const revealObs = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
 }, { threshold: 0.12 });
 revealEls.forEach(el => revealObs.observe(el));
 
-// Counter animation on stats
+// ───────────────────────────────────────────────────────────
+// COUNTER ANIMATION ON STATS
+// ───────────────────────────────────────────────────────────
 const counters = document.querySelectorAll('[data-target]');
 const cntObs = new IntersectionObserver((entries) => {
   entries.forEach(e => {
@@ -608,6 +780,288 @@ const cntObs = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.5 });
 counters.forEach(el => cntObs.observe(el));
+
+// ───────────────────────────────────────────────────────────
+// MODAL SYSTEM
+// ───────────────────────────────────────────────────────────
+let currentModal = null;
+let modalAnimTimer = null;
+
+function openModal(id) {
+  document.querySelectorAll('.k-modal-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById(id);
+  if (!panel) return;
+  panel.style.display = 'block';
+  const backdrop = document.getElementById('k-modal-backdrop');
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  currentModal = id;
+  clearTimeout(modalAnimTimer);
+  modalAnimTimer = setTimeout(() => startModalAnim(id), 80);
+}
+
+function closeModal() {
+  document.getElementById('k-modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+  clearTimeout(modalAnimTimer);
+  stopAllModalAnims();
+  currentModal = null;
+}
+
+document.getElementById('k-modal-backdrop').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && currentModal) closeModal();
+});
+
+function stopAllModalAnims() {
+  document.getElementById('ocrScanBar').classList.remove('scanning');
+  [['ocrFieldMonto','Amount'],['ocrFieldFecha','Date'],['ocrFieldCat','Category']].forEach(([id,label]) => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('filled'); el.textContent = label; }
+  });
+  ['currTabARS','currTabUSD','currTabEUR'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', i === 0);
+  });
+  ['currRow1','currRow2','currRow3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('updating');
+  });
+  const cw = document.getElementById('chatWindow');
+  if (cw) {
+    cw.querySelectorAll('.k-chat-bot:not(.k-chat-typing)').forEach(b => b.remove());
+    const typing = document.getElementById('chatTyping');
+    if (typing) typing.style.display = 'flex';
+  }
+  const bar = document.getElementById('goalBar');
+  if (bar) bar.style.width = '0%';
+  const pct = document.getElementById('goalPct');
+  if (pct) pct.textContent = '0%';
+  const msg = document.getElementById('goalMsg');
+  if (msg) msg.style.opacity = '0';
+  const cw2 = document.getElementById('confettiWrap');
+  if (cw2) cw2.innerHTML = '';
+  ['sharedBadge1','sharedBadge2','sharedBadge3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  ['badge1','badge2','badge3','badge4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('unlocked');
+  });
+  document.getElementById('burst1').classList.remove('pop');
+  const ut = document.getElementById('unlockToast');
+  if (ut) ut.classList.remove('show');
+}
+
+function animOCR() {
+  document.getElementById('ocrScanBar').classList.add('scanning');
+  [['ocrFieldMonto','$11.50'],['ocrFieldFecha','04/04/2026'],['ocrFieldCat','🛒 Groceries']].forEach(([id,val], i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = val;
+      el.classList.add('filled');
+    }, 900 + i * 350);
+  });
+}
+
+function animCurrency() {
+  const data = [
+    { tab:'currTabUSD', rows: ['$2.50', '$850.00', '$43.20'] },
+    { tab:'currTabEUR', rows: ['€2.34', '€797.52', '€40.51'] },
+    { tab:'currTabARS', rows: ['ARS 2.500', 'ARS 850.000', 'ARS 43.200'] }
+  ];
+  let step = 0;
+  function runStep() {
+    const d = data[step % data.length];
+    ['currTabARS','currTabUSD','currTabEUR'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active', id === d.tab);
+    });
+    ['currRow1','currRow2','currRow3'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('updating');
+      setTimeout(() => { el.textContent = d.rows[i]; el.classList.remove('updating'); }, 300);
+    });
+    step++;
+  }
+  runStep();
+  return setInterval(runStep, 2200);
+}
+
+function animChat() {
+  const cw = document.getElementById('chatWindow');
+  const typing = document.getElementById('chatTyping');
+  const response = 'Your biggest spend was 🛒 Groceries at $43.20 (51% of total). I recommend reviewing your food budget.';
+  setTimeout(() => {
+    if (!typing || !cw) return;
+    typing.style.display = 'none';
+    const bubble = document.createElement('div');
+    bubble.className = 'k-chat-bubble k-chat-bot';
+    cw.appendChild(bubble);
+    let i = 0;
+    const timer = setInterval(() => {
+      bubble.textContent = response.slice(0, ++i);
+      cw.scrollTop = cw.scrollHeight;
+      if (i >= response.length) clearInterval(timer);
+    }, 28);
+  }, 1400);
+}
+
+function animGoals() {
+  const bar = document.getElementById('goalBar');
+  const pct = document.getElementById('goalPct');
+  const msg = document.getElementById('goalMsg');
+  const wrap = document.getElementById('confettiWrap');
+  let cur = 0;
+  const target = 78;
+  const colors = ['#f59e0b','#3b82f6','#10b981','#ef4444','#7c3aed','#06b6d4'];
+  const timer = setInterval(() => {
+    cur = Math.min(cur + 1, target);
+    if (bar) bar.style.width = cur + '%';
+    if (pct) pct.textContent = cur + '%';
+    if (cur >= target) {
+      clearInterval(timer);
+      if (msg) msg.style.opacity = '1';
+      for (let j = 0; j < 14; j++) {
+        const piece = document.createElement('div');
+        piece.className = 'k-confetti-piece burst';
+        piece.style.cssText = `left:${10 + j * 6}%;background:${colors[j % colors.length]};animation-delay:${j * 0.05}s`;
+        wrap.appendChild(piece);
+      }
+    }
+  }, 30);
+}
+
+function animShared() {
+  ['sharedBadge1','sharedBadge2','sharedBadge3'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('visible');
+    }, 600 + i * 500);
+  });
+}
+
+function animGamif() {
+  setTimeout(() => {
+    const b = document.getElementById('badge1');
+    const burst = document.getElementById('burst1');
+    const toast = document.getElementById('unlockToast');
+    if (b) b.classList.add('unlocked');
+    if (burst) burst.classList.add('pop');
+    setTimeout(() => { if (toast) toast.classList.add('show'); }, 400);
+  }, 600);
+}
+
+function startModalAnim(id) {
+  if (id === 'modal-ocr')      animOCR();
+  if (id === 'modal-currency') { window._currTimer = animCurrency(); }
+  if (id === 'modal-chat')     animChat();
+  if (id === 'modal-goals')    animGoals();
+  if (id === 'modal-shared')   animShared();
+  if (id === 'modal-gamif')    animGamif();
+}
+
+// ───────────────────────────────────────────────────────────
+// ADD-EXPENSE DEMO LOOP
+// ───────────────────────────────────────────────────────────
+(function expenseDemo() {
+  const commerce  = 'La Madeleine';
+  const amount    = '$1.50';
+  const cats      = document.querySelectorAll('#demoCatOptions .k-demo-select-opt');
+  const cText     = document.getElementById('demoCText');
+  const cCursor   = document.getElementById('demoCCursor');
+  const aText     = document.getElementById('demoAText');
+  const aCursor   = document.getElementById('demoACursor');
+  const dateEl    = document.getElementById('demoDText');
+  const saveBtn   = document.getElementById('demoSaveBtn');
+  const newRow    = document.getElementById('demoNewRow');
+  const newCat    = document.getElementById('demoNewCat');
+  const newAmt    = document.getElementById('demoNewAmt');
+  const toast     = document.getElementById('demoToast');
+  const fieldC    = document.getElementById('demoCommerce');
+  const fieldA    = document.getElementById('demoAmount');
+
+  if (!cText) return;
+
+  let loopTimer;
+
+  function type(el, cursor, str, cb) {
+    let i = 0;
+    cursor.style.display = 'inline-block';
+    const t = setInterval(() => {
+      el.textContent = str.slice(0, ++i);
+      if (i >= str.length) { clearInterval(t); setTimeout(cb, 200); }
+    }, 80);
+  }
+
+  function resetDemo() {
+    if (cText) cText.textContent = '';
+    if (aText) aText.textContent = '';
+    if (cCursor) cCursor.style.display = 'none';
+    if (aCursor) aCursor.style.display = 'none';
+    if (dateEl) dateEl.textContent = '';
+    if (fieldC) fieldC.classList.remove('active');
+    if (fieldA) fieldA.classList.remove('active');
+    cats.forEach(c => c.classList.remove('chosen'));
+    if (saveBtn) saveBtn.classList.remove('pulse');
+    if (newRow) newRow.classList.remove('visible','new-row');
+    if (toast) toast.classList.remove('show');
+  }
+
+  function runLoop() {
+    resetDemo();
+    loopTimer = setTimeout(() => {
+      if (fieldC) fieldC.classList.add('active');
+      type(cText, cCursor, commerce, () => {
+        if (cCursor) cCursor.style.display = 'none';
+        if (fieldC) fieldC.classList.remove('active');
+        loopTimer = setTimeout(() => {
+          if (fieldA) fieldA.classList.add('active');
+          type(aText, aCursor, amount, () => {
+            if (aCursor) aCursor.style.display = 'none';
+            if (fieldA) fieldA.classList.remove('active');
+            loopTimer = setTimeout(() => {
+              cats[0].classList.add('chosen');
+              if (newCat) newCat.textContent = '🍔 Food';
+              loopTimer = setTimeout(() => {
+                if (dateEl) { dateEl.textContent = '04/04/2026'; dateEl.style.color = 'var(--k-text)'; }
+                loopTimer = setTimeout(() => {
+                  if (saveBtn) saveBtn.classList.add('pulse');
+                  loopTimer = setTimeout(() => {
+                    if (saveBtn) saveBtn.classList.remove('pulse');
+                    if (newAmt) newAmt.textContent = amount;
+                    if (newRow) newRow.classList.add('visible','new-row');
+                    loopTimer = setTimeout(() => {
+                      if (toast) toast.classList.add('show');
+                      loopTimer = setTimeout(runLoop, 2200);
+                    }, 400);
+                  }, 500);
+                }, 700);
+              }, 500);
+            }, 500);
+          });
+        }, 400);
+      });
+    }, 500);
+  }
+
+  const demoSection = document.getElementById('expenseDemo');
+  if (demoSection) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { obs.unobserve(e.target); runLoop(); }
+      });
+    }, { threshold: 0.3 });
+    obs.observe(demoSection);
+  } else {
+    setTimeout(runLoop, 800);
+  }
+})();
 </script>
 </body>
 </html>
