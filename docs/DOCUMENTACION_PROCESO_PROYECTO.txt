@@ -79,7 +79,7 @@ El proyecto sigue una arquitectura de tres capas desacopladas:
                              │  HTTP / JSON (REST)
                              │  Authorization: Bearer <JWT>
   ┌─────────────────────────▼───────────────────────────────────────┐
-  │                    BACKEND (NestJS / Node.js)                    │
+  │                    BACKEND (NestJS / Node.js)                   │
   │   API REST con prefijo global /api                              │
   │   Módulos: auth, users, expenses, tickets, advisor,             │
   │            budgets, goals, gamification,                        │
