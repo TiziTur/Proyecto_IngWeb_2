@@ -1,6 +1,6 @@
 ================================================================================
   DOCUMENTACIÓN DEL PROYECTO — SISTEMA DE GESTIÓN DE GASTOS PERSONALES
-  Ingeniería Web 2 — Universidad
+  Ingeniería Web 2 — Instituto Universitario Aeronautico (IUA)
   Fecha de actualización: Marzo 2026
 ================================================================================
 
