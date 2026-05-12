@@ -1,6 +1,6 @@
 ================================================================================
   DOCUMENTACIÓN DEL PROYECTO — SISTEMA DE GESTIÓN DE GASTOS PERSONALES
-  Ingeniería Web 2 — Universidad
+  Ingeniería Web 2 — Instituto Universitario Aeronautico (IUA)
   Fecha de actualización: Marzo 2026
 ================================================================================
 
@@ -79,7 +79,7 @@ El proyecto sigue una arquitectura de tres capas desacopladas:
                              │  HTTP / JSON (REST)
                              │  Authorization: Bearer <JWT>
   ┌─────────────────────────▼───────────────────────────────────────┐
-  │                    BACKEND (NestJS / Node.js)                    │
+  │                    BACKEND (NestJS / Node.js)                   │
   │   API REST con prefijo global /api                              │
   │   Módulos: auth, users, expenses, tickets, advisor,             │
   │            budgets, goals, gamification,                        │

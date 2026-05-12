@@ -46,7 +46,7 @@ Klarity es una plataforma moderna de gestion financiera que permite registrar, a
 ┌─────────────────────────────────────────────────────────┐
 │               BACKEND NestJS (Railway)                  │
 │  ┌─────────────────────────────────────────────────────┐│
-│  │  Auth | Users | Expenses | Advisor | Tickets/OCR   ││
+│  │  Auth | Users | Expenses | Advisor | Tickets/OCR    ││
 │  │  Budgets | Gamification | Friendships | Shared Exp  ││
 │  └─────────────────────────────────────────────────────┘│
 └──────────────────────┬──────────────────────────────────┘
