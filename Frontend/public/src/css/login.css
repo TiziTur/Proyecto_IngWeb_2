@@ -31,7 +31,7 @@ body {
 /* ── Left side (brand) ──────────────────────────────────── */
 .login-side {
   position: relative;
-  background: linear-gradient(135deg, #1d4ed8 0%, #0891b2 100%);
+  background: linear-gradient(150deg, #1e3a8a 0%, #1d4ed8 35%, #0369a1 70%, #0e7490 100%);
   overflow: hidden;
   display: flex;
   align-items: stretch;
@@ -42,8 +42,21 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.08) 1px, transparent 0);
-  background-size: 32px 32px;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 0);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+.login-side::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.09) 0%, rgba(99,179,255,.06) 40%, transparent 70%);
   pointer-events: none;
 }
 
@@ -293,7 +306,8 @@ body {
 .login-input:focus {
   outline: none;
   border-color: var(--k-primary);
-  box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.18), 0 0 16px rgba(59,130,246,.12);
+  transition: border-color .25s ease, box-shadow .25s ease;
 }
 
 .login-input-wrap .login-input { padding-right: 2.75rem; }

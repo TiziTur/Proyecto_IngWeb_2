@@ -24,9 +24,13 @@
   --k-success:     #10b981;
   --k-warning:     #f59e0b;
   --k-danger:      #ef4444;
-  --k-shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-  --k-shadow:      0 4px 16px rgba(30,50,90,.08);
-  --k-shadow-lg:   0 16px 48px rgba(30,50,90,.12);
+  --k-shadow-sm:   0 1px 2px rgba(0,0,0,.04), 0 2px 6px rgba(59,130,246,.06);
+  --k-shadow:      0 4px 12px rgba(0,0,0,.06), 0 8px 32px rgba(59,130,246,.08);
+  --k-shadow-lg:   0 8px 24px rgba(0,0,0,.08), 0 24px 64px rgba(59,130,246,.14);
+  --k-glow-primary: 0 0 20px rgba(59,130,246,.35);
+  --k-glass-bg:     rgba(255,255,255,0.72);
+  --k-glass-border: rgba(255,255,255,0.55);
+  --k-glass-blur:   blur(18px) saturate(180%);
   --k-radius:      0.875rem;
   --k-radius-sm:   0.5rem;
   --k-radius-xl:   1.5rem;
@@ -74,9 +78,13 @@
   --k-danger:      #f87171;
 
   /* Shadows — slightly more opaque for depth */
-  --k-shadow-sm:   0 1px 4px rgba(0,0,0,.5);
-  --k-shadow:      0 4px 20px rgba(0,0,0,.45);
-  --k-shadow-lg:   0 16px 56px rgba(0,0,0,.6);
+  --k-shadow-sm:   0 1px 4px rgba(0,0,0,.5), 0 2px 8px rgba(59,130,246,.08);
+  --k-shadow:      0 4px 20px rgba(0,0,0,.45), 0 8px 32px rgba(59,130,246,.10);
+  --k-shadow-lg:   0 16px 56px rgba(0,0,0,.6), 0 24px 64px rgba(59,130,246,.16);
+  --k-glow-primary: 0 0 24px rgba(96,165,250,.4);
+  --k-glass-bg:     rgba(26,32,48,0.80);
+  --k-glass-border: rgba(255,255,255,0.08);
+  --k-glass-blur:   blur(18px) saturate(180%);
 
   /* Legacy aliases */
   --app-bg:             var(--k-bg);
